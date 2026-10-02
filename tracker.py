@@ -28,7 +28,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = "1.0"
+VERSION = "1.1"
 ROOT = Path(__file__).resolve().parent
 ET = ZoneInfo("America/New_York")
 UA = f"house-ie-tracker/{VERSION}"
@@ -178,12 +178,22 @@ def load_pres_margins(path: Path) -> dict:
     return out
 
 
-def read_ie(path: Path, cfg: dict) -> tuple[list[dict], dict, Counter]:
-    """Returns House general-election rows, the amendment map (all offices), and counts."""
+def named_key(spe_id: str, spe_nam: str, cols: list[dict]) -> str | None:
+    """Which named column (if any) a spender belongs to, regardless of side."""
+    for c in cols:
+        if spe_id in c["ids"] or any(p.search(spe_nam) for p in c["pats"]):
+            return c["key"]
+    return None
+
+
+def read_ie(path: Path, cfg: dict, cols: list[dict], master: dict) -> tuple[list[dict], dict, Counter, list[dict]]:
+    """Returns House general-election rows, the amendment map (all offices), counts, and
+    excluded rows from named-column groups (so gaps in e.g. CLF are visible)."""
     etypes = tuple(t.upper() for t in cfg.get("filters", {}).get("election_types", ["G"]))
     cycle = str(cfg.get("cycle", 2026))
     parent: dict[str, str] = {}
     rows: list[dict] = []
+    excluded: list[dict] = []
     stats: Counter = Counter()
 
     with open(path, newline="", encoding="utf-8", errors="replace") as fh:
@@ -197,41 +207,125 @@ def read_ie(path: Path, cfg: dict) -> tuple[list[dict], dict, Counter]:
             if fn and prev:
                 parent[fn] = prev  # amendment chains are tracked across every office
 
-            if (r.get("can_office") or "").strip().upper() != "H":
-                continue
-            if not (r.get("ele_type") or "").strip().upper().startswith(etypes):
-                continue
-            yr = (r.get("fec_election_yr") or "").strip()
-            if yr and yr != cycle:
+            cid = (r.get("cand_id") or "").strip().upper()
+            m = master.get(cid, {})
+            # Filers sometimes leave office/state/district blank; fill from the candidate ID / FEC master.
+            office = (r.get("can_office") or "").strip().upper()
+            if not office and re.fullmatch(r"[HSP][0-9A-Z]{8}", cid):
+                office = cid[0]
+                stats["recovered_office"] += 1
+            if office != "H":
                 continue
             st = (r.get("can_office_state") or "").strip().upper()
             if not re.fullmatch(r"[A-Z]{2}", st):
-                stats["skipped_no_state"] += 1
-                continue
+                st = (m.get("state") or (cid[2:4] if cid.startswith("H") else "")).upper()
+                if st:
+                    stats["recovered_state"] += 1
             dis = (r.get("can_office_dis") or "").strip()
+            if not dis.isdigit() and (m.get("district") or "").strip().isdigit():
+                dis = m["district"].strip()
+                stats["recovered_district"] += 1
             dis = dis.zfill(2)[-2:] if dis.isdigit() else "00"
-            cid = (r.get("cand_id") or "").strip().upper()
+
             name = (r.get("cand_name") or "").strip()
+            spe_id = (r.get("spe_id") or "").strip().upper()
+            spe_nam = " ".join((r.get("spe_nam") or "").split())
+            ele = (r.get("ele_type") or "").strip().upper()
+            receipt = parse_date(r.get("receipt_dat"))
+            date = parse_date(r.get("dissem_dt")) or parse_date(r.get("exp_date")) or receipt
+            amount = to_float(r.get("exp_amo"))
+            nk = named_key(spe_id, spe_nam, cols)
+
+            def exclude(reason: str):
+                if nk:
+                    excluded.append({"column": nk, "reason": reason, "spender": spe_nam, "candidate": name,
+                                     "race": f"{st}{dis}" if st else "", "election_type": ele or "blank",
+                                     "amount": amount, "date": date, "file_num": fn,
+                                     "tran_id": (r.get("tran_id") or "").strip()})
+
+            if not ele.startswith(etypes):
+                exclude("Coded as primary or other election")
+                continue
+            yr = (r.get("fec_election_yr") or "").strip()
+            if yr and yr != cycle:
+                exclude("Different election cycle")
+                continue
+            if not re.fullmatch(r"[A-Z]{2}", st):
+                stats["skipped_no_state"] += 1
+                exclude("No state on filing")
+                continue
             district = st + dis
             cand_key = cid if re.fullmatch(r"H[0-9A-Z]{8}", cid) else f"{district}:{last_name(name)}"
-            receipt = parse_date(r.get("receipt_dat"))
             rows.append({
+                "kind": "IE", "named": nk,
                 "cand_key": cand_key, "cand_id": cid, "cand_name": name, "district": district,
                 "party_raw": norm_party(r.get("cand_pty_aff")),
                 "party_text": (r.get("cand_pty_aff") or "").strip().upper(),
-                "spe_id": (r.get("spe_id") or "").strip().upper(),
-                "spe_nam": " ".join((r.get("spe_nam") or "").split()),
-                "amount": to_float(r.get("exp_amo")), "agg": to_float(r.get("agg_amo")),
+                "spe_id": spe_id, "spe_nam": spe_nam,
+                "amount": amount, "agg": to_float(r.get("agg_amo")),
                 "so": (r.get("sup_opp") or "").strip().upper()[:1],
                 "purpose": (r.get("pur") or "").strip(), "payee": (r.get("pay") or "").strip(),
                 "file_num": fn, "amend": (r.get("amndt_ind") or "").strip(),
                 "tran_id": (r.get("tran_id") or "").strip(),
                 "image_num": (r.get("image_num") or "").strip(),
-                "date": parse_date(r.get("dissem_dt")) or parse_date(r.get("exp_date")) or receipt,
-                "filed": receipt,
+                "date": date, "filed": receipt,
             })
     stats["rows_house_general"] = len(rows)
-    return rows, parent, stats
+    return rows, parent, stats, excluded
+
+
+def load_coordinated(path: Path, cfg: dict, cols: list[dict], master: dict, stats: Counter) -> list[dict]:
+    """Party coordinated expenditures (transaction type 24C) from the FEC pas2 file, for
+    columns marked coordinated = true. Pipe-delimited, 22 columns, no header."""
+    coord_cols = [c for c in cols if c["coordinated"]]
+    include_memos = cfg.get("filters", {}).get("coordinated_include_memos", False)
+    best: dict[tuple, dict] = {}
+
+    def lines():
+        if zipfile.is_zipfile(path):
+            with zipfile.ZipFile(path) as z:
+                name = next(n for n in z.namelist() if n.lower().endswith(".txt"))
+                with z.open(name) as fh:
+                    yield from io.TextIOWrapper(fh, encoding="latin-1")
+        else:
+            with open(path, encoding="latin-1") as fh:
+                yield from fh
+
+    for line in lines():
+        p = line.rstrip("\r\n").split("|")
+        if len(p) < 22 or p[5].strip().upper() != "24C":
+            continue
+        cmte, cid = p[0].strip().upper(), p[16].strip().upper()
+        col = next((c for c in coord_cols if cmte in c["ids"]), None)
+        if not col or not cid.startswith("H"):
+            continue
+        if p[19].strip().upper() == "X" and not include_memos:
+            stats["coordinated_memo_skipped"] += 1
+            continue
+        m = master.get(cid)
+        if not m or not m.get("state"):
+            stats["coordinated_no_candidate_info"] += 1
+            continue
+        dis = m.get("district", "").strip()
+        dis = dis.zfill(2)[-2:] if dis.isdigit() else "00"
+        dt_raw = p[13].strip()
+        date = parse_date(f"{dt_raw[:2]}/{dt_raw[2:4]}/{dt_raw[4:]}") if len(dt_raw) == 8 else ""
+        row = {
+            "kind": "COORD", "named": col["key"],
+            "cand_key": cid, "cand_id": cid, "cand_name": m.get("name", ""), "district": m["state"].upper() + dis,
+            "party_raw": norm_party(m.get("party")), "party_text": (m.get("party") or "").upper(),
+            "spe_id": cmte, "spe_nam": f"{col['label']} (coordinated)",
+            "amount": to_float(p[14]), "agg": 0.0, "so": "S",
+            "purpose": "Coordinated party expenditure", "payee": p[7].strip(),
+            "file_num": p[18].strip(), "amend": p[1].strip(), "tran_id": p[17].strip(),
+            "image_num": p[4].strip(), "date": date, "filed": date,
+        }
+        key = (cmte, row["tran_id"]) if row["tran_id"] else (cmte, p[21].strip())
+        if key not in best or num(row["file_num"]) >= num(best[key]["file_num"]):
+            best[key] = row
+    out = list(best.values())
+    stats["rows_coordinated"] = len(out)
+    return out
 
 
 # ----------------------------------------------------------------------------- cleaning
@@ -255,12 +349,13 @@ def superseded_filings(parent: dict[str, str]) -> set[str]:
     return {fn for fn in members if newest[root(fn)] != fn}
 
 
-def clean_rows(rows: list[dict], superseded: set[str], stats: Counter) -> list[dict]:
+def clean_rows(rows: list[dict], superseded: set[str], stats: Counter, excluded: list[dict]) -> list[dict]:
     """Drop rows from amended-away filings, then exact re-filings of the same transaction."""
-    out, seen = [], set()
+    out, seen, dropped = [], set(), []
     for r in sorted(rows, key=lambda r: num(r["file_num"]), reverse=True):
         if r["file_num"] in superseded:
             stats["dropped_amended"] += 1
+            dropped.append(r)
             continue
         if r["tran_id"]:
             key = (r["spe_id"] or r["spe_nam"].upper(), r["tran_id"], r["cand_key"],
@@ -270,6 +365,14 @@ def clean_rows(rows: list[dict], superseded: set[str], stats: Counter) -> list[d
                 continue
             seen.add(key)
         out.append(r)
+    # A superseded row whose transaction never reappears in a newer filing is worth surfacing.
+    kept = {(r["spe_id"], r["tran_id"], r["cand_key"]) for r in out}
+    for r in dropped:
+        if r["named"] and (r["spe_id"], r["tran_id"], r["cand_key"]) not in kept:
+            excluded.append({"column": r["named"], "reason": "Removed by a later amendment",
+                             "spender": r["spe_nam"], "candidate": r["cand_name"], "race": r["district"],
+                             "election_type": "G", "amount": r["amount"], "date": r["date"],
+                             "file_num": r["file_num"], "tran_id": r["tran_id"]})
     stats["rows_counted"] = len(out)
     return out
 
@@ -318,7 +421,8 @@ def compile_columns(cfg: dict) -> list[dict]:
     for c in cfg.get("columns", []):
         cols.append({"key": c["key"], "label": c.get("label", c["key"]), "side": c["side"].upper(),
                      "ids": {i.upper() for i in c.get("ids", [])},
-                     "pats": [re.compile(p, re.I) for p in c.get("name_patterns", [])]})
+                     "pats": [re.compile(p, re.I) for p in c.get("name_patterns", [])],
+                     "coordinated": bool(c.get("coordinated", False))})
     return cols
 
 
@@ -329,7 +433,7 @@ def classify(spe_id: str, spe_nam: str, side: str, cols: list[dict]) -> str:
     return f"OTH_{side}"
 
 
-def build(cfg: dict, rows: list[dict], cands: dict, pres: dict) -> dict:
+def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[dict]) -> dict:
     cols = compile_columns(cfg)
     named = [c["key"] for c in cols]
     as_of = max((r["filed"] for r in rows if r["filed"]), default=dt.date.today().isoformat())
@@ -345,26 +449,37 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict) -> dict:
         if side is None:
             u = unassigned.setdefault(c["key"], {"name": c["name"], "district": c["district"], "amount": 0.0})
             u["amount"] += r["amount"]
+            if r["named"]:
+                excluded.append({"column": r["named"],
+                                 "reason": "No usable party or support/oppose",
+                                 "spender": r["spe_nam"], "candidate": c["name"], "race": c["district"],
+                                 "election_type": "G", "amount": r["amount"], "date": r["date"],
+                                 "file_num": r["file_num"], "tran_id": r["tran_id"]})
             continue
         col = classify(r["spe_id"], r["spe_nam"], side, cols)
         d = c["district"]
         race = races.setdefault(d, {"cols": defaultdict(float), "cand_money": defaultdict(float),
-                                    "spenders": {}, "new7": defaultdict(float), "last_filed": ""})
+                                    "spenders": {}, "new7": defaultdict(float), "last_filed": "",
+                                    "coord": defaultdict(float)})
         race["cols"][col] += r["amount"]
         race["cand_money"][c["key"]] += abs(r["amount"])
         if r["filed"] >= week_ago:
             race["new7"][side] += r["amount"]
         race["last_filed"] = max(race["last_filed"], r["filed"])
 
-        sk = f"{r['spe_id'] or r['spe_nam']}|{col}"
+        sk = f"{r['spe_id'] or r['spe_nam']}|{col}|{r['kind']}"
         sp = race["spenders"].setdefault(sk, {"id": r["spe_id"], "name": r["spe_nam"], "col": col,
                                               "side": side, "amount": 0.0, "targets": Counter(),
-                                              "last": "", "n": 0})
+                                              "last": "", "n": 0, "kind": r["kind"]})
+        if r["kind"] == "COORD":
+            race["coord"][col] += r["amount"]
         sp["amount"] += r["amount"]
         sp["targets"][f"{'For' if r['so'] == 'S' else 'Against'} {c['name']}"] += r["amount"]
         sp["last"] = max(sp["last"], r["date"] or r["filed"])
         sp["n"] += 1
 
+        if r["kind"] != "IE":
+            continue
         pc = pair_check[(r["spe_id"] or r["spe_nam"].upper(), c["key"])]
         pc["sum"] += r["amount"]
         pc["agg"] = max(pc["agg"], r["agg"])
@@ -382,7 +497,7 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict) -> dict:
         r_total = sum(v for k, v in cvals.items() if k in [c["key"] for c in cols if c["side"] == "R"] + ["OTH_R"])
         d_total = sum(v for k, v in cvals.items() if k in [c["key"] for c in cols if c["side"] == "D"] + ["OTH_D"])
         spenders = sorted(
-            ({"id": s["id"], "name": s["name"], "col": s["col"], "side": s["side"],
+            ({"id": s["id"], "name": s["name"], "col": s["col"], "side": s["side"], "kind": s["kind"],
               "amount": round(s["amount"], 2), "last": s["last"], "n": s["n"],
               "targets": [t for t, _ in s["targets"].most_common()]}
              for s in race["spenders"].values()),
@@ -391,7 +506,8 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict) -> dict:
         out_races.append({
             "district": d, "pres": pres.get(d),
             "rep": nominees.get("REP"), "dem": nominees.get("DEM"),
-            "cols": cvals, "r_total": round(r_total, 2), "d_total": round(d_total, 2),
+            "cols": cvals, "coord": {k: round(v, 2) for k, v in race["coord"].items()},
+            "r_total": round(r_total, 2), "d_total": round(d_total, 2),
             "total": round(r_total + d_total, 2), "adv": round(d_total - r_total, 2),
             "new7": round(race["new7"]["R"] + race["new7"]["D"], 2),
             "new7_r": round(race["new7"]["R"], 2), "new7_d": round(race["new7"]["D"], 2),
@@ -422,9 +538,21 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict) -> dict:
             if v["agg"] > 0 and v["sum"] > v["agg"] * 1.05 and v["sum"] - v["agg"] > 10_000]
     over.sort(key=lambda x: -(x["counted"] - x["filer_aggregate"]))
 
-    columns = ([{"key": c["key"], "label": c["label"], "side": "R"} for c in cols if c["side"] == "R"]
+    recon = []
+    for c in cols:
+        counted_ie = sum(r["cols"].get(c["key"], 0) - r["coord"].get(c["key"], 0) for r in out_races)
+        counted_coord = sum(r["coord"].get(c["key"], 0) for r in out_races)
+        reasons = Counter()
+        for e in excluded:
+            if e["column"] == c["key"]:
+                reasons[e["reason"]] += e["amount"]
+        recon.append({"key": c["key"], "label": c["label"], "counted_ie": round(counted_ie, 2),
+                      "counted_coordinated": round(counted_coord, 2), "coordinated": c["coordinated"],
+                      "not_counted": {k: round(v, 2) for k, v in reasons.most_common()}})
+
+    columns = ([{"key": c["key"], "label": c["label"], "side": "R", "coordinated": c["coordinated"]} for c in cols if c["side"] == "R"]
                + [{"key": "OTH_R", "label": cfg.get("display", {}).get("other_r_label", "OTH R"), "side": "R"}]
-               + [{"key": c["key"], "label": c["label"], "side": "D"} for c in cols if c["side"] == "D"]
+               + [{"key": c["key"], "label": c["label"], "side": "D", "coordinated": c["coordinated"]} for c in cols if c["side"] == "D"]
                + [{"key": "OTH_D", "label": cfg.get("display", {}).get("other_d_label", "OTH D"), "side": "D"}])
 
     return {
@@ -435,13 +563,15 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict) -> dict:
                                   for k, v in unassigned.items()), key=lambda x: -x["amount"]),
             "top_other": top_other,
             "possible_double_counts": over[:15],
+            "reconciliation": recon,
         },
     }
 
 
 # ----------------------------------------------------------------------------- output
 
-def write_outputs(result: dict, rows: list[dict], cands: dict, out: Path, cfg: dict) -> None:
+def write_outputs(result: dict, rows: list[dict], cands: dict, out: Path, cfg: dict,
+                  excluded: list[dict]) -> None:
     out.mkdir(parents=True, exist_ok=True)
     (out / "data.json").write_text(json.dumps(result, separators=(",", ":")))
 
@@ -459,13 +589,21 @@ def write_outputs(result: dict, rows: list[dict], cands: dict, out: Path, cfg: d
 
     with open(out / "transactions.csv", "w", newline="") as fh:
         w = csv.writer(fh)
-        w.writerow(["district", "candidate", "candidate_party", "support_oppose", "spender_id", "spender",
+        w.writerow(["type", "district", "candidate", "candidate_party", "support_oppose", "spender_id", "spender",
                     "amount", "date", "filed", "purpose", "payee", "file_num", "tran_id", "image_num"])
         for r in sorted(rows, key=lambda r: (r["filed"], r["date"]), reverse=True):
             c = cands[r["cand_key"]]
-            w.writerow([c["district"], c["name"], c["party"], r["so"], r["spe_id"], r["spe_nam"],
+            w.writerow([r["kind"], c["district"], c["name"], c["party"], r["so"], r["spe_id"], r["spe_nam"],
                         r["amount"], r["date"], r["filed"], r["purpose"], r["payee"],
                         r["file_num"], r["tran_id"], r["image_num"]])
+
+    with open(out / "not_counted.csv", "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["column", "reason", "spender", "candidate", "race", "election_type", "amount", "date",
+                    "file_num", "tran_id"])
+        for e in sorted(excluded, key=lambda e: (e["column"], e["reason"], e["date"]), reverse=True):
+            w.writerow([e[k] for k in ("column", "reason", "spender", "candidate", "race", "election_type",
+                                       "amount", "date", "file_num", "tran_id")])
 
     template = (ROOT / "template.html").read_text()
     payload = json.dumps(result, separators=(",", ":")).replace("</", "<\\/")
@@ -479,6 +617,7 @@ def main() -> int:
     ap.add_argument("--config", default=str(ROOT / "config.toml"))
     ap.add_argument("--input", help="local IE CSV instead of downloading")
     ap.add_argument("--candidates", help="local cnYY.zip / cn.txt instead of downloading")
+    ap.add_argument("--coordinated", help="local pas2YY.zip / itpas2.txt instead of downloading")
     ap.add_argument("--out", default=str(ROOT / "docs"))
     ap.add_argument("--force", action="store_true", help="rebuild even if the FEC file is unchanged")
     ap.add_argument("--note", default="", help="banner text to show on the page (e.g. for previews)")
@@ -522,10 +661,28 @@ def main() -> int:
     except Exception as e:  # names/party fall back to what filers report
         print(f"Warning: candidate master file unavailable ({e}); using filer-reported names.", file=sys.stderr)
 
-    rows, parent, stats = read_ie(ie_path, cfg)
-    rows = clean_rows(rows, superseded_filings(parent), stats)
+    cols = compile_columns(cfg)
+    rows, parent, stats, excluded = read_ie(ie_path, cfg, cols, master)
+    rows = clean_rows(rows, superseded_filings(parent), stats, excluded)
+
+    if any(c["coordinated"] for c in cols):
+        coord_path = None
+        if args.coordinated:
+            coord_path = Path(args.coordinated)
+        elif not args.input and cfg["sources"].get("coordinated_url"):
+            co_url = cfg["sources"]["coordinated_url"].format(**fmt)
+            coord_path = ROOT / "data" / Path(co_url).name
+            try:
+                print(f"Downloading {co_url} ...")
+                download(co_url, coord_path)
+            except Exception as e:
+                print(f"Warning: coordinated file unavailable ({e}); party columns show IEs only.", file=sys.stderr)
+                coord_path = None
+        if coord_path and coord_path.exists():
+            rows += load_coordinated(coord_path, cfg, cols, master, stats)
+
     cands, party_notes = resolve_candidates(rows, master, cfg)
-    result = build(cfg, rows, cands, load_pres_margins(pres_path))
+    result = build(cfg, rows, cands, load_pres_margins(pres_path), excluded)
 
     now = dt.datetime.now(ET)
     result.update({
@@ -536,7 +693,7 @@ def main() -> int:
         "stats": dict(stats), "has_pres": bool(load_pres_margins(pres_path)),
     })
     result["diagnostics"]["party_notes"] = party_notes
-    write_outputs(result, rows, cands, out, cfg)
+    write_outputs(result, rows, cands, out, cfg, excluded)
 
     meta.update({"ie_etag": source.get("etag"), "ie_last_modified": source.get("last_modified"),
                  "build_sig": build_sig, "pres_sig": pres_sig, "generated": result["generated"]})
@@ -545,7 +702,7 @@ def main() -> int:
     party = [r for r in result["races"] if r["party_race"]]
     print(f"Rows in file: {stats['rows_in_file']:,} | House general: {stats['rows_house_general']:,} | "
           f"counted: {stats['rows_counted']:,} (dropped {stats['dropped_amended']:,} amended, "
-          f"{stats['dropped_duplicate']:,} duplicate)")
+          f"{stats['dropped_duplicate']:,} duplicate) | coordinated rows: {stats['rows_coordinated']:,}")
     print(f"Races: {len(party)} with party spending, {len(result['races'])} total. "
           f"Data filed through {result['as_of']}. Wrote {out}/index.html")
     return 0

@@ -101,6 +101,7 @@ tr.detail td{padding:0 0 14px;background:var(--paper);text-align:left}
 .detail .links{grid-column:1/-1;font:500 13px var(--cond)}
 .empty{padding:28px;text-align:center;color:var(--muted)}
 
+.foot{font:400 13px var(--cond);color:var(--muted);margin:8px 0 0}
 /* Notes */
 details.notes{margin-top:28px;border-top:1px solid var(--rule);padding-top:12px;font-size:14px;max-width:1100px}
 details.notes summary{font:700 15px var(--sans);cursor:pointer}
@@ -146,6 +147,8 @@ details.notes summary{font:700 15px var(--sans);cursor:pointer}
 
   <div class="scroller"><table id="tbl"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
 
+  <p class="foot" id="foot"></p>
+
   <details class="notes" id="notes"><summary>Data notes and methodology</summary><div id="notesBody"></div></details>
 </div>
 
@@ -164,9 +167,9 @@ const FIELDS = [
   ...(DATA.has_pres ? [{key:"pres", label:"PRES '24", cls:"", get:r => r.pres ?? -999}] : []),
   {key:"rep", label:"REP", cls:"l rep", get:r => r.rep?.name || "", sort:"str"},
   {key:"dem", label:"DEM", cls:"l dem", get:r => r.dem?.name || "", sort:"str"},
-  ...R_COLS.map(c => ({key:c.key, label:c.label, cls:"rc", get:r => r.cols[c.key] || 0, side:"R"})),
+  ...R_COLS.map(c => ({key:c.key, label:c.label + (c.coordinated ? "*" : ""), cls:"rc", get:r => r.cols[c.key] || 0, side:"R"})),
   {key:"r_total", label:"R TOTAL", cls:"rc sum", get:r => r.r_total, side:"R"},
-  ...D_COLS.map(c => ({key:c.key, label:c.label, cls:"dc", get:r => r.cols[c.key] || 0, side:"D"})),
+  ...D_COLS.map(c => ({key:c.key, label:c.label + (c.coordinated ? "*" : ""), cls:"dc", get:r => r.cols[c.key] || 0, side:"D"})),
   {key:"d_total", label:"D TOTAL", cls:"dc sum", get:r => r.d_total, side:"D"},
   {key:"adv", label:"ADV", cls:"", get:r => r.adv},
   {key:"new7", label:"NEW 7D", cls:"", get:r => r.new7},
@@ -213,9 +216,9 @@ function detail(r) {
     if (!list.length) return `<div class="side-${side.toLowerCase()}"><h3>${title}</h3><div class="sp"><span class="meta">No reported spending.</span></div></div>`;
     const colLabel = k => (COLS.find(c => c.key === k) || {}).label || k;
     return `<div class="side-${side.toLowerCase()}"><h3>${title}</h3>` + list.map(s => `
-      <div class="sp"><span class="nm">${s.id ? `<a href="https://www.fec.gov/data/committee/${esc(s.id)}/" target="_blank" rel="noopener">${esc(s.name)}</a>` : esc(s.name)}<span class="tag">${esc(colLabel(s.col))}</span></span>
+      <div class="sp"><span class="nm">${s.id ? `<a href="https://www.fec.gov/data/committee/${esc(s.id)}/" target="_blank" rel="noopener">${esc(s.name)}</a>` : esc(s.name)}<span class="tag">${esc(colLabel(s.col))}${s.kind === "COORD" ? " coordinated" : ""}</span></span>
       <span class="am">${money(s.amount)}</span>
-      <span class="meta">${esc(s.targets.join("; "))}. ${s.n} ${s.n === 1 ? "expenditure" : "expenditures"}, latest ${esc(fmtDate(s.last))}.</span></div>`).join("") + `</div>`;
+      <span class="meta">${esc(s.targets.join("; "))}. ${s.n} ${s.kind === "COORD" ? "coordinated " : ""}${s.n === 1 ? "expenditure" : "expenditures"}, latest ${esc(fmtDate(s.last))}.</span></div>`).join("") + `</div>`;
   };
   return `<tr class="detail"><td colspan="${FIELDS.length}"><div class="detail-inner">
     ${block("R", "Helping Republicans " + money(r.r_total))}${block("D", "Helping Democrats " + money(r.d_total))}
@@ -265,7 +268,11 @@ function renderNotes() {
     <p>FEC bulk file of 24- and 48-hour independent expenditure reports (<a href="${esc(DATA.source?.ie_url)}">${esc(DATA.source?.ie_url)}</a>)${DATA.source?.last_modified ? `, last modified ${esc(DATA.source.last_modified)}` : ""}. House general-election expenditures only. Filings received through ${esc(fmtDate(DATA.as_of))}; NEW 7D counts filings received ${esc(fmtDate(DATA.week_start))} or later.</p>
     <h4>How rows are counted</h4>
     <p>${n(s.rows_in_file)} rows in the file, ${n(s.rows_house_general)} for House general elections. When a filing is amended, only the newest version is kept (${n(s.dropped_amended)} superseded rows dropped). Identical transactions filed twice are counted once (${n(s.dropped_duplicate)} dropped). ${n(s.rows_counted)} rows counted.</p>
-    <p>Money goes to a side by who it helps: supporting a Republican or opposing a Democrat is R-side. REP and DEM are the candidate on each side with the most IE money. Expenditures disclosed only on monthly or quarterly reports, without a 24/48-hour notice, are not in this file.</p>
+    <p>Money goes to a side by who it helps: supporting a Republican or opposing a Democrat is R-side. REP and DEM are the candidate on each side with the most IE money. Expenditures disclosed only on monthly or quarterly reports, without a 24/48-hour notice, are not in this file. Filings with a blank office, state or district are filled in from the candidate's FEC ID (${n((s.recovered_office || 0) + (s.recovered_state || 0) + (s.recovered_district || 0))} fields recovered).</p>
+    <p>Party coordinated expenditures come from the FEC's committee-to-candidate file (transaction type 24C, ${n(s.rows_coordinated)} rows). Memo entries are left out because they are re-reported as regular entries once paid.</p>
+    <h4>Where each column's money went</h4>
+    <p>Spending by each named group that the FEC file contains but the table does not count, by reason. Check this first if a column looks low. Primary-coded money is usually genuine primary spending; rows dated after a race's primary are the ones to question. Row-level detail: <a href="not_counted.csv">not_counted.csv</a>.</p>
+    ${tbl(["Column", "Counted IEs", "Counted coordinated", "Not counted"], (g.reconciliation || []).map(c => `<tr><td>${esc(c.label)}</td><td class="n">${money(c.counted_ie)}</td><td class="n">${c.coordinated ? money(c.counted_coordinated) : ""}</td><td>${Object.entries(c.not_counted).map(([k, v]) => `${esc(k)}: ${money(v)}`).join("<br>") || "Nothing"}</td></tr>`))}
     <h4>Biggest groups without their own column</h4>
     <p>Add any of these to config.toml to break them out.</p>
     ${["R","D"].map(sd => tbl([sd === "R" ? "Helping Republicans" : "Helping Democrats", "Races", "Amount"],
@@ -280,6 +287,8 @@ function renderNotes() {
     ${tbl(["Group", "Candidate", "District", "Counted", "Filer aggregate"], (g.possible_double_counts || []).map(o => `<tr><td>${esc(o.spender)}</td><td>${esc(o.candidate)}</td><td>${esc(o.district)}</td><td class="n">${money(o.counted)}</td><td class="n">${money(o.filer_aggregate)}</td></tr>`))}`;
 }
 
+const coordCols = COLS.filter(c => c.coordinated).map(c => c.label);
+if (coordCols.length) $("#foot").textContent = `* ${coordCols.join(" and ")} include party coordinated expenditures as well as independent expenditures. Coordinated spending appears only once the party files its monthly report, so it lags IEs by weeks.`;
 $("#title").textContent = DATA.title;
 document.title = DATA.title;
 $("#stamp").textContent = `Updated ${DATA.generated_label}. FEC filings received through ${fmtDate(DATA.as_of)}.`;

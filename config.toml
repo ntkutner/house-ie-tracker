@@ -7,6 +7,9 @@ cycle = 2026   # two-year FEC period (2026 = 2025-2026)
 ie_url = "https://www.fec.gov/files/bulk-downloads/{cycle}/independent_expenditure_{cycle}.csv"
 # FEC candidate master file, used for clean names, incumbency, and party when filers leave it blank.
 candidate_master_url = "https://www.fec.gov/files/bulk-downloads/{cycle}/cn{yy}.zip"
+# FEC file of committee contributions/expenditures to candidates. Used for party coordinated
+# expenditures (transaction type 24C) for any column marked coordinated = true.
+coordinated_url = "https://www.fec.gov/files/bulk-downloads/{cycle}/pas2{yy}.zip"
 # Optional. Two columns: district,margin  e.g.  CO08,R+1.8   or   NY17,D+0.6
 pres_margins_csv = "pres_margins_2024.csv"
 
@@ -15,6 +18,9 @@ election_types = ["G"]   # G = general election. Add "S" to include special elec
 # "party": show races where any named column below has spent (matches the original chart).
 # "all":   show every House race with general-election IEs. The page has a toggle either way.
 races = "party"
+# Coordinated "memo" entries are spending disseminated but not yet paid; the payment shows up again
+# later as a regular entry, so counting both would double count. Leave false unless you know otherwise.
+coordinated_include_memos = false
 
 [display]
 title = "House Races w/ Party Spending (General Election)"
@@ -35,6 +41,7 @@ label = "CLF"
 side = "R"
 ids = ["C00504530"]
 name_patterns = ['^CONGRESSIONAL LEADERSHIP FUND']
+# To fold in CLF's sister group, add:  '^AMERICAN ACTION NETWORK'  to the list above.
 
 [[columns]]
 key = "NRCC"
@@ -42,14 +49,15 @@ label = "NRCC"
 side = "R"
 ids = ["C00075820"]
 name_patterns = ['^NRCC\b', 'NATIONAL REPUBLICAN CONGRESSIONAL']
+coordinated = true   # also count party coordinated expenditures (Schedule F) by these IDs
 
 [[columns]]
 key = "TRUMP"
 label = "TRUMP"
 side = "R"
-# MAGA Inc. Add other Trump-aligned groups here if you want them in this column.
+# MAGA Inc. plus the Trump-aligned spending vehicles No Going Back PAC and Safety and Affordability PAC.
 ids = ["C00892471"]
-name_patterns = ['^MAGA,? INC']
+name_patterns = ['^MAGA,? INC', '^NO GOING BACK PAC', '^SAFETY (AND|&) AFFORDABILITY PAC']
 
 [[columns]]
 key = "HMP"
@@ -64,6 +72,7 @@ label = "DCCC"
 side = "D"
 ids = ["C00000935"]
 name_patterns = ['^DCCC\b', 'DEMOCRATIC CONGRESSIONAL CAMPAIGN']
+coordinated = true   # also count party coordinated expenditures (Schedule F) by these IDs
 
 # ---------------------------------------------------------------------------
 # Party overrides, keyed by FEC candidate ID. Use when filers report a candidate's
@@ -71,4 +80,4 @@ name_patterns = ['^DCCC\b', 'DEMOCRATIC CONGRESSIONAL CAMPAIGN']
 # side the candidate counts on: "REP" or "DEM".
 # ---------------------------------------------------------------------------
 [party_overrides]
-# "H2CA03157" = "REP"
+"H2CA03157" = "REP"   # Kevin Kiley (CA-06); filers report his party as OTHER

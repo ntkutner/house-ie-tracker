@@ -7,7 +7,7 @@ nothing at all when the file hasn't changed.
 
 ## What you get
 
-`docs/index.html` is a page with one row per House race: CLF, NRCC, TRUMP, OTH R, HMP, DCCC,
+`docs/index.html` is a page with one row per House race: CLF, NRCC*, TRUMP, OTH R, HMP, DCCC*,
 OTH D, the R/D totals, advantage, money filed in the last 7 days, and the grand total. Sort by any
 column, filter by district/candidate/group, toggle between party races and all races, and click
 a row to see every group in that race, who they're for or against, and links to their FEC pages.
@@ -47,6 +47,11 @@ Tests: `python3 -m unittest discover tests`
 
 ## How the numbers are built
 
+- **Party columns (NRCC*, DCCC*)** count party coordinated expenditures (FEC transaction type
+  24C, from the committee-to-candidate bulk file) as well as any IEs. Coordinated spending has no
+  24/48-hour notice, so it appears only after the party files its monthly or pre-general report.
+- **TRUMP** counts MAGA Inc., No Going Back PAC, and Safety and Affordability PAC.
+
 - House rows with election type G for the configured cycle.
 - **Amendments:** when a filing is amended, every row from the older versions is dropped and only
   the newest version counts. This handles both A1-then-A2 chains and amendments that all point at
@@ -55,10 +60,13 @@ Tests: `python3 -m unittest discover tests`
   filed in two separate reports is counted once.
 - **Side:** supporting a Republican or opposing a Democrat is R-side, and vice versa.
 - **REP / DEM names:** the candidate on each side with the most IE money in the race.
-- **QA:** Data notes flags any spender/candidate pair where the counted total exceeds the filer's
+- **Blank race info:** filings missing office, state or district are filled in from the candidate's
+  FEC ID and the FEC candidate file.
+- **QA:** Data notes shows, for each named column, any money in the FEC files that wasn't counted
+  and why (coded as primary, removed by an amendment, no usable party), with row detail in
+  `docs/not_counted.csv`. It also flags any spender/candidate pair where the counted total exceeds the filer's
   own reported running aggregate by more than 5%.
 
 Known limits: the file only contains 24/48-hour notices, so IEs disclosed only on monthly or
-quarterly reports (generally small ones made more than 20 days out) won't appear. Party
-coordinated expenditures are a separate FEC dataset and aren't included. The FEC refreshes this
+quarterly reports (generally small ones made more than 20 days out) won't appear. The FEC refreshes this
 file roughly daily, so "real time" here means within about a day of filing.
