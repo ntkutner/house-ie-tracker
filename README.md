@@ -47,9 +47,12 @@ Tests: `python3 -m unittest discover tests`
 
 ## How the numbers are built
 
-- **Party columns (NRCC*, DCCC*)** count party coordinated expenditures (FEC transaction type
-  24C, from the committee-to-candidate bulk file) as well as any IEs. Coordinated spending has no
-  24/48-hour notice, so it appears only after the party files its monthly or pre-general report.
+- **Party columns (NRCC*, DCCC*)** count party coordinated expenditures as well as any IEs. The
+  parties' recent monthly reports are read straight from their e-filings (Schedule F), so they
+  count the day they're filed; older periods come from the FEC's processed bulk file. Listing
+  the parties' filings uses the OpenFEC API: add a free key from api.data.gov as a repository
+  secret named FEC_API_KEY (Settings > Secrets and variables > Actions). Parsed filings are
+  cached in `cache/coordinated/`.
 - **TRUMP** counts MAGA Inc., No Going Back PAC, and Safety and Affordability PAC.
 
 - House rows with election type G for the configured cycle.

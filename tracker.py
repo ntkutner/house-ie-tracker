@@ -17,6 +17,7 @@ import csv
 import datetime as dt
 import hashlib
 import io
+import os
 import json
 import re
 import sys
@@ -28,7 +29,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = "1.2"
+VERSION = "1.3"
 ROOT = Path(__file__).resolve().parent
 ET = ZoneInfo("America/New_York")
 UA = f"house-ie-tracker/{VERSION}"
@@ -275,8 +276,124 @@ def read_ie(path: Path, cfg: dict, cols: list[dict], master: dict) -> tuple[list
     return rows, parent, stats, excluded
 
 
-def load_coordinated(path: Path, cfg: dict, cols: list[dict], master: dict, stats: Counter,
-                     excluded: list[dict]) -> list[dict]:
+FEC_API = "https://api.open.fec.gov/v1"
+
+
+_REPORTS_CACHE: dict[str, list[dict]] = {}
+
+
+def list_party_reports(committee_id: str, api_key: str, cycle: int) -> list[dict]:
+    """Most recent version of each periodic report (F3X) a committee has e-filed, as filed.
+    One OpenFEC call per committee. The efile endpoint covers roughly the last four months."""
+    if committee_id in _REPORTS_CACHE:
+        return _REPORTS_CACHE[committee_id]
+    url = (f"{FEC_API}/efile/filings/?committee_id={committee_id}&per_page=100"
+           f"&sort=-receipt_date&api_key={api_key}")
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        results = json.load(r).get("results", [])
+    latest: dict[tuple, dict] = {}
+    for f in results:
+        form = str(f.get("form_type") or "").upper()
+        fn = f.get("file_number") or f.get("fec_file_id")
+        start, end = f.get("coverage_start_date"), f.get("coverage_end_date")
+        if not form.startswith("F3X") or not fn or not end:
+            continue
+        if str(end)[:4] < str(cycle - 1):
+            continue
+        key = (str(start)[:10], str(end)[:10])
+        if key not in latest or int(fn) > int(latest[key]["file_number"]):
+            latest[key] = {"file_number": int(fn), "form_type": form, "start": key[0], "end": key[1],
+                           "receipt_date": str(f.get("receipt_date") or "")[:10]}
+    if results and not latest and not any(str(f.get("form_type") or "").upper().startswith("F3X") for f in results):
+        pass  # committee simply hasn't e-filed a periodic report in the window
+    elif results and not latest:
+        raise ValueError(f"unexpected filing format from the FEC API (fields: {sorted(results[0])[:12]})")
+    _REPORTS_CACHE[committee_id] = sorted(latest.values(), key=lambda x: x["end"])
+    return _REPORTS_CACHE[committee_id]
+
+
+def party_reports_signature(cfg: dict, cols: list[dict]) -> str:
+    """File numbers of the party reports in use, so a new party filing triggers a rebuild."""
+    api_key = os.environ.get("FEC_API_KEY") or "DEMO_KEY"
+    nums = []
+    for c in cols:
+        for cid in sorted(c["ids"]) if c["coordinated"] else []:
+            try:
+                nums += [f["file_number"] for f in list_party_reports(cid, api_key, int(cfg.get("cycle", 2026)))]
+            except Exception:
+                nums.append(f"error:{cid}")
+    return ",".join(map(str, nums))
+
+
+def extract_schedule_f(items, committee_id: str) -> list[dict]:
+    """Schedule F (coordinated party expenditure) lines from a parsed .fec filing."""
+    out = []
+    for it in items:
+        if it.data_type != "itemization" or not isinstance(it.data, dict):
+            continue
+        d = it.data
+        if not str(d.get("form_type", "")).upper().startswith("SF"):
+            continue
+        g = lambda k: str(d.get(k) or "").strip()
+        out.append({
+            "cmte": committee_id, "tran_id": g("transaction_id_number"),
+            "cand_id": g("payee_candidate_id_number").upper(),
+            "cand_last": g("payee_candidate_last_name"), "cand_first": g("payee_candidate_first_name"),
+            "office": g("payee_candidate_office").upper(), "state": g("payee_candidate_state").upper(),
+            "district": g("payee_candidate_district"), "cand_committee": g("payee_committee_id_number").upper(),
+            "amount": to_float(d.get("expenditure_amount")), "date": parse_date(g("expenditure_date")),
+            "memo": g("memo_code").upper() == "X", "payee": g("payee_organization_name") or
+            " ".join(x for x in (g("payee_first_name"), g("payee_last_name")) if x),
+            "purpose": g("expenditure_purpose_descrip"),
+        })
+    return out
+
+
+def load_coordinated_raw(cfg: dict, cols: list[dict], cache_dir: Path, stats: Counter) -> tuple[list[dict], list[dict], str]:
+    """Schedule F lines from each party's most recent e-filed reports, read from the filings
+    themselves (docquery.fec.gov) so they count the day they're filed. Parsed filings are cached."""
+    try:
+        import fecfile
+    except ImportError:
+        return [], [], "the fecfile package isn't installed (pip install fecfile)"
+    api_key = os.environ.get("FEC_API_KEY") or "DEMO_KEY"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    lines, reports, errors = [], [], []
+    for c in cols:
+        if not c["coordinated"]:
+            continue
+        for cid in sorted(c["ids"]):
+            try:
+                manifest = cache_dir / "reports.json"   # test fixtures only
+                filings = ([f for f in json.loads(manifest.read_text()) if f["committee_id"] == cid]
+                           if manifest.exists() else list_party_reports(cid, api_key, int(cfg.get("cycle", 2026))))
+            except Exception as e:
+                errors.append(f"couldn't list {c['label']} filings ({e})")
+                continue
+            for f in filings:
+                cpath = cache_dir / f"{f['file_number']}.json"
+                if cpath.exists():
+                    sf = json.loads(cpath.read_text())
+                else:
+                    try:
+                        print(f"Reading {c['label']} filing {f['file_number']} ({f['start']} to {f['end']}) ...")
+                        items = fecfile.iter_http(f["file_number"], options={"filter_itemizations": ["SF"],
+                                                                              "as_strings": True})
+                        sf = extract_schedule_f(items, cid)
+                        cpath.write_text(json.dumps(sf))
+                    except Exception as e:
+                        errors.append(f"couldn't read {c['label']} filing {f['file_number']} ({e})")
+                        continue
+                lines += sf
+                reports.append({**f, "column": c["key"], "label": c["label"], "committee_id": cid,
+                                "rows": len(sf), "amount": round(sum(x["amount"] for x in sf if not x["memo"]), 2)})
+    stats["coordinated_raw_lines"] = len(lines)
+    return lines, reports, "; ".join(errors)
+
+
+def load_coordinated(path: Path | None, cfg: dict, cols: list[dict], master: dict, stats: Counter,
+                     excluded: list[dict], raw_lines: list[dict] = (), raw_reports: list[dict] = ()) -> list[dict]:
     """Party coordinated expenditures (transaction type 24C) from the FEC pas2 file, for
     columns marked coordinated = true. Pipe-delimited, 22 columns, no header."""
     coord_cols = [c for c in cols if c["coordinated"]]
@@ -284,7 +401,22 @@ def load_coordinated(path: Path, cfg: dict, cols: list[dict], master: dict, stat
     by_pcc = {m["pcc"]: cid for cid, m in master.items() if m.get("pcc")}
     best: dict[tuple, dict] = {}
 
+    # Periods covered by a party report read directly; the bulk file is only used outside them.
+    windows = defaultdict(list)
+    for rp in raw_reports:
+        windows[rp["committee_id"]].append((rp["start"], rp["end"]))
+    in_raw_window = lambda cmte, d: bool(d) and any(a <= d <= b for a, b in windows.get(cmte, []))
+
+    by_race = defaultdict(dict)
+    cycle = str(cfg.get("cycle", 2026))
+    for mcid, mm in master.items():
+        if mcid.startswith("H") and mm.get("year") == cycle:
+            ds = mm.get("district", "").strip()
+            by_race[mm["state"].upper() + (ds.zfill(2)[-2:] if ds.isdigit() else "00")][mcid] = mm["name"]
+
     def lines():
+        if path is None or not path.exists():
+            return
         if zipfile.is_zipfile(path):
             with zipfile.ZipFile(path) as z:
                 name = next(n for n in z.namelist() if n.lower().endswith(".txt"))
@@ -310,6 +442,9 @@ def load_coordinated(path: Path, cfg: dict, cols: list[dict], master: dict, stat
         amount = to_float(p[14])
         dt_raw = p[13].strip()
         date = parse_date(f"{dt_raw[:2]}/{dt_raw[2:4]}/{dt_raw[4:]}") if len(dt_raw) == 8 else ""
+        if in_raw_window(cmte, date):
+            stats["coordinated_bulk_superseded_by_raw"] += 1
+            continue
         cid = p[16].strip().upper()
         if not cid.startswith(("H", "S", "P")):
             cid = by_pcc.get(p[15].strip().upper(), "")  # OTHER_ID can be the candidate's committee
@@ -347,6 +482,44 @@ def load_coordinated(path: Path, cfg: dict, cols: list[dict], master: dict, stat
         key = (cmte, row["tran_id"]) if row["tran_id"] else (cmte, p[21].strip())
         if key not in best or num(row["file_num"]) >= num(best[key]["file_num"]):
             best[key] = row
+
+    for x in raw_lines:
+        col = next((c for c in coord_cols if x["cmte"] in c["ids"]), None)
+        if not col:
+            continue
+        cid = x["cand_id"] if x["cand_id"].startswith(("H", "S", "P")) else by_pcc.get(x["cand_committee"], "")
+        if not cid and x["office"] in ("H", "") and x["state"]:
+            ds = x["district"]
+            race = x["state"] + (ds.zfill(2)[-2:] if ds.isdigit() else "00")
+            nm = f"{x['cand_last']}, {x['cand_first']}"
+            hits = [k for k, v in by_race.get(race, {}).items() if same_person(nm, v)]
+            cid = hits[0] if len(hits) == 1 else ""
+            if cid:
+                stats["coordinated_id_from_name"] += 1
+        pseudo = [x["cmte"], "", "", "G", "", "24C", "", x["payee"]] + [""] * 14
+        if not cid:
+            drop(col, "Coordinated: no candidate identified", x["amount"], x["date"], pseudo)
+            continue
+        if not cid.startswith("H"):
+            continue
+        m = master.get(cid)
+        if not m or not m.get("state"):
+            drop(col, "Coordinated: candidate not in FEC candidate file", x["amount"], x["date"], pseudo, cid)
+            continue
+        dis = m.get("district", "").strip()
+        dis = dis.zfill(2)[-2:] if dis.isdigit() else "00"
+        row = {
+            "kind": "COORD", "named": col["key"], "memo": x["memo"],
+            "cand_key": cid, "cand_id": cid, "cand_name": m.get("name", ""), "district": m["state"].upper() + dis,
+            "party_raw": norm_party(m.get("party")), "party_text": (m.get("party") or "").upper(),
+            "spe_id": x["cmte"], "spe_nam": f"{col['label']} (coordinated)",
+            "amount": x["amount"], "agg": 0.0, "so": "S",
+            "purpose": (x["purpose"] or "Coordinated party expenditure") + (" (memo)" if x["memo"] else ""),
+            "payee": x["payee"], "file_num": "", "amend": "", "tran_id": x["tran_id"],
+            "image_num": "", "date": x["date"], "filed": x["date"],
+        }
+        best[("raw", x["cmte"], x["tran_id"] or f"{cid}{x['amount']}{x['date']}")] = row
+        stats["coordinated_from_raw"] += 1
 
     # A memo entry (disseminated, not yet paid) is later re-reported as a regular entry once paid.
     # Count a memo only if no regular entry for the same committee, candidate and amount exists.
@@ -717,6 +890,7 @@ def main() -> int:
     ap.add_argument("--input", help="local IE CSV instead of downloading")
     ap.add_argument("--candidates", help="local cnYY.zip / cn.txt instead of downloading")
     ap.add_argument("--coordinated", help="local pas2YY.zip / itpas2.txt instead of downloading")
+    ap.add_argument("--coordinated-cache", help="folder of cached party filings (for testing)")
     ap.add_argument("--out", default=str(ROOT / "docs"))
     ap.add_argument("--force", action="store_true", help="rebuild even if the FEC file is unchanged")
     ap.add_argument("--note", default="", help="banner text to show on the page (e.g. for previews)")
@@ -739,7 +913,10 @@ def main() -> int:
     else:
         url = cfg["sources"]["ie_url"].format(**fmt)
         ie_path = ROOT / "data" / Path(url).name
-        unchanged_build = meta.get("build_sig") == build_sig and meta.get("pres_sig") == pres_sig
+        raw_sig = party_reports_signature(cfg, compile_columns(cfg)) if any(
+            c.get("coordinated") for c in cfg.get("columns", [])) else ""
+        unchanged_build = (meta.get("build_sig") == build_sig and meta.get("pres_sig") == pres_sig
+                           and meta.get("raw_sig") == raw_sig)
         etag = meta.get("ie_etag") if (unchanged_build and not args.force) else None
         print(f"Checking {url} ...")
         res = download(url, ie_path, etag)
@@ -780,8 +957,15 @@ def main() -> int:
             except Exception as e:
                 print(f"Warning: coordinated file unavailable ({e}); party columns show IEs only.", file=sys.stderr)
                 coord_path = None
-        if coord_path and coord_path.exists():
-            coord_rows = load_coordinated(coord_path, cfg, cols, master, stats, excluded)
+        raw_lines, raw_reports, raw_error = [], [], ""
+        if not args.input or args.coordinated_cache:
+            raw_lines, raw_reports, raw_error = load_coordinated_raw(
+                cfg, cols, Path(args.coordinated_cache or ROOT / "cache" / "coordinated"), stats)
+            if raw_error:
+                print(f"Warning: {raw_error}", file=sys.stderr)
+        source_coord.update({"reports": raw_reports, "raw_error": raw_error})
+        if (coord_path and coord_path.exists()) or raw_lines:
+            coord_rows = load_coordinated(coord_path, cfg, cols, master, stats, excluded, raw_lines, raw_reports)
             rows += coord_rows
             source_coord["latest_transaction"] = max((r["date"] for r in coord_rows if r["date"]), default="")
 
@@ -801,7 +985,8 @@ def main() -> int:
     write_outputs(result, rows, cands, out, cfg, excluded)
 
     meta.update({"ie_etag": source.get("etag"), "ie_last_modified": source.get("last_modified"),
-                 "build_sig": build_sig, "pres_sig": pres_sig, "generated": result["generated"]})
+                 "build_sig": build_sig, "pres_sig": pres_sig, "generated": result["generated"],
+                 "raw_sig": locals().get("raw_sig", "")})
     meta_path.write_text(json.dumps(meta, indent=2))
 
     party = [r for r in result["races"] if r["party_race"]]
