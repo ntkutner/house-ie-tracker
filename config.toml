@@ -1,0 +1,74 @@
+# House IE Tracker configuration. Edit this file, commit, and the next run rebuilds.
+
+cycle = 2026   # two-year FEC period (2026 = 2025-2026)
+
+[sources]
+# FEC bulk file of 24- and 48-hour independent expenditure reports. No API key needed.
+ie_url = "https://www.fec.gov/files/bulk-downloads/{cycle}/independent_expenditure_{cycle}.csv"
+# FEC candidate master file, used for clean names, incumbency, and party when filers leave it blank.
+candidate_master_url = "https://www.fec.gov/files/bulk-downloads/{cycle}/cn{yy}.zip"
+# Optional. Two columns: district,margin  e.g.  CO08,R+1.8   or   NY17,D+0.6
+pres_margins_csv = "pres_margins_2024.csv"
+
+[filters]
+election_types = ["G"]   # G = general election. Add "S" to include special elections.
+# "party": show races where any named column below has spent (matches the original chart).
+# "all":   show every House race with general-election IEs. The page has a toggle either way.
+races = "party"
+
+[display]
+title = "House Races w/ Party Spending (General Election)"
+other_r_label = "OTH R"
+other_d_label = "OTH D"
+
+# ---------------------------------------------------------------------------
+# Named columns, in display order. A spender matches by FEC ID or by name pattern
+# (case-insensitive regex). Money is put on a side by who it helps: supporting a
+# Republican or opposing a Democrat is R-side, and vice versa. Anything that is not
+# matched here lands in OTH R / OTH D. To give another group its own column,
+# copy a block. The page's "Data notes" lists the biggest unmatched groups.
+# ---------------------------------------------------------------------------
+
+[[columns]]
+key = "CLF"
+label = "CLF"
+side = "R"
+ids = ["C00504530"]
+name_patterns = ['^CONGRESSIONAL LEADERSHIP FUND']
+
+[[columns]]
+key = "NRCC"
+label = "NRCC"
+side = "R"
+ids = ["C00075820"]
+name_patterns = ['^NRCC\b', 'NATIONAL REPUBLICAN CONGRESSIONAL']
+
+[[columns]]
+key = "TRUMP"
+label = "TRUMP"
+side = "R"
+# MAGA Inc. Add other Trump-aligned groups here if you want them in this column.
+ids = ["C00892471"]
+name_patterns = ['^MAGA,? INC']
+
+[[columns]]
+key = "HMP"
+label = "HMP"
+side = "D"
+ids = ["C00495028"]
+name_patterns = ['^HOUSE MAJORITY PAC']
+
+[[columns]]
+key = "DCCC"
+label = "DCCC"
+side = "D"
+ids = ["C00000935"]
+name_patterns = ['^DCCC\b', 'DEMOCRATIC CONGRESSIONAL CAMPAIGN']
+
+# ---------------------------------------------------------------------------
+# Party overrides, keyed by FEC candidate ID. Use when filers report a candidate's
+# party as OTHER/blank, or for independents one side is backing. The value is the
+# side the candidate counts on: "REP" or "DEM".
+# ---------------------------------------------------------------------------
+[party_overrides]
+# "H2CA03157" = "REP"
