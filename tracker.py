@@ -28,7 +28,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = "1.1"
+VERSION = "1.2"
 ROOT = Path(__file__).resolve().parent
 ET = ZoneInfo("America/New_York")
 UA = f"house-ie-tracker/{VERSION}"
@@ -146,8 +146,9 @@ def load_candidate_master(path: Path) -> dict:
         for line in lines:
             p = line.rstrip("\r\n").split("|")
             if len(p) >= 8 and p[0]:
-                out[p[0].upper()] = {"name": p[1], "party": p[2], "state": p[4],
-                                     "office": p[5], "district": p[6], "ici": p[7]}
+                out[p[0].upper()] = {"name": p[1], "party": p[2], "year": p[3], "state": p[4],
+                                     "office": p[5], "district": p[6], "ici": p[7],
+                                     "pcc": p[9].strip().upper() if len(p) > 9 else ""}
         return out
 
     if zipfile.is_zipfile(path):
@@ -274,11 +275,13 @@ def read_ie(path: Path, cfg: dict, cols: list[dict], master: dict) -> tuple[list
     return rows, parent, stats, excluded
 
 
-def load_coordinated(path: Path, cfg: dict, cols: list[dict], master: dict, stats: Counter) -> list[dict]:
+def load_coordinated(path: Path, cfg: dict, cols: list[dict], master: dict, stats: Counter,
+                     excluded: list[dict]) -> list[dict]:
     """Party coordinated expenditures (transaction type 24C) from the FEC pas2 file, for
     columns marked coordinated = true. Pipe-delimited, 22 columns, no header."""
     coord_cols = [c for c in cols if c["coordinated"]]
-    include_memos = cfg.get("filters", {}).get("coordinated_include_memos", False)
+    include_memos = cfg.get("filters", {}).get("coordinated_include_memos", True)
+    by_pcc = {m["pcc"]: cid for cid, m in master.items() if m.get("pcc")}
     best: dict[tuple, dict] = {}
 
     def lines():
@@ -291,41 +294,137 @@ def load_coordinated(path: Path, cfg: dict, cols: list[dict], master: dict, stat
             with open(path, encoding="latin-1") as fh:
                 yield from fh
 
+    def drop(col, reason, amount, date, p, cid=""):
+        excluded.append({"column": col["key"], "reason": reason, "spender": col["label"] + " (coordinated)",
+                         "candidate": cid or p[7].strip(), "race": "", "election_type": p[3].strip() or "blank",
+                         "amount": amount, "date": date, "file_num": p[18].strip(), "tran_id": p[17].strip()})
+
     for line in lines():
         p = line.rstrip("\r\n").split("|")
         if len(p) < 22 or p[5].strip().upper() != "24C":
             continue
-        cmte, cid = p[0].strip().upper(), p[16].strip().upper()
+        cmte = p[0].strip().upper()
         col = next((c for c in coord_cols if cmte in c["ids"]), None)
-        if not col or not cid.startswith("H"):
+        if not col:
             continue
-        if p[19].strip().upper() == "X" and not include_memos:
-            stats["coordinated_memo_skipped"] += 1
+        amount = to_float(p[14])
+        dt_raw = p[13].strip()
+        date = parse_date(f"{dt_raw[:2]}/{dt_raw[2:4]}/{dt_raw[4:]}") if len(dt_raw) == 8 else ""
+        cid = p[16].strip().upper()
+        if not cid.startswith(("H", "S", "P")):
+            cid = by_pcc.get(p[15].strip().upper(), "")  # OTHER_ID can be the candidate's committee
+            if cid:
+                stats["coordinated_id_from_committee"] += 1
+        if not cid:
+            drop(col, "Coordinated: no candidate identified", amount, date, p)
+            continue
+        if not cid.startswith("H"):
+            continue  # Senate/presidential
+        pgi = p[3].strip().upper()
+        if pgi and not pgi.startswith("G"):
+            drop(col, "Coordinated: special or other election", amount, date, p, cid)
+            continue
+        memo = p[19].strip().upper() == "X"
+        if memo and not include_memos:
+            drop(col, "Coordinated: memo entry", amount, date, p, cid)
             continue
         m = master.get(cid)
         if not m or not m.get("state"):
-            stats["coordinated_no_candidate_info"] += 1
+            drop(col, "Coordinated: candidate not in FEC candidate file", amount, date, p, cid)
             continue
         dis = m.get("district", "").strip()
         dis = dis.zfill(2)[-2:] if dis.isdigit() else "00"
-        dt_raw = p[13].strip()
-        date = parse_date(f"{dt_raw[:2]}/{dt_raw[2:4]}/{dt_raw[4:]}") if len(dt_raw) == 8 else ""
         row = {
-            "kind": "COORD", "named": col["key"],
+            "kind": "COORD", "named": col["key"], "memo": memo,
             "cand_key": cid, "cand_id": cid, "cand_name": m.get("name", ""), "district": m["state"].upper() + dis,
             "party_raw": norm_party(m.get("party")), "party_text": (m.get("party") or "").upper(),
             "spe_id": cmte, "spe_nam": f"{col['label']} (coordinated)",
-            "amount": to_float(p[14]), "agg": 0.0, "so": "S",
-            "purpose": "Coordinated party expenditure", "payee": p[7].strip(),
+            "amount": amount, "agg": 0.0, "so": "S",
+            "purpose": "Coordinated party expenditure" + (" (memo)" if memo else ""), "payee": p[7].strip(),
             "file_num": p[18].strip(), "amend": p[1].strip(), "tran_id": p[17].strip(),
             "image_num": p[4].strip(), "date": date, "filed": date,
         }
         key = (cmte, row["tran_id"]) if row["tran_id"] else (cmte, p[21].strip())
         if key not in best or num(row["file_num"]) >= num(best[key]["file_num"]):
             best[key] = row
-    out = list(best.values())
+
+    # A memo entry (disseminated, not yet paid) is later re-reported as a regular entry once paid.
+    # Count a memo only if no regular entry for the same committee, candidate and amount exists.
+    rows = list(best.values())
+    paid = Counter((r["spe_id"], r["cand_key"], round(r["amount"], 2)) for r in rows if not r["memo"])
+    out = []
+    for r in rows:
+        k = (r["spe_id"], r["cand_key"], round(r["amount"], 2))
+        if r["memo"] and paid[k] > 0:
+            paid[k] -= 1
+            stats["coordinated_memo_matched"] += 1
+            continue
+        out.append(r)
     stats["rows_coordinated"] = len(out)
     return out
+
+
+SUFFIXES = {"JR", "SR", "II", "III", "IV", "V", "MR", "MRS", "MS", "DR", "HON", "REP", "SEN"}
+
+
+def name_tokens(n: str) -> tuple[list[str], list[str] | None]:
+    """(all tokens, last-name tokens if the name is 'LAST, FIRST' else None), suffixes removed."""
+    n = re.sub(r"[^A-Z,\- ]", " ", (n or "").upper())
+    clean = lambda part: [t for t in part.replace(",", " ").split() if t not in SUFFIXES]
+    if "," in n:
+        last, rest = n.split(",", 1)
+        return clean(rest) + clean(last), clean(last)
+    return clean(n), None
+
+
+def same_person(row_name: str, master_name: str) -> bool:
+    toks, last = name_tokens(row_name)
+    mtoks, mlast = name_tokens(master_name)
+    mlast = mlast or mtoks[-1:]
+    if not toks or not mlast:
+        return False
+    if last is not None:
+        return last == mlast
+    return toks[-len(mlast):] == mlast
+
+
+def resolve_missing_ids(rows: list[dict], master: dict, cfg: dict, stats: Counter) -> None:
+    """Many filers (CLF among them) leave the candidate ID and party blank. Match those rows
+    to a candidate by last name: first among IDs other filers used in the same race, then in
+    the FEC candidate file for the race, then statewide."""
+    cycle = str(cfg.get("cycle", 2026))
+    in_race = defaultdict(dict)       # district -> {cand_id: name}
+    for r in rows:
+        if r["cand_id"] and not r["cand_key"].count(":"):
+            in_race[r["district"]].setdefault(r["cand_id"], r["cand_name"])
+    by_race, by_state = defaultdict(dict), defaultdict(dict)
+    for cid, m in master.items():
+        if not cid.startswith("H") or m.get("year") != cycle:
+            continue
+        dis = m.get("district", "").strip()
+        dis = dis.zfill(2)[-2:] if dis.isdigit() else "00"
+        by_race[m["state"].upper() + dis][cid] = m["name"]
+        by_state[m["state"].upper()][cid] = m["name"]
+
+    cache = {}
+    for r in rows:
+        if ":" not in r["cand_key"]:
+            continue
+        k = (r["district"], r["cand_name"].upper())
+        if k not in cache:
+            found = None
+            for pool in (in_race.get(r["district"], {}), by_race.get(r["district"], {}),
+                         by_state.get(r["district"][:2], {})):
+                hits = {cid for cid, nm in pool.items() if same_person(r["cand_name"], nm)}
+                if len(hits) == 1:
+                    found = hits.pop()
+                    break
+                if len(hits) > 1:
+                    break  # ambiguous; leave it for a party override
+            cache[k] = found
+        if cache[k]:
+            r["cand_key"] = r["cand_id"] = cache[k]
+            stats["recovered_candidate_id"] += 1
 
 
 # ----------------------------------------------------------------------------- cleaning
@@ -663,10 +762,12 @@ def main() -> int:
 
     cols = compile_columns(cfg)
     rows, parent, stats, excluded = read_ie(ie_path, cfg, cols, master)
+    resolve_missing_ids(rows, master, cfg, stats)
     rows = clean_rows(rows, superseded_filings(parent), stats, excluded)
 
     if any(c["coordinated"] for c in cols):
         coord_path = None
+        source_coord = {"url": args.coordinated or "", "last_modified": None}
         if args.coordinated:
             coord_path = Path(args.coordinated)
         elif not args.input and cfg["sources"].get("coordinated_url"):
@@ -674,12 +775,15 @@ def main() -> int:
             coord_path = ROOT / "data" / Path(co_url).name
             try:
                 print(f"Downloading {co_url} ...")
-                download(co_url, coord_path)
+                co_res = download(co_url, coord_path)
+                source_coord = {"url": co_url, "last_modified": co_res.get("last_modified")}
             except Exception as e:
                 print(f"Warning: coordinated file unavailable ({e}); party columns show IEs only.", file=sys.stderr)
                 coord_path = None
         if coord_path and coord_path.exists():
-            rows += load_coordinated(coord_path, cfg, cols, master, stats)
+            coord_rows = load_coordinated(coord_path, cfg, cols, master, stats, excluded)
+            rows += coord_rows
+            source_coord["latest_transaction"] = max((r["date"] for r in coord_rows if r["date"]), default="")
 
     cands, party_notes = resolve_candidates(rows, master, cfg)
     result = build(cfg, rows, cands, load_pres_margins(pres_path), excluded)
@@ -690,6 +794,7 @@ def main() -> int:
         "generated": now.isoformat(timespec="seconds"),
         "generated_label": now.strftime("%b %-d, %Y at %-I:%M %p ET"),
         "source": source, "note": args.note,
+        "source_coordinated": locals().get("source_coord"),
         "stats": dict(stats), "has_pres": bool(load_pres_margins(pres_path)),
     })
     result["diagnostics"]["party_notes"] = party_notes

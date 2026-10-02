@@ -18,9 +18,9 @@ election_types = ["G"]   # G = general election. Add "S" to include special elec
 # "party": show races where any named column below has spent (matches the original chart).
 # "all":   show every House race with general-election IEs. The page has a toggle either way.
 races = "party"
-# Coordinated "memo" entries are spending disseminated but not yet paid; the payment shows up again
-# later as a regular entry, so counting both would double count. Leave false unless you know otherwise.
-coordinated_include_memos = false
+# Coordinated "memo" entries are spending disseminated but not yet paid. They're counted (as the FEC
+# recommends) unless a regular entry for the same party, candidate and amount shows the payment.
+coordinated_include_memos = true
 
 [display]
 title = "House Races w/ Party Spending (General Election)"
