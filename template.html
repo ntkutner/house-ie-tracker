@@ -6,13 +6,14 @@
 <title>__TITLE__</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --accent:#1747C9; --ink:#121A2E; --muted:#4A5672; --page:#F7F9FD; --card:#FFFFFF; --rule:#E3E8F2; --edge:#DCE3F0;
   --d:#1D3F8F; --d-head:#E7EFFF; --d-cell:#F3F7FF; --d-bar:#1747C9;
   --r:#7A5550; --r-name:#5B4642; --r-head:#F6F1F0; --r-cell:#FBF8F7; --r-bar:#E3A29C;
   --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --cond:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -21,10 +22,10 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--page);color:var(--ink);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.wrap{max-width:1360px;margin:0 auto}
+.wrap{max-width:1680px;margin:0 auto}
 
 /* Header band */
-header.band{background:var(--accent);color:#fff;padding:40px clamp(16px,4vw,64px) 48px}
+header.band{background:var(--accent);color:#fff;padding:36px clamp(16px,3vw,40px) 40px}
 .band .wrap{display:flex;flex-direction:column;gap:36px}
 .toprow{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:24px}
 .titleblock{display:flex;flex-direction:column;gap:12px;flex:1 1 560px;min-width:0}
@@ -45,24 +46,24 @@ nav.sections a:hover{text-decoration:underline}
 .caption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:14px;font-weight:600}
 
 /* Main */
-main{padding:40px clamp(16px,4vw,64px) 72px}
-main .wrap{display:flex;flex-direction:column;gap:28px}
+main{padding:28px clamp(16px,3vw,40px) 56px}
+main .wrap{display:flex;flex-direction:column;gap:20px}
 .note{padding:12px 16px;border-radius:8px;background:#FFF4E5;color:#5A3A00;font-size:14px}
 .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .controls label{font-weight:700;font-size:15px}
-.controls input{flex:1 1 260px;max-width:380px;height:44px;padding:0 14px;border:1px solid #C9D3E6;border-radius:8px;background:#fff;font:15px var(--sans);color:var(--ink)}
-.controls button{height:44px;padding:0 18px;border-radius:8px;border:1px solid #C9D3E6;background:#fff;color:#2A3550;font:700 14px var(--sans);cursor:pointer}
+.controls input{flex:1 1 260px;max-width:360px;height:40px;padding:0 14px;border:1px solid #C9D3E6;border-radius:8px;background:#fff;font:15px var(--sans);color:var(--ink)}
+.controls button{height:40px;padding:0 16px;border-radius:8px;border:1px solid #C9D3E6;background:#fff;color:#2A3550;font:700 14px var(--sans);cursor:pointer}
 .controls button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff}
 .dl{margin-left:auto;display:flex;gap:20px;font-size:14px;font-weight:600;color:var(--d)}
 
 /* Table */
 .tablecard{overflow-x:auto;background:var(--card);border:1px solid var(--edge);border-radius:12px}
-table.races{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
-.races th,.races td{padding:11px 8px;white-space:nowrap}
-.races thead tr.groups th{padding:10px 10px 6px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center}
+table.races{width:100%;border-collapse:collapse;font:500 13px/1.25 var(--cond);font-variant-numeric:tabular-nums}
+.races th,.races td{padding:6px 7px;white-space:nowrap}
+.races thead tr.groups th{padding:6px 7px 4px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center}
 .races thead tr.groups th.g-d{color:var(--d);background:var(--d-head);border-radius:8px 8px 0 0}
 .races thead tr.groups th.g-r{color:var(--r);background:var(--r-head);border-radius:8px 8px 0 0}
-.races thead tr.cols th{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-align:right;border-bottom:2px solid var(--ink);cursor:pointer;user-select:none;background:var(--card)}
+.races thead tr.cols th{font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);text-align:right;border-bottom:2px solid var(--ink);cursor:pointer;user-select:none;background:var(--card)}
 .races thead tr.cols th.l{text-align:left}
 .races thead tr.cols th.dc{background:var(--d-head)} .races thead tr.cols th.rc{background:var(--r-head)}
 .races thead tr.cols th.dsum{color:var(--d)} .races thead tr.cols th.rsum{color:var(--r)}
@@ -76,18 +77,19 @@ table.races{width:100%;border-collapse:collapse;font-size:14px;font-variant-nume
 .races td.zero{color:#9AA3B8}
 .races td.dist{font-weight:800}
 .races td.dem{font-weight:700;color:var(--d)} .races td.rep{color:var(--r-name)}
+.races td.dem,.races td.rep{white-space:normal;min-width:110px;max-width:165px;line-height:1.2}
 .races td.total{font-weight:800}
 .races td.new7{color:var(--muted)}
-.inc{margin-left:6px;font-size:11px;font-weight:700;color:#5B6787}
+.inc{margin-left:4px;font-size:10px;font-weight:700;color:#5B6787}
 .sticky{position:sticky;left:0;z-index:1;background:var(--card)}
 tbody tr.race{cursor:pointer}
 tbody tr.race:hover td{filter:brightness(.98)}
 tbody tr.race[aria-expanded="true"] td{border-bottom-color:transparent}
-.split{min-width:150px}
-.split .mini{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--rule)}
+.split{min-width:88px}
+.split .mini{display:flex;height:6px;border-radius:4px;overflow:hidden;background:var(--rule)}
 .split .mini i{display:block;height:100%}
 .split .mini .d{background:var(--d-bar)} .split .mini .r{background:var(--r-bar)}
-.split .edge{margin-top:4px;font-size:12px;font-weight:800}
+.split .edge{margin-top:3px;font-size:12px;font-weight:700}
 .split .edge.d{color:var(--d)} .split .edge.r{color:#8A4B44;font-weight:700}
 .pres-r{color:#8A4B44;font-weight:600} .pres-d{color:var(--d);font-weight:600}
 tfoot td{font-weight:800;border-top:2px solid var(--ink);border-bottom:0}
@@ -95,7 +97,7 @@ tfoot tr.counts td{font-weight:500;color:var(--muted);border-top:0}
 .empty{padding:28px;text-align:center;color:var(--muted)}
 
 /* Drill-down: the race spotlight */
-tr.detail td{padding:0 10px 18px;text-align:left;background:var(--card);border-bottom:1px solid var(--rule)}
+tr.detail td{padding:0 7px 14px;text-align:left;background:var(--card);border-bottom:1px solid var(--rule)}
 .spot{position:sticky;left:10px;max-width:min(1300px,calc(100vw - 2 * clamp(16px,4vw,64px) - 40px));border:1px solid var(--edge);border-radius:12px;padding:24px;background:#fff;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 32px;white-space:normal}
 .spot .head{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
 .spot .head .k{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
@@ -192,15 +194,15 @@ const R_COLS = COLS.filter(c => c.side === "R"), D_COLS = COLS.filter(c => c.sid
 const FIELDS = [
   {key:"district", label:"Dist", cls:"l dist sticky", get:r => r.district, sort:"str"},
   ...(DATA.has_pres ? [{key:"pres", label:"Pres '24", cls:"", get:r => r.pres ?? -999}] : []),
-  {key:"dem", label:"Democrat", cls:"l dem", get:r => r.dem?.name || "", sort:"str"},
-  {key:"rep", label:"Republican", cls:"l rep", get:r => r.rep?.name || "", sort:"str"},
+  {key:"dem", label:"Dem", cls:"l dem", get:r => r.dem?.name || "", sort:"str"},
+  {key:"rep", label:"Rep", cls:"l rep", get:r => r.rep?.name || "", sort:"str"},
   ...D_COLS.map(c => ({key:c.key, label:label(c), cls:"dc", get:r => r.cols[c.key] || 0, side:"D"})),
   {key:"d_total", label:"Total", cls:"dc dsum", get:r => r.d_total, side:"D"},
   ...R_COLS.map(c => ({key:c.key, label:label(c), cls:"rc", get:r => r.cols[c.key] || 0, side:"R"})),
   {key:"r_total", label:"Total", cls:"rc rsum", get:r => r.r_total, side:"R"},
   {key:"adv", label:"Split", cls:"split", get:r => r.adv},
   {key:"new7", label:"New 7d", cls:"new7", get:r => r.new7},
-  {key:"total", label:"Race total", cls:"total", get:r => r.total},
+  {key:"total", label:"Total", cls:"total", get:r => r.total},
 ];
 const NUMERIC = new Set(FIELDS.filter(f => !f.sort && f.key !== "pres").map(f => f.key));
 const state = {view: DATA.default_view === "all" ? "all" : "party", q: "", sort: "total", dir: -1, open: new Set()};
