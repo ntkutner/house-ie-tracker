@@ -1,4 +1,8 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,purpose,payee,file_num,tran_id,image_num
+IE,AZ02,JONATHAN MICHAEL NEZ,DEM,S,C00752576,Our Voice Our Vote Arizona PAC,4320.0,2026-09-30,2026-10-03,In-Kind Non-Contribution Account - Digital Production,WAY TO LEAD PAC,2016552,500022269,
+IE,AZ02,ELI CRANE,REP,O,C00752576,Our Voice Our Vote Arizona PAC,3680.0,2026-09-30,2026-10-03,In-Kind Non-Contribution Account - Digital Production,WAY TO LEAD PAC,2016552,500022270,
+IE,AZ02,ELI CRANE,REP,O,C00752576,Our Voice Our Vote Arizona PAC,46000.0,2026-09-30,2026-10-03,Non-Contribution Account - Digital Media Ad Buy,WKQ Media LLC,2016552,500022272,
+IE,AZ02,JONATHAN MICHAEL NEZ,DEM,S,C00752576,Our Voice Our Vote Arizona PAC,54000.0,2026-09-30,2026-10-03,Non-Contribution Account - Digital Media Ad Buy,WKQ Media LLC,2016552,500022273,
 IE,AZ06,JUAN CISCOMANI,REP,O,C00869321,Victory PAC,6785.0,2026-09-30,2026-10-03,In-Kind - Digital Production,WAY TO LEAD PAC,2016549,500110252,
 IE,AZ06,JOANNA MENDOZA,DEM,S,C00869321,Victory PAC,7965.0,2026-09-30,2026-10-03,In-Kind - Digital Production,WAY TO LEAD PAC,2016549,500110253,
 IE,AZ06,JUAN CISCOMANI,REP,O,C00869321,Victory PAC,46000.0,2026-09-30,2026-10-03,Digital Media Ad Buy,WKQ MEDIA,2016549,500110258,
