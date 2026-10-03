@@ -6,175 +6,201 @@
 <title>__TITLE__</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#ffffff; --ink:#1a1d23; --muted:#5d6572; --rule:#d9dde3; --alt:#f5f6f8;
-  --r:#b0222b; --r-tint:#f7d9db; --r-wash:#fcefef;
-  --d:#1c4c9c; --d-tint:#d8e3f5; --d-wash:#eef3fb;
-  --focus:#1c4c9c;
-  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --cond:"IBM Plex Sans Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
+  --accent:#1747C9; --ink:#121A2E; --muted:#4A5672; --page:#F7F9FD; --card:#FFFFFF; --rule:#E3E8F2; --edge:#DCE3F0;
+  --d:#1D3F8F; --d-head:#E7EFFF; --d-cell:#F3F7FF; --d-bar:#1747C9;
+  --r:#7A5550; --r-name:#5B4642; --r-head:#F6F1F0; --r-cell:#FBF8F7; --r-bar:#E3A29C;
+  --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --paper:#16181d; --ink:#e7e9ed; --muted:#9aa2ae; --rule:#2f343c; --alt:#1c1f25;
-  --r:#ff7a7f; --r-tint:#4a2226; --r-wash:#2a1d20; --d:#86aef5; --d-tint:#1f3358; --d-wash:#1b2333; --focus:#86aef5;
-}}
-:root[data-theme="dark"]{
-  --paper:#16181d; --ink:#e7e9ed; --muted:#9aa2ae; --rule:#2f343c; --alt:#1c1f25;
-  --r:#ff7a7f; --r-tint:#4a2226; --r-wash:#2a1d20; --d:#86aef5; --d-tint:#1f3358; --d-wash:#1b2333; --focus:#86aef5;
-}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--page);color:var(--ink);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
 a{color:inherit}
-:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.wrap{max-width:1680px;margin:0 auto;padding:28px 20px 48px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1360px;margin:0 auto}
 
-/* Hero: the split of money is the headline */
-header h1{font:700 clamp(22px,2.6vw,32px)/1.15 var(--sans);margin:0;letter-spacing:-.01em}
-.seats{font:600 15px var(--cond);color:var(--muted);margin-top:4px}
-.split{margin:22px 0 6px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:end}
-.split .amt{font:700 clamp(20px,2.4vw,30px)/1 var(--cond);font-variant-numeric:tabular-nums}
-.split .who{font:500 13px var(--cond);color:var(--muted);display:block;margin-bottom:4px}
-.split .rep .amt{color:var(--r)} .split .dem{text-align:right} .split .dem .amt{color:var(--d)}
-.split .mid{text-align:center;font:600 14px var(--cond);color:var(--muted);padding-bottom:3px}
-.bar{display:flex;height:14px;border-radius:2px;overflow:hidden;background:var(--rule)}
+/* Header band */
+header.band{background:var(--accent);color:#fff;padding:40px clamp(16px,4vw,64px) 48px}
+.band .wrap{display:flex;flex-direction:column;gap:36px}
+.toprow{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:24px}
+.titleblock{display:flex;flex-direction:column;gap:12px;flex:1 1 560px;min-width:0}
+.kicker{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;opacity:.85}
+h1{margin:0;max-width:900px;font-size:40px;line-height:1.08;font-weight:800;letter-spacing:-.02em}
+nav.sections{display:flex;gap:24px;font-size:15px;font-weight:600;padding-top:2px}
+nav.sections a{text-decoration:none}
+nav.sections a:hover{text-decoration:underline}
+.totals{display:flex;flex-direction:column;gap:14px}
+.totals .nums{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px}
+.totals .lbl{font-size:14px;font-weight:600;opacity:.85}
+.totals .amt{font-size:40px;line-height:1.1;font-weight:800;font-variant-numeric:tabular-nums}
+.totals .amt.r{color:#FFC9C4}
+.totals .right{text-align:right}
+.bar{display:flex;height:14px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,.2)}
 .bar i{display:block;height:100%;transition:width .5s ease}
-.bar .r{background:var(--r)} .bar .d{background:var(--d)}
-.stamp{margin-top:10px;font:400 13px var(--cond);color:var(--muted)}
-.note{margin:16px 0 0;padding:10px 14px;border-left:4px solid var(--r);background:var(--r-wash);font-size:14px}
+.bar .d{background:#fff} .bar .r{background:#F08A82}
+.caption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:14px;font-weight:600}
 
-/* Controls */
-.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:26px 0 12px}
-.controls input[type=search]{flex:1 1 260px;max-width:420px;font:15px var(--sans);padding:8px 12px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink)}
-.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
-.seg button{font:600 14px var(--cond);padding:7px 12px;border:0;background:var(--paper);color:var(--muted);cursor:pointer}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-.dl{margin-left:auto;font:500 14px var(--cond);display:flex;gap:14px}
-.dl a{color:var(--muted)}
+/* Main */
+main{padding:40px clamp(16px,4vw,64px) 72px}
+main .wrap{display:flex;flex-direction:column;gap:28px}
+.note{padding:12px 16px;border-radius:8px;background:#FFF4E5;color:#5A3A00;font-size:14px}
+.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.controls label{font-weight:700;font-size:15px}
+.controls input{flex:1 1 260px;max-width:380px;height:44px;padding:0 14px;border:1px solid #C9D3E6;border-radius:8px;background:#fff;font:15px var(--sans);color:var(--ink)}
+.controls button{height:44px;padding:0 18px;border-radius:8px;border:1px solid #C9D3E6;background:#fff;color:#2A3550;font:700 14px var(--sans);cursor:pointer}
+.controls button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:#fff}
+.dl{margin-left:auto;display:flex;gap:20px;font-size:14px;font-weight:600;color:var(--d)}
 
 /* Table */
-.scroller{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
-table{border-collapse:collapse;width:100%;font:500 13px/1.25 var(--cond);font-variant-numeric:tabular-nums}
-th,td{padding:5px 8px;white-space:nowrap;border-bottom:1px solid var(--rule)}
-thead th{position:sticky;top:0;z-index:2;background:var(--paper);font-weight:700;text-align:right;cursor:pointer;user-select:none;border-bottom:2px solid var(--ink)}
-thead tr.groups th{position:static;cursor:default;border-bottom:0;font-weight:600;font-size:12px;text-align:center;padding:4px 8px}
-thead tr.groups th.g-r{background:var(--r-tint);color:var(--r)} thead tr.groups th.g-d{background:var(--d-tint);color:var(--d)}
-thead th.l,td.l{text-align:left}
-thead th.rc{background:var(--r-tint)} thead th.dc{background:var(--d-tint)}
-thead th[aria-sort] span::after{content:"";display:inline-block;margin-left:3px;border:4px solid transparent}
-thead th[aria-sort="descending"] span::after{border-top-color:currentColor;transform:translateY(2px)}
-thead th[aria-sort="ascending"] span::after{border-bottom-color:currentColor;transform:translateY(-2px)}
-td{text-align:right}
-td.rc{background:var(--r-wash)} td.dc{background:var(--d-wash)}
-td.sum{font-weight:700}
-td.zero{color:var(--muted);opacity:.55}
-.sticky{position:sticky;left:0;z-index:1;background:inherit}
-thead th.sticky{z-index:3}
-tbody tr.race{cursor:pointer;background:var(--paper)}
-tbody tr.race.alt{background:var(--alt)}
-tbody tr.race:hover td{filter:brightness(.97)}
+.tablecard{overflow-x:auto;background:var(--card);border:1px solid var(--edge);border-radius:12px}
+table.races{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.races th,.races td{padding:11px 8px;white-space:nowrap}
+.races thead tr.groups th{padding:10px 10px 6px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center}
+.races thead tr.groups th.g-d{color:var(--d);background:var(--d-head);border-radius:8px 8px 0 0}
+.races thead tr.groups th.g-r{color:var(--r);background:var(--r-head);border-radius:8px 8px 0 0}
+.races thead tr.cols th{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);text-align:right;border-bottom:2px solid var(--ink);cursor:pointer;user-select:none;background:var(--card)}
+.races thead tr.cols th.l{text-align:left}
+.races thead tr.cols th.dc{background:var(--d-head)} .races thead tr.cols th.rc{background:var(--r-head)}
+.races thead tr.cols th.dsum{color:var(--d)} .races thead tr.cols th.rsum{color:var(--r)}
+.races th[aria-sort] span::after{content:"";display:inline-block;margin-left:4px;border:4px solid transparent}
+.races th[aria-sort="descending"] span::after{border-top-color:currentColor;transform:translateY(2px)}
+.races th[aria-sort="ascending"] span::after{border-bottom-color:currentColor;transform:translateY(-2px)}
+.races td{text-align:right;border-bottom:1px solid var(--rule)}
+.races td.l{text-align:left}
+.races td.dc{background:var(--d-cell)} .races td.rc{background:var(--r-cell)}
+.races td.dsum{font-weight:800;color:var(--d)} .races td.rsum{font-weight:800;color:var(--r)}
+.races td.zero{color:#9AA3B8}
+.races td.dist{font-weight:800}
+.races td.dem{font-weight:700;color:var(--d)} .races td.rep{color:var(--r-name)}
+.races td.total{font-weight:800}
+.races td.new7{color:var(--muted)}
+.inc{margin-left:6px;font-size:11px;font-weight:700;color:#5B6787}
+.sticky{position:sticky;left:0;z-index:1;background:var(--card)}
+tbody tr.race{cursor:pointer}
+tbody tr.race:hover td{filter:brightness(.98)}
 tbody tr.race[aria-expanded="true"] td{border-bottom-color:transparent}
-td.dist{font-weight:700}
-td.rep{color:var(--r);font-weight:600} td.dem{color:var(--d);font-weight:600}
-.inc{font-weight:400;opacity:.7;margin-left:3px}
-.adv-r{color:var(--r);font-weight:700} .adv-d{color:var(--d);font-weight:700}
-.pres-r{color:var(--r)} .pres-d{color:var(--d)}
-tfoot td{font-weight:700;background:var(--paper);border-top:2px solid var(--ink)}
+.split{min-width:150px}
+.split .mini{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--rule)}
+.split .mini i{display:block;height:100%}
+.split .mini .d{background:var(--d-bar)} .split .mini .r{background:var(--r-bar)}
+.split .edge{margin-top:4px;font-size:12px;font-weight:800}
+.split .edge.d{color:var(--d)} .split .edge.r{color:#8A4B44;font-weight:700}
+.pres-r{color:#8A4B44;font-weight:600} .pres-d{color:var(--d);font-weight:600}
+tfoot td{font-weight:800;border-top:2px solid var(--ink);border-bottom:0}
 tfoot tr.counts td{font-weight:500;color:var(--muted);border-top:0}
-
-/* Drill-down */
-tr.detail td{padding:0 0 14px;background:var(--paper);text-align:left}
-.detail-inner{padding:10px 12px 0 calc(8px + 4em);display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:18px}
-.detail h3{font:700 13px var(--cond);margin:0 0 6px;padding-bottom:4px;border-bottom:2px solid currentColor}
-.detail .side-r h3{color:var(--r)} .detail .side-d h3{color:var(--d)}
-.sp{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:5px 0;border-bottom:1px solid var(--rule);font:500 13px/1.3 var(--cond)}
-.sp .nm{font-weight:600;white-space:normal}
-.sp .nm a{text-decoration:none} .sp .nm a:hover{text-decoration:underline}
-.sp .tag{display:inline-block;font-size:11px;font-weight:700;padding:0 5px;border-radius:2px;margin-left:6px;vertical-align:1px}
-.side-r .tag{background:var(--r-tint);color:var(--r)} .side-d .tag{background:var(--d-tint);color:var(--d)}
-.sp .meta{grid-column:1/-1;color:var(--muted);font-weight:400;white-space:normal}
-.sp .am{font-variant-numeric:tabular-nums;font-weight:700}
-.detail .links{grid-column:1/-1;font:500 13px var(--cond)}
 .empty{padding:28px;text-align:center;color:var(--muted)}
 
-.foot{font:400 13px var(--cond);color:var(--muted);margin:8px 0 0}
+/* Drill-down: the race spotlight */
+tr.detail td{padding:0 10px 18px;text-align:left;background:var(--card);border-bottom:1px solid var(--rule)}
+.spot{position:sticky;left:10px;max-width:min(1300px,calc(100vw - 2 * clamp(16px,4vw,64px) - 40px));border:1px solid var(--edge);border-radius:12px;padding:24px;background:#fff;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 32px;white-space:normal}
+.spot .head{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.spot .head .k{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.spot h2{margin:4px 0 0;font-size:24px;font-weight:800;letter-spacing:-.02em}
+.spot .head .edge{font-size:15px;font-weight:700}
+.spot h3{margin:0 0 6px;font-size:15px;padding-bottom:8px}
+.spot .side-d h3{color:var(--d);border-bottom:2px solid var(--accent)}
+.spot .side-r h3{color:var(--r);border-bottom:2px solid var(--r-bar)}
+.sp{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:9px 0;border-bottom:1px solid var(--rule)}
+.sp:last-child{border-bottom:0}
+.sp .nm{font-weight:600}
+.sp .nm a{text-decoration:none} .sp .nm a:hover{text-decoration:underline}
+.sp .tag{display:inline-block;font-size:11px;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:6px;vertical-align:1px}
+.side-d .tag{background:var(--d-head);color:var(--d)} .side-r .tag{background:var(--r-head);color:var(--r)}
+.sp .am{font-weight:800;font-variant-numeric:tabular-nums}
+.sp .meta{grid-column:1/-1;font-size:13px;color:var(--muted)}
+.spot .links{grid-column:1/-1;font-size:13px;color:var(--muted)}
+
+.foot,.checked{margin:0;font-size:13px;color:var(--muted)}
+
 /* Notes */
-details.notes{margin-top:28px;border-top:1px solid var(--rule);padding-top:12px;font-size:14px;max-width:1100px}
-details.notes summary{font:700 15px var(--sans);cursor:pointer}
-.notes h4{font:700 14px var(--sans);margin:18px 0 6px}
-.notes p,.notes li{color:var(--muted);max-width:75ch}
-.notes table{font-size:13px;width:auto;margin-top:6px}
-.notes td,.notes th{text-align:left;padding:3px 10px 3px 0;border-bottom:1px solid var(--rule)}
-.notes td.n{text-align:right}
+details.notes{background:var(--card);border:1px solid var(--edge);border-radius:12px;padding:20px 24px;font-size:14px}
+details.notes summary{font-weight:800;font-size:16px;cursor:pointer}
+.notes h4{font-size:14px;font-weight:800;margin:20px 0 6px}
+.notes p,.notes li{color:var(--muted);max-width:80ch}
+.notes table{border-collapse:collapse;font-size:13px;margin-top:6px}
+.notes td,.notes th{text-align:left;padding:4px 12px 4px 0;border-bottom:1px solid var(--rule)}
+.notes td.n{text-align:right;font-variant-numeric:tabular-nums}
 
 @media (max-width:700px){
-  .wrap{padding:18px 12px 36px}
+  h1{font-size:28px}
+  .totals .amt{font-size:30px}
   .dl{margin-left:0}
-  .detail-inner{padding-left:12px;grid-template-columns:1fr;position:sticky;left:0;width:calc(100vw - 26px)}
-  .split{grid-template-columns:1fr 1fr}
-  .split .mid{grid-column:1/-1;grid-row:2;text-align:left;padding:0}
+  .spot{padding:16px}
 }
+@media (max-width:860px){.spot{grid-template-columns:minmax(0,1fr)}}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1 id="title"></h1>
-    <div class="seats" id="seats"></div>
-    <div class="split" aria-label="Spending split">
-      <div class="rep"><span class="who">Republican side</span><span class="amt" id="rTot"></span></div>
-      <div class="mid" id="grand"></div>
-      <div class="dem"><span class="who">Democratic side</span><span class="amt" id="dTot"></span></div>
+<header class="band">
+  <div class="wrap">
+    <div class="toprow">
+      <div class="titleblock">
+        <div class="kicker">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"></path></svg>
+          <span id="kicker">General election</span>
+        </div>
+        <h1 id="title"></h1>
+      </div>
+      <nav class="sections" aria-label="Sections"><a href="#races">Races</a><a href="#groups" data-open-notes>Groups</a><a href="#notes" data-open-notes>Methodology</a></nav>
     </div>
-    <div class="bar" role="img" id="bar"><i class="r" id="barR"></i><i class="d" id="barD"></i></div>
-    <div class="stamp" id="stamp"></div>
-    <div class="stamp" id="checked"></div>
-    <div class="note" id="note" hidden></div>
-  </header>
+    <div class="totals">
+      <div class="nums">
+        <div><div class="lbl">Helping Democrats</div><div class="amt" id="dTot"></div></div>
+        <div class="right"><div class="lbl">Helping Republicans</div><div class="amt r" id="rTot"></div></div>
+      </div>
+      <div class="bar" role="img" id="bar"><i class="d" id="barD"></i><i class="r" id="barR"></i></div>
+      <div class="caption"><span id="pctD"></span><span id="gap"></span></div>
+    </div>
+  </div>
+</header>
 
-  <div class="controls">
-    <input type="search" id="q" placeholder="Filter by district, candidate, or group" aria-label="Filter races">
-    <div class="seg" role="group" aria-label="Which races">
+<main>
+  <div class="wrap">
+    <div class="note" id="note" hidden></div>
+    <div class="controls" id="races">
+      <label for="q">Find a race</label>
+      <input type="search" id="q" placeholder="District, candidate or group">
       <button type="button" data-view="party" aria-pressed="true">Party races</button>
       <button type="button" data-view="all" aria-pressed="false">All races</button>
+      <div class="dl"><a href="races.csv">Download races CSV</a><a href="transactions.csv">Download transactions CSV</a></div>
     </div>
-    <div class="dl"><a href="races.csv">Download races CSV</a><a href="transactions.csv">Download transactions CSV</a></div>
+    <div class="tablecard"><table class="races" id="tbl"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+    <p class="foot" id="foot"></p>
+    <p class="checked" id="checked"></p>
+    <details class="notes" id="notes"><summary>Data notes and methodology</summary><div id="notesBody"></div></details>
   </div>
-
-  <div class="scroller"><table id="tbl"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
-
-  <p class="foot" id="foot"></p>
-
-  <details class="notes" id="notes"><summary>Data notes and methodology</summary><div id="notesBody"></div></details>
-</div>
+</main>
 
 <script>
 const DATA = /*__DATA__*/null;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const money = n => (n < 0 ? "-$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
+const millions = n => "$" + (Math.abs(n) / 1e6).toFixed(1) + "M";
 const fmtDate = iso => iso ? new Date(iso + "T12:00:00").toLocaleDateString("en-US", {month:"short", day:"numeric"}) : "";
 const advText = a => Math.round(a) === 0 ? "EVEN" : (a > 0 ? "D +" : "R +") + money(Math.abs(a));
+const edgeText = a => Math.round(a) === 0 ? "Even" : (a > 0 ? "Dems +" : "GOP +") + millions(a);
 
 const COLS = DATA.columns;
+const label = c => (c.key.startsWith("OTH_") ? "Other" : c.label) + (c.coordinated ? "*" : "");
 const R_COLS = COLS.filter(c => c.side === "R"), D_COLS = COLS.filter(c => c.side === "D");
 const FIELDS = [
-  {key:"district", label:"DIST", cls:"l dist sticky", get:r => r.district, sort:"str"},
-  ...(DATA.has_pres ? [{key:"pres", label:"PRES '24", cls:"", get:r => r.pres ?? -999}] : []),
-  {key:"rep", label:"REP", cls:"l rep", get:r => r.rep?.name || "", sort:"str"},
-  {key:"dem", label:"DEM", cls:"l dem", get:r => r.dem?.name || "", sort:"str"},
-  ...R_COLS.map(c => ({key:c.key, label:c.label + (c.coordinated ? "*" : ""), cls:"rc", get:r => r.cols[c.key] || 0, side:"R"})),
-  {key:"r_total", label:"R TOTAL", cls:"rc sum", get:r => r.r_total, side:"R"},
-  ...D_COLS.map(c => ({key:c.key, label:c.label + (c.coordinated ? "*" : ""), cls:"dc", get:r => r.cols[c.key] || 0, side:"D"})),
-  {key:"d_total", label:"D TOTAL", cls:"dc sum", get:r => r.d_total, side:"D"},
-  {key:"adv", label:"ADV", cls:"", get:r => r.adv},
-  {key:"new7", label:"NEW 7D", cls:"", get:r => r.new7},
-  {key:"total", label:"TOTAL", cls:"sum", get:r => r.total},
+  {key:"district", label:"Dist", cls:"l dist sticky", get:r => r.district, sort:"str"},
+  ...(DATA.has_pres ? [{key:"pres", label:"Pres '24", cls:"", get:r => r.pres ?? -999}] : []),
+  {key:"dem", label:"Democrat", cls:"l dem", get:r => r.dem?.name || "", sort:"str"},
+  {key:"rep", label:"Republican", cls:"l rep", get:r => r.rep?.name || "", sort:"str"},
+  ...D_COLS.map(c => ({key:c.key, label:label(c), cls:"dc", get:r => r.cols[c.key] || 0, side:"D"})),
+  {key:"d_total", label:"Total", cls:"dc dsum", get:r => r.d_total, side:"D"},
+  ...R_COLS.map(c => ({key:c.key, label:label(c), cls:"rc", get:r => r.cols[c.key] || 0, side:"R"})),
+  {key:"r_total", label:"Total", cls:"rc rsum", get:r => r.r_total, side:"R"},
+  {key:"adv", label:"Split", cls:"split", get:r => r.adv},
+  {key:"new7", label:"New 7d", cls:"new7", get:r => r.new7},
+  {key:"total", label:"Race total", cls:"total", get:r => r.total},
 ];
 const NUMERIC = new Set(FIELDS.filter(f => !f.sort && f.key !== "pres").map(f => f.key));
 const state = {view: DATA.default_view === "all" ? "all" : "party", q: "", sort: "total", dir: -1, open: new Set()};
@@ -198,6 +224,12 @@ function presCell(m) {
   return m > 0 ? `<span class="pres-r">TRUMP+${m.toFixed(1)}</span>` : `<span class="pres-d">HARRIS+${Math.abs(m).toFixed(1)}</span>`;
 }
 
+function splitCell(r) {
+  const t = (r.d_total + r.r_total) || 1;
+  return `<td class="split"><div class="mini"><i class="d" style="width:${(r.d_total / t * 100).toFixed(1)}%"></i><i class="r" style="width:${(r.r_total / t * 100).toFixed(1)}%"></i></div>` +
+         `<div class="edge ${r.adv >= 0 ? "d" : "r"}">${edgeText(r.adv)}</div></td>`;
+}
+
 function cell(f, r) {
   const v = f.get(r);
   if (f.key === "district") return `<td class="${f.cls}">${esc(v)}</td>`;
@@ -206,58 +238,66 @@ function cell(f, r) {
     const c = r[f.key];
     return `<td class="${f.cls}">${c ? esc(c.name) + (c.incumbent ? '<span class="inc">(i)</span>' : "") : "—"}</td>`;
   }
-  if (f.key === "adv") return `<td class="${r.adv > 0 ? "adv-d" : r.adv < 0 ? "adv-r" : ""}">${advText(v)}</td>`;
+  if (f.key === "adv") return splitCell(r);
   const zero = Math.round(v) === 0;
-  return `<td class="${f.cls}${zero ? " zero" : ""}">${money(v)}</td>`;
+  return `<td class="${f.cls}${zero ? " zero" : ""}">${zero ? "—" : money(v)}</td>`;
 }
 
 function detail(r) {
-  const block = (side, title) => {
+  const colLabel = k => { const c = COLS.find(c => c.key === k); return c ? label(c).replace("*", "") : k; };
+  const block = (side, who, total) => {
     const list = r.spenders.filter(s => s.side === side);
-    if (!list.length) return `<div class="side-${side.toLowerCase()}"><h3>${title}</h3><div class="sp"><span class="meta">No reported spending.</span></div></div>`;
-    const colLabel = k => (COLS.find(c => c.key === k) || {}).label || k;
-    return `<div class="side-${side.toLowerCase()}"><h3>${title}</h3>` + list.map(s => `
+    const rows = list.length ? list.map(s => `
       <div class="sp"><span class="nm">${s.id ? `<a href="https://www.fec.gov/data/committee/${esc(s.id)}/" target="_blank" rel="noopener">${esc(s.name)}</a>` : esc(s.name)}<span class="tag">${esc(colLabel(s.col))}${s.kind === "COORD" ? " coordinated" : ""}</span></span>
       <span class="am">${money(s.amount)}</span>
-      <span class="meta">${esc(s.targets.join("; "))}. ${s.n} ${s.kind === "COORD" ? "coordinated " : ""}${s.n === 1 ? "expenditure" : "expenditures"}, latest ${esc(fmtDate(s.last))}.</span></div>`).join("") + `</div>`;
+      <span class="meta">${esc(s.targets.join("; "))}. ${s.n} ${s.kind === "COORD" ? "coordinated " : ""}${s.n === 1 ? "expenditure" : "expenditures"}, latest ${esc(fmtDate(s.last))}.</span></div>`).join("")
+      : `<div class="sp"><span class="meta">No reported spending.</span></div>`;
+    return `<div class="side-${side.toLowerCase()}"><h3>Helping ${esc(who)} · ${money(total)}</h3>${rows}</div>`;
   };
-  return `<tr class="detail"><td colspan="${FIELDS.length}"><div class="detail-inner">
-    ${block("R", "Helping Republicans " + money(r.r_total))}${block("D", "Helping Democrats " + money(r.d_total))}
-    <div class="links"><a href="${esc(r.fec_url)}" target="_blank" rel="noopener">FEC race page for ${esc(r.district)}</a>${r.last_filed ? `, last filing ${esc(fmtDate(r.last_filed))}` : ""}</div>
+  const dem = r.dem?.name || "Democrats", rep = r.rep?.name || "Republicans";
+  return `<tr class="detail"><td colspan="${FIELDS.length}"><div class="spot">
+    <div class="head"><div><div class="k">Race spotlight</div><h2>${esc(r.district)}: ${esc(dem)} vs. ${esc(rep)}</h2></div>
+      <div class="edge" style="color:${r.adv >= 0 ? "var(--d)" : "#8A4B44"}">${r.adv >= 0 ? "Democratic side" : "Republican side"} +${money(Math.abs(r.adv))}</div></div>
+    ${block("D", dem, r.d_total)}${block("R", rep, r.r_total)}
+    <div class="links"><a href="${esc(r.fec_url)}" target="_blank" rel="noopener">FEC race page for ${esc(r.district)}</a>${r.last_filed ? ` · last filing ${esc(fmtDate(r.last_filed))}` : ""}${r.new7 ? ` · ${money(r.new7)} filed in the last 7 days` : ""}</div>
   </div></td></tr>`;
 }
 
 function renderHead() {
   const pre = FIELDS.slice(0, FIELDS.findIndex(f => f.side));
-  const rN = FIELDS.filter(f => f.side === "R").length, dN = FIELDS.filter(f => f.side === "D").length;
+  const dN = FIELDS.filter(f => f.side === "D").length, rN = FIELDS.filter(f => f.side === "R").length;
   const post = FIELDS.length - pre.length - rN - dN;
   $("#tbl thead").innerHTML =
-    `<tr class="groups"><th colspan="${pre.length}" class="sticky"></th><th colspan="${rN}" class="g-r">Helping Republicans</th><th colspan="${dN}" class="g-d">Helping Democrats</th><th colspan="${post}"></th></tr>` +
-    `<tr>${FIELDS.map(f => `<th scope="col" data-key="${f.key}" class="${f.cls.replace(/\b(sum|dist|rep|dem)\b/g, "")}" tabindex="0"${state.sort === f.key ? ` aria-sort="${state.dir < 0 ? "descending" : "ascending"}"` : ""}><span>${esc(f.label)}</span></th>`).join("")}</tr>`;
+    `<tr class="groups"><th colspan="${pre.length}" class="sticky"></th><th colspan="${dN}" class="g-d">Helping Democrats</th><th colspan="${rN}" class="g-r">Helping Republicans</th><th colspan="${post}"></th></tr>` +
+    `<tr class="cols">${FIELDS.map(f => `<th scope="col" data-key="${f.key}" class="${f.cls.replace(/\b(dist|rep|dem|zero|total|new7|split)\b/g, "")}" tabindex="0"${state.sort === f.key ? ` aria-sort="${state.dir < 0 ? "descending" : "ascending"}"` : ""}><span>${esc(f.label)}</span></th>`).join("")}</tr>`;
 }
 
 function render() {
   const rows = visible();
   renderHead();
-  $("#tbl tbody").innerHTML = rows.length ? rows.map((r, i) => {
+  $("#tbl tbody").innerHTML = rows.length ? rows.map(r => {
     const open = state.open.has(r.district);
-    return `<tr class="race${i % 2 ? " alt" : ""}" tabindex="0" data-d="${esc(r.district)}" aria-expanded="${open}">${FIELDS.map(f => cell(f, r)).join("")}</tr>` + (open ? detail(r) : "");
-  }).join("") : `<tr><td colspan="${FIELDS.length}" class="empty">No races match "${esc(state.q)}". Clear the filter or switch to All races.</td></tr>`;
+    return `<tr class="race" tabindex="0" data-d="${esc(r.district)}" aria-expanded="${open}">${FIELDS.map(f => cell(f, r)).join("")}</tr>` + (open ? detail(r) : "");
+  }).join("") : `<tr><td colspan="${FIELDS.length}" class="empty">No races match "${esc(state.q)}". Clear the search or switch to All races.</td></tr>`;
 
   const tot = {}, cnt = {};
   for (const f of FIELDS) if (NUMERIC.has(f.key)) { tot[f.key] = rows.reduce((a, r) => a + f.get(r), 0); cnt[f.key] = rows.filter(r => Math.round(f.get(r)) !== 0).length; }
   const lead = FIELDS.findIndex(f => NUMERIC.has(f.key));
   $("#tbl tfoot").innerHTML =
-    `<tr><td class="l sticky" colspan="${lead}">Total</td>${FIELDS.slice(lead).map(f => f.key === "adv" ? `<td class="${tot.adv > 0 ? "adv-d" : "adv-r"}">${advText(tot.adv)}</td>` : `<td class="${f.cls.replace("sticky", "")}">${money(tot[f.key])}</td>`).join("")}</tr>` +
+    `<tr><td class="l sticky" colspan="${lead}">Total</td>${FIELDS.slice(lead).map(f => f.key === "adv" ? `<td class="split"><div class="edge ${tot.adv >= 0 ? "d" : "r"}">${edgeText(tot.adv)}</div></td>` : `<td class="${f.cls}">${money(tot[f.key])}</td>`).join("")}</tr>` +
     `<tr class="counts"><td class="l sticky" colspan="${lead}">Races with spending</td>${FIELDS.slice(lead).map(f => f.key === "adv" ? "<td></td>" : `<td>${cnt[f.key]}</td>`).join("")}</tr>`;
 
   const r = tot.r_total || 0, d = tot.d_total || 0, all = r + d || 1;
-  $("#rTot").textContent = money(r); $("#dTot").textContent = money(d);
-  $("#grand").textContent = money(r + d) + " total, " + advText(d - r);
-  $("#barR").style.width = (r / all * 100) + "%"; $("#barD").style.width = (d / all * 100) + "%";
-  $("#bar").setAttribute("aria-label", `Republican side ${money(r)}, Democratic side ${money(d)}`);
-  $("#seats").textContent = `${rows.length} ${rows.length === 1 ? "seat" : "seats"}` + (state.view === "party" ? " with party-side spending" : " with any general-election IE");
-  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === state.view)));
+  $("#dTot").textContent = millions(d); $("#rTot").textContent = millions(r);
+  $("#barD").style.width = (d / all * 100) + "%"; $("#barR").style.width = (r / all * 100) + "%";
+  $("#bar").setAttribute("aria-label", `Democratic side ${money(d)}, Republican side ${money(r)}`);
+  $("#pctD").textContent = `${Math.round(d / all * 100)}% Democratic side · ${rows.length} ${rows.length === 1 ? "seat" : "seats"}`;
+  $("#gap").textContent = Math.round(d - r) === 0 ? "Even" : (d > r ? "Democrats +" : "Republicans +") + millions(d - r);
+  const partyN = DATA.races.filter(x => x.party_race).length;
+  document.querySelectorAll(".controls button").forEach(b => {
+    b.setAttribute("aria-pressed", String(b.dataset.view === state.view));
+    b.textContent = b.dataset.view === "party" ? `Party races · ${partyN}` : `All races · ${DATA.races.length}`;
+  });
 }
 
 function renderNotes() {
@@ -283,7 +323,7 @@ function renderNotes() {
     <h4>Where each column's money went</h4>
     <p>Spending by each named group that the FEC file contains but the table does not count, by reason. Check this first if a column looks low. Primary-coded money is usually genuine primary spending; rows dated after a race's primary are the ones to question. Row-level detail: <a href="not_counted.csv">not_counted.csv</a>.</p>
     ${tbl(["Column", "Counted IEs", "Counted coordinated", "Not counted"], (g.reconciliation || []).map(c => `<tr><td>${esc(c.label)}</td><td class="n">${money(c.counted_ie)}</td><td class="n">${c.coordinated ? money(c.counted_coordinated) : ""}</td><td>${Object.entries(c.not_counted).map(([k, v]) => `${esc(k)}: ${money(v)}`).join("<br>") || "Nothing"}</td></tr>`))}
-    <h4>Biggest groups without their own column</h4>
+    <h4 id="groups">Biggest groups without their own column</h4>
     <p>Add any of these to config.toml to break them out.</p>
     ${["R","D"].map(sd => tbl([sd === "R" ? "Helping Republicans" : "Helping Democrats", "Races", "Amount"],
       (g.top_other?.[sd] || []).map(o => `<tr><td>${esc(o.name)} <span style="opacity:.6">${esc(o.id)}</span></td><td class="n">${o.races}</td><td class="n">${money(o.amount)}</td></tr>`))).join("")}
@@ -297,15 +337,18 @@ function renderNotes() {
     ${tbl(["Group", "Candidate", "District", "Counted", "Filer aggregate"], (g.possible_double_counts || []).map(o => `<tr><td>${esc(o.spender)}</td><td>${esc(o.candidate)}</td><td>${esc(o.district)}</td><td class="n">${money(o.counted)}</td><td class="n">${money(o.filer_aggregate)}</td></tr>`))}`;
 }
 
+
 const coordCols = COLS.filter(c => c.coordinated).map(c => c.label);
-if (coordCols.length) $("#foot").textContent = `* ${coordCols.join(" and ")} include party coordinated expenditures as well as independent expenditures. Coordinated spending appears only once the party files its monthly report, so it lags IEs by weeks.`;
+$("#foot").textContent = (coordCols.length ? `* ${coordCols.join(" and ")} include party coordinated spending as well as independent expenditures; coordinated spending appears once the party files its monthly report. ` : "") +
+  `Click any race for its spotlight. FEC filings received through ${fmtDate(DATA.as_of)}.`;
 $("#title").textContent = DATA.title;
 document.title = DATA.title;
-$("#stamp").textContent = `Updated ${DATA.generated_label}. FEC filings received through ${fmtDate(DATA.as_of)}.`;
+$("#kicker").textContent = `General election · Updated ${DATA.generated_label}`;
 if (DATA.note) { $("#note").hidden = false; $("#note").textContent = DATA.note; }
 
 $("#q").addEventListener("input", e => { state.q = e.target.value; render(); });
-document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { state.view = b.dataset.view; render(); }));
+document.querySelectorAll(".controls button").forEach(b => b.addEventListener("click", () => { state.view = b.dataset.view; render(); }));
+document.querySelectorAll("[data-open-notes]").forEach(a => a.addEventListener("click", () => { $("#notes").open = true; }));
 const toggleRow = tr => { const d = tr.dataset.d; state.open.has(d) ? state.open.delete(d) : state.open.add(d); render(); document.querySelector(`tr.race[data-d="${d}"]`)?.focus(); };
 const sortBy = th => { const k = th.dataset.key; if (state.sort === k) state.dir *= -1; else { state.sort = k; state.dir = NUMERIC.has(k) || k === "pres" ? -1 : 1; } render(); document.querySelector(`th[data-key="${k}"]`)?.focus(); };
 $("#tbl").addEventListener("click", e => {

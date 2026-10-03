@@ -23,7 +23,7 @@ races = "party"
 coordinated_include_memos = true
 
 [display]
-title = "House Races w/ Party Spending (General Election)"
+title = "2026 House Battlefield Independent Expenditure Dashboard"
 other_r_label = "OTH R"
 other_d_label = "OTH D"
 
