@@ -29,7 +29,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = "1.6"
+VERSION = "1.8"
 ROOT = Path(__file__).resolve().parent
 ET = ZoneInfo("America/New_York")
 UA = f"house-ie-tracker/{VERSION}"
@@ -799,6 +799,19 @@ def clean_rows(rows: list[dict], superseded: set[str], stats: Counter, excluded:
     return out
 
 
+def find_override(overrides: dict, key: str, district: str, names) -> str:
+    """Party override by candidate key (FEC ID or RACE:LASTNAME as filed), or by race and last
+    name for any candidate, e.g. "AK00:HAFNER"."""
+    if key in overrides:
+        return overrides[key]
+    for n in names:
+        toks, last = name_tokens(n)
+        ln = " ".join(last or toks[-1:])
+        if ln and f"{district}:{ln}" in overrides:
+            return overrides[f"{district}:{ln}"]
+    return ""
+
+
 def apply_exclusions_and_aliases(rows: list[dict], master: dict, cfg: dict, stats: Counter) -> list[dict]:
     """1) Drop rows for candidates listed under [exclusions] (by name or key).
     2) A candidate key with no usable party (an unrecognized or old FEC ID, or a name-only
@@ -806,7 +819,7 @@ def apply_exclusions_and_aliases(rows: list[dict], master: dict, cfg: dict, stat
     ex_entries = [e.strip().upper() for e in cfg.get("exclusions", {}).get("candidates", [])]
     ex_keys = {e for e in ex_entries if ":" in e or re.fullmatch(r"[HSP][0-9A-Z]{8}", e)}
     ex_names = [set(name_tokens(e)[0]) for e in ex_entries if e not in ex_keys]
-    overrides = {k.upper() for k in cfg.get("party_overrides", {})}
+    overrides = {k.upper(): norm_party(v) for k, v in cfg.get("party_overrides", {}).items()}
 
     aliases = {k.upper(): v for k, v in cfg.get("candidate_aliases", {}).items()}
     kept = []
@@ -826,7 +839,9 @@ def apply_exclusions_and_aliases(rows: list[dict], master: dict, cfg: dict, stat
         i["money"] += abs(r["amount"])
 
     def party(k):
-        if k in overrides:
+        i = info[k]
+        if find_override(overrides, k, i["districts"].most_common(1)[0][0],
+                         list(i["names"]) + [master.get(k, {}).get("name", "")]):
             return "override"
         reported = next((p for p, _ in info[k]["parties"].most_common() if p), "")
         return reported or norm_party(master.get(k, {}).get("party"))
@@ -873,13 +888,16 @@ def resolve_candidates(rows: list[dict], master: dict, cfg: dict) -> tuple[dict,
         m = master.get(key, {})
         reported = next((p for p, _ in a["parties"].most_common() if p), "")
         mparty = norm_party(m.get("party"))
-        if key in overrides:
-            party, how = overrides[key], "override"
+        ov = find_override(overrides, key, a["districts"].most_common(1)[0][0],
+                           list(a["names"]) + [m.get("name", "")])
+        if ov:
+            party, how = ov, "override"
         elif reported:
             party, how = reported, "filers"
         else:
             party, how = mparty, "fec_master" if mparty else "unknown"
-        if how in ("fec_master", "unknown") or (how == "filers" and mparty and mparty != reported):
+        if how in ("fec_master", "unknown") or (how == "filers" and mparty and mparty != reported) or \
+                (how == "override" and ov != (reported or mparty)):
             notes.append({"key": key, "name": display_name(m.get("name") or a["names"].most_common(1)[0][0]),
                           "district": a["districts"].most_common(1)[0][0],
                           "filers_say": a["texts"].most_common(1)[0][0] or "blank",
@@ -995,6 +1013,14 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
             "last_filed": race["last_filed"], "spenders": spenders,
             "fec_url": f"https://www.fec.gov/data/elections/house/{st}/{dn}/{cfg.get('cycle', 2026)}/",
         })
+    # Races to leave out (e.g. special elections), and nominees no filing names yet.
+    skip = {d.strip().upper() for d in cfg.get("exclusions", {}).get("races", [])}
+    out_races = [r for r in out_races if r["district"] not in skip]
+    for r in out_races:
+        nom = {k.lower(): v for k, v in cfg.get("nominees", {}).get(r["district"], {}).items()}
+        for side, key in (("rep", "rep"), ("dem", "dem")):
+            if nom.get(side):
+                r[key] = {"name": nom[side].upper(), "incumbent": bool(nom.get(f"{side}_incumbent")), "id": ""}
     out_races.sort(key=lambda r: -r["total"])
 
     # Biggest groups that don't have their own column, to help decide what to promote.

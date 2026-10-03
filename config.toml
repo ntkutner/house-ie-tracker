@@ -75,9 +75,47 @@ name_patterns = ['^DCCC\b', 'DEMOCRATIC CONGRESSIONAL CAMPAIGN']
 coordinated = true   # also count party coordinated expenditures (Schedule F) by these IDs
 
 # ---------------------------------------------------------------------------
-# Party overrides, keyed by FEC candidate ID. Use when filers report a candidate's
-# party as OTHER/blank, or for independents one side is backing. The value is the
-# side the candidate counts on: "REP" or "DEM".
+# Party overrides. Key = the candidate as Data notes lists it: an FEC candidate ID
+# (H6AK01092) or, for filings with no ID, race and last name as filed (VA02:LURIA).
+# Value = the side the candidate counts on: "REP" or "DEM".
 # ---------------------------------------------------------------------------
 [party_overrides]
-"H2CA03157" = "REP"   # Kevin Kiley (CA-06); filers report his party as OTHER
+"H2CA03157" = "REP"    # Kevin Kiley (CA-06); filers report his party as OTHER
+"H6AK01092" = "DEM"    # Bill Hill (AK-AL), independent counted with Democrats
+"AK00:HAFNER" = "REP"  # Eric Hafner (AK-AL): spending against him helps Bill Hill, so it counts
+                       # as helping Democrats (and spending for him as helping Republicans)
+"H0NJ07089" = "REP"    # Tom Kean (NJ-07)
+"VA02:LURIA" = "DEM"   # Elaine Luria (VA-02)
+"H4NY04158" = "DEM"    # Laura Gillen (NY-04)
+"H4PA07118" = "REP"    # Ryan Mackenzie (PA-07)
+"H8NV03200" = "DEM"    # Susie Lee (NV-03)
+"H8VA05106" = "DEM"    # Tom Perriello (VA-05)
+"H4CA45170" = "DEM"    # Derek Tran (CA-45)
+"OH13:SKYES" = "DEM"   # Emilia Sykes (OH-13), misspelled by the filer
+
+# Filings that name a candidate wrongly, to be counted toward the right candidate in the
+# same race. Key = the candidate as Data notes lists it; value = the right last name.
+[candidate_aliases]
+"TX28:CUELLER" = "CUELLAR"   # Henry Cuellar (TX-28), misspelled by the filer
+
+# Nominee names to show when no filing names them (or to override the name shown).
+# Keys: rep, dem. Add rep_incumbent = true / dem_incumbent = true for the (i) marker.
+[nominees]
+"IN01" = { rep = "Barb Regnitz" }
+"AK00" = { dem = "Bill Hill (Ind.)" }
+
+# ---------------------------------------------------------------------------
+# Candidates to leave out entirely. A name drops every filing naming that person in
+# any race; a key (FEC ID or RACE:LASTNAME) drops just that one.
+# ---------------------------------------------------------------------------
+[exclusions]
+candidates = [
+  "SHAWN BETTIS",   # not a real candidate; bogus filings (one for $3 billion)
+  "SETH BODNAR",    # running for Senate, filed under House by mistake
+  "H6IL04195",      # Christopher Getty (IL-04), independent
+  "H6IA01213",      # Michael Bridgford (IA-01), independent
+  "H4ME02093",      # John Baldacci, Maine ID filed against an Iowa race
+  "CA47:BAUGH",     # Scott Baugh (CA-47)
+]
+# Races to leave out entirely (spending there was for special elections).
+races = ["GA14", "CA01", "FL06", "TN07"]
