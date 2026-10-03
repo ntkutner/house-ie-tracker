@@ -29,7 +29,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = "1.3"
+VERSION = "1.6"
 ROOT = Path(__file__).resolve().parent
 ET = ZoneInfo("America/New_York")
 UA = f"house-ie-tracker/{VERSION}"
@@ -188,7 +188,8 @@ def named_key(spe_id: str, spe_nam: str, cols: list[dict]) -> str | None:
     return None
 
 
-def read_ie(path: Path, cfg: dict, cols: list[dict], master: dict) -> tuple[list[dict], dict, Counter, list[dict]]:
+def read_ie(path: Path, cfg: dict, cols: list[dict], master: dict, extra: list[dict] = (),
+            all_files: set | None = None) -> tuple[list[dict], dict, Counter, list[dict]]:
     """Returns House general-election rows, the amendment map (all offices), counts, and
     excluded rows from named-column groups (so gaps in e.g. CLF are visible)."""
     etypes = tuple(t.upper() for t in cfg.get("filters", {}).get("election_types", ["G"]))
@@ -198,13 +199,22 @@ def read_ie(path: Path, cfg: dict, cols: list[dict], master: dict) -> tuple[list
     excluded: list[dict] = []
     stats: Counter = Counter()
 
-    with open(path, newline="", encoding="utf-8", errors="replace") as fh:
-        reader = csv.DictReader(fh)
-        reader.fieldnames = [HEADER_ALIASES.get(h.strip().lower(), h.strip().lower())
-                             for h in (reader.fieldnames or [])]
-        for r in reader:
+    def source():
+        with open(path, newline="", encoding="utf-8", errors="replace") as fh:
+            reader = csv.DictReader(fh)
+            reader.fieldnames = [HEADER_ALIASES.get(h.strip().lower(), h.strip().lower())
+                                 for h in (reader.fieldnames or [])]
+            yield from reader
+        for x in extra:
+            stats["rows_from_raw_filings"] += 1
+            yield x
+
+    if True:
+        for r in source():
             stats["rows_in_file"] += 1
             fn = (r.get("file_num") or "").strip()
+            if all_files is not None and fn:
+                all_files.add(fn)
             prev = (r.get("prev_file_num") or "").strip()
             if fn and prev:
                 parent[fn] = prev  # amendment chains are tracked across every office
@@ -390,6 +400,146 @@ def load_coordinated_raw(cfg: dict, cols: list[dict], cache_dir: Path, stats: Co
                                 "rows": len(sf), "amount": round(sum(x["amount"] for x in sf if not x["memo"]), 2)})
     stats["coordinated_raw_lines"] = len(lines)
     return lines, reports, "; ".join(errors)
+
+
+_IE_LIST_CACHE: dict[str, list[dict]] = {}
+
+
+def list_recent_ie_filings(api_key: str, since: str, max_pages: int = 40) -> list[dict]:
+    """24/48-hour IE notices (Form 24) and Form 5 reports e-filed on or after `since`, newest
+    first, from OpenFEC's raw e-filing list."""
+    if since in _IE_LIST_CACHE:
+        return _IE_LIST_CACHE[since]
+    out, seen = [], set()
+    for page in range(1, max_pages + 1):
+        base = f"{FEC_API}/efile/filings/?sort=-receipt_date&per_page=100&page={page}&api_key={api_key}"
+        try:
+            with urllib.request.urlopen(urllib.request.Request(
+                    base + f"&min_receipt_date={since}", headers={"User-Agent": UA}), timeout=60) as r:
+                results = json.load(r).get("results", [])
+        except urllib.error.HTTPError as e:
+            if e.code not in (400, 422):
+                raise
+            with urllib.request.urlopen(urllib.request.Request(base, headers={"User-Agent": UA}), timeout=60) as r:
+                results = json.load(r).get("results", [])
+        if not results:
+            break
+        oldest = "9999"
+        for f in results:
+            rd = str(f.get("receipt_date") or "")[:10]
+            oldest = min(oldest, rd or oldest)
+            form = str(f.get("form_type") or "").upper()
+            fn = f.get("file_number") or f.get("fec_file_id")
+            if not fn or rd < since or fn in seen or not (form.startswith("F24") or form.startswith("F5")):
+                continue
+            seen.add(fn)
+            amends = f.get("amends_file") or f.get("amendment_of") or ""
+            out.append({"file_number": int(fn), "form_type": form, "receipt_date": rd,
+                        "committee_id": str(f.get("committee_id") or "").upper(),
+                        "committee_name": f.get("committee_name") or f.get("filer_name") or "",
+                        "amendment": form.endswith("A") or str(f.get("amendment_indicator") or "").upper() == "A",
+                        "amends": str(amends) if amends else ""})
+        if oldest < since:
+            break
+    _IE_LIST_CACHE[since] = out
+    return out
+
+
+def parse_ie_filing(items, filing: dict) -> list[dict]:
+    """Schedule E / Form 5 line 7 expenditures from a parsed 24/48-hour filing, shaped like rows
+    of the FEC bulk IE file so they go through exactly the same cleaning."""
+    name, rows = filing.get("committee_name", ""), []
+    for it in items:
+        d = it.data if isinstance(it.data, dict) else {}
+        if it.data_type == "summary":
+            name = (d.get("committee_name") or d.get("organization_name") or
+                    " ".join(x for x in (d.get("individual_first_name"), d.get("individual_last_name")) if x)
+                    or name)
+            continue
+        if it.data_type != "itemization":
+            continue
+        ft = str(d.get("form_type") or "").upper()
+        if not (ft.startswith("SE") or ft.startswith("F57")):
+            continue
+        g = lambda k: str(d.get(k) or "").strip()
+        if g("memo_code").upper() == "X":
+            continue
+        ec = g("election_code").upper()
+        rows.append({
+            "cand_id": g("candidate_id_number"),
+            "cand_name": ", ".join(x for x in (g("candidate_last_name"), g("candidate_first_name")) if x),
+            "spe_id": g("filer_committee_id_number") or filing.get("committee_id", ""), "spe_nam": name,
+            "ele_type": ec[:1], "fec_election_yr": ec[1:5] if ec[1:5].isdigit() else "",
+            "can_office_state": g("candidate_state"), "can_office_dis": g("candidate_district"),
+            "can_office": g("candidate_office"), "cand_pty_aff": "",
+            "exp_amo": g("expenditure_amount"), "exp_date": g("disbursement_date") or g("dissemination_date"),
+            "dissem_dt": g("dissemination_date"), "agg_amo": g("calendar_y_t_d_per_election_office"),
+            "sup_opp": g("support_oppose_code"), "pur": g("expenditure_purpose_descrip"),
+            "pay": g("payee_organization_name") or " ".join(x for x in (g("payee_first_name"), g("payee_last_name")) if x),
+            "file_num": str(filing["file_number"]), "amndt_ind": "A" if filing.get("amendment") else "N",
+            "tran_id": g("transaction_id_number"), "image_num": "",
+            "receipt_dat": filing.get("receipt_date", ""), "prev_file_num": filing.get("amends", ""),
+        })
+    return rows
+
+
+def load_ie_raw(since: str, cache_dir: Path, stats: Counter, known_files: set | None = None) -> tuple[list[dict], list[dict], str]:
+    """IE rows from 24/48-hour notices filed since the bulk file was built, read from the filings
+    themselves. Filings already in the bulk file are skipped; parsed filings are cached."""
+    try:
+        import fecfile
+    except ImportError:
+        return [], [], "the fecfile package isn't installed (pip install fecfile)"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    manifest = cache_dir / "filings.json"      # test fixtures only
+    try:
+        filings = (json.loads(manifest.read_text()) if manifest.exists()
+                   else list_recent_ie_filings(os.environ.get("FEC_API_KEY") or "DEMO_KEY", since))
+    except Exception as e:
+        return [], [], f"couldn't list recent 24/48-hour filings ({e})"
+    rows, used, errors = [], [], []
+    for f in sorted(filings, key=lambda f: f["file_number"]):
+        if known_files and str(f["file_number"]) in known_files:
+            continue  # already in the bulk file
+        cpath = cache_dir / f"{f['file_number']}.json"
+        if cpath.exists():
+            got = json.loads(cpath.read_text())
+        else:
+            try:
+                items = fecfile.iter_http(f["file_number"], options={"filter_itemizations": ["SE", "F57"],
+                                                                      "as_strings": True})
+                got = parse_ie_filing(items, f)
+                cpath.write_text(json.dumps(got))
+            except Exception as e:
+                errors.append(f"filing {f['file_number']}: {e}")
+                continue
+        rows += got
+        used.append({**f, "rows": len(got)})
+    # Drop cached filings the bulk file now covers, so the cache stays small.
+    if known_files:
+        for c in cache_dir.glob("*.json"):
+            if c.stem in known_files:
+                c.unlink()
+    stats["raw_ie_filings"] = len(used)
+    msg = f"{len(errors)} filing(s) couldn't be read: " + "; ".join(errors[:3]) if errors else ""
+    return rows, used, msg
+
+
+def infer_raw_parents(rows: list[dict], parent: dict, raw_used: list[dict]) -> None:
+    """An amended 24/48-hour notice replaces the filer's earlier notice that has the same
+    transactions. When the FEC listing doesn't say which one, find it by transaction ID."""
+    by_tran = defaultdict(set)
+    for r in rows:
+        if r["tran_id"]:
+            by_tran[(r["spe_id"], r["tran_id"])].add(r["file_num"])
+    for f in raw_used:
+        fn = str(f["file_number"])
+        if not f.get("amendment") or fn in parent:
+            continue
+        earlier = {x for r in rows if r["file_num"] == fn and r["tran_id"]
+                   for x in by_tran[(r["spe_id"], r["tran_id"])] if num(x) < num(fn)}
+        if earlier:
+            parent[fn] = max(earlier, key=num)
 
 
 def load_coordinated(path: Path | None, cfg: dict, cols: list[dict], master: dict, stats: Counter,
@@ -649,6 +799,64 @@ def clean_rows(rows: list[dict], superseded: set[str], stats: Counter, excluded:
     return out
 
 
+def apply_exclusions_and_aliases(rows: list[dict], master: dict, cfg: dict, stats: Counter) -> list[dict]:
+    """1) Drop rows for candidates listed under [exclusions] (by name or key).
+    2) A candidate key with no usable party (an unrecognized or old FEC ID, or a name-only
+    filing) is folded into the candidate with the same name in the same race who has one."""
+    ex_entries = [e.strip().upper() for e in cfg.get("exclusions", {}).get("candidates", [])]
+    ex_keys = {e for e in ex_entries if ":" in e or re.fullmatch(r"[HSP][0-9A-Z]{8}", e)}
+    ex_names = [set(name_tokens(e)[0]) for e in ex_entries if e not in ex_keys]
+    overrides = {k.upper() for k in cfg.get("party_overrides", {})}
+
+    aliases = {k.upper(): v for k, v in cfg.get("candidate_aliases", {}).items()}
+    kept = []
+    for r in rows:
+        toks = set(name_tokens(r["cand_name"])[0])
+        if r["cand_key"] in ex_keys or any(n and n <= toks for n in ex_names):
+            stats["excluded_candidate_rows"] += 1
+            continue
+        kept.append(r)
+
+    info = defaultdict(lambda: {"names": Counter(), "districts": Counter(), "parties": Counter(), "money": 0.0})
+    for r in kept:
+        i = info[r["cand_key"]]
+        i["names"][r["cand_name"]] += 1
+        i["districts"][r["district"]] += 1
+        i["parties"][r["party_raw"]] += 1
+        i["money"] += abs(r["amount"])
+
+    def party(k):
+        if k in overrides:
+            return "override"
+        reported = next((p for p, _ in info[k]["parties"].most_common() if p), "")
+        return reported or norm_party(master.get(k, {}).get("party"))
+
+    remap = {}
+    for k, target in aliases.items():  # explicit: "TX28:CUELLER" = "CUELLAR"
+        if k not in info:
+            continue
+        d = info[k]["districts"].most_common(1)[0][0]
+        hits = [(o["money"], ok) for ok, o in info.items() if ok != k
+                and o["districts"].most_common(1)[0][0] == d
+                and same_person(target, o["names"].most_common(1)[0][0])]
+        if hits:
+            remap[k] = max(hits)[1]
+    for k, i in info.items():
+        if k in remap or party(k):
+            continue
+        d, nm = i["districts"].most_common(1)[0][0], i["names"].most_common(1)[0][0]
+        targets = [(o["money"], ok) for ok, o in info.items() if ok != k and party(ok)
+                   and o["districts"].most_common(1)[0][0] == d
+                   and same_person(nm, o["names"].most_common(1)[0][0])]
+        if targets and len({party(t[1]) for t in targets}) == 1:
+            remap[k] = max(targets)[1]
+    for r in kept:
+        if r["cand_key"] in remap:
+            r["cand_key"] = remap[r["cand_key"]]
+            stats["merged_into_known_candidate"] += 1
+    return kept
+
+
 def resolve_candidates(rows: list[dict], master: dict, cfg: dict) -> tuple[dict, list[dict]]:
     overrides = {k.upper(): norm_party(v) for k, v in cfg.get("party_overrides", {}).items()}
     agg = defaultdict(lambda: {"districts": Counter(), "parties": Counter(),
@@ -891,10 +1099,18 @@ def main() -> int:
     ap.add_argument("--candidates", help="local cnYY.zip / cn.txt instead of downloading")
     ap.add_argument("--coordinated", help="local pas2YY.zip / itpas2.txt instead of downloading")
     ap.add_argument("--coordinated-cache", help="folder of cached party filings (for testing)")
+    ap.add_argument("--ie-cache", help="folder of cached 24/48-hour filings (for testing)")
     ap.add_argument("--out", default=str(ROOT / "docs"))
     ap.add_argument("--force", action="store_true", help="rebuild even if the FEC file is unchanged")
     ap.add_argument("--note", default="", help="banner text to show on the page (e.g. for previews)")
     args = ap.parse_args()
+
+    def heartbeat(result_text: str) -> None:
+        now = dt.datetime.now(ET)
+        Path(args.out).mkdir(parents=True, exist_ok=True)
+        (Path(args.out) / "status.json").write_text(json.dumps({
+            "last_checked": now.isoformat(timespec="seconds"),
+            "last_checked_label": now.strftime("%b %-d at %-I:%M %p ET"), "result": result_text}))
 
     cfg_text = Path(args.config).read_text()
     cfg = tomllib.loads(cfg_text)
@@ -915,6 +1131,13 @@ def main() -> int:
         ie_path = ROOT / "data" / Path(url).name
         raw_sig = party_reports_signature(cfg, compile_columns(cfg)) if any(
             c.get("coordinated") for c in cfg.get("columns", [])) else ""
+        if cfg.get("sources", {}).get("read_new_filings", True) and meta.get("bulk_latest"):
+            try:
+                since = (dt.date.fromisoformat(meta["bulk_latest"]) - dt.timedelta(days=1)).isoformat()
+                raw_sig += "|" + ",".join(str(f["file_number"]) for f in list_recent_ie_filings(
+                    os.environ.get("FEC_API_KEY") or "DEMO_KEY", since))
+            except Exception as e:
+                raw_sig += f"|error:{type(e).__name__}"
         unchanged_build = (meta.get("build_sig") == build_sig and meta.get("pres_sig") == pres_sig
                            and meta.get("raw_sig") == raw_sig)
         etag = meta.get("ie_etag") if (unchanged_build and not args.force) else None
@@ -922,6 +1145,7 @@ def main() -> int:
         res = download(url, ie_path, etag)
         if not res["changed"]:
             print("FEC file unchanged since last build. Nothing to do.")
+            heartbeat("no new FEC data")
             return 0
         source = {"ie_url": url, "last_modified": res.get("last_modified"), "etag": res.get("etag")}
 
@@ -938,7 +1162,28 @@ def main() -> int:
         print(f"Warning: candidate master file unavailable ({e}); using filer-reported names.", file=sys.stderr)
 
     cols = compile_columns(cfg)
-    rows, parent, stats, excluded = read_ie(ie_path, cfg, cols, master)
+    # Pass 1: which filings the bulk file already has, and how fresh it is.
+    bulk_files: set = set()
+    bulk_latest = ""
+    with open(ie_path, newline="", encoding="utf-8", errors="replace") as fh:
+        rdr = csv.DictReader(fh)
+        rdr.fieldnames = [HEADER_ALIASES.get(h.strip().lower(), h.strip().lower()) for h in (rdr.fieldnames or [])]
+        for r in rdr:
+            if r.get("file_num"):
+                bulk_files.add(r["file_num"].strip())
+            bulk_latest = max(bulk_latest, parse_date(r.get("receipt_dat")))
+    raw_ie_rows, raw_ie_used, raw_ie_error = [], [], ""
+    if cfg.get("sources", {}).get("read_new_filings", True) and (not args.input or args.ie_cache):
+        since = (dt.date.fromisoformat(bulk_latest) - dt.timedelta(days=1)).isoformat() if bulk_latest else \
+            (dt.date.today() - dt.timedelta(days=3)).isoformat()
+        raw_ie_rows, raw_ie_used, raw_ie_error = load_ie_raw(
+            since, Path(args.ie_cache or ROOT / "cache" / "ie"), Counter(), bulk_files)
+        if raw_ie_error:
+            print(f"Warning: {raw_ie_error}", file=sys.stderr)
+        print(f"New 24/48-hour filings read directly: {len(raw_ie_used)} ({len(raw_ie_rows)} lines)")
+    rows, parent, stats, excluded = read_ie(ie_path, cfg, cols, master, raw_ie_rows)
+    infer_raw_parents(rows, parent, raw_ie_used)
+    stats["raw_ie_filings"] = len(raw_ie_used)
     resolve_missing_ids(rows, master, cfg, stats)
     rows = clean_rows(rows, superseded_filings(parent), stats, excluded)
 
@@ -969,6 +1214,7 @@ def main() -> int:
             rows += coord_rows
             source_coord["latest_transaction"] = max((r["date"] for r in coord_rows if r["date"]), default="")
 
+    rows = apply_exclusions_and_aliases(rows, master, cfg, stats)
     cands, party_notes = resolve_candidates(rows, master, cfg)
     result = build(cfg, rows, cands, load_pres_margins(pres_path), excluded)
 
@@ -979,6 +1225,8 @@ def main() -> int:
         "generated_label": now.strftime("%b %-d, %Y at %-I:%M %p ET"),
         "source": source, "note": args.note,
         "source_coordinated": locals().get("source_coord"),
+        "source_new_filings": {"since": locals().get("since", ""), "bulk_latest": bulk_latest,
+                               "filings": raw_ie_used[-200:], "error": raw_ie_error},
         "stats": dict(stats), "has_pres": bool(load_pres_margins(pres_path)),
     })
     result["diagnostics"]["party_notes"] = party_notes
@@ -986,8 +1234,9 @@ def main() -> int:
 
     meta.update({"ie_etag": source.get("etag"), "ie_last_modified": source.get("last_modified"),
                  "build_sig": build_sig, "pres_sig": pres_sig, "generated": result["generated"],
-                 "raw_sig": locals().get("raw_sig", "")})
+                 "raw_sig": locals().get("raw_sig", ""), "bulk_latest": bulk_latest})
     meta_path.write_text(json.dumps(meta, indent=2))
+    heartbeat("updated with new data")
 
     party = [r for r in result["races"] if r["party_race"]]
     print(f"Rows in file: {stats['rows_in_file']:,} | House general: {stats['rows_house_general']:,} | "

@@ -133,6 +133,7 @@ details.notes summary{font:700 15px var(--sans);cursor:pointer}
     </div>
     <div class="bar" role="img" id="bar"><i class="r" id="barR"></i><i class="d" id="barD"></i></div>
     <div class="stamp" id="stamp"></div>
+    <div class="stamp" id="checked"></div>
     <div class="note" id="note" hidden></div>
   </header>
 
@@ -271,6 +272,10 @@ function renderNotes() {
     <p>Money goes to a side by who it helps: supporting a Republican or opposing a Democrat is R-side. REP and DEM are the candidate on each side with the most IE money. Expenditures disclosed only on monthly or quarterly reports, without a 24/48-hour notice, are not in this file. Filings with a blank office, state or district are filled in from the candidate's FEC ID (${n((s.recovered_office || 0) + (s.recovered_state || 0) + (s.recovered_district || 0))} fields recovered).</p>
     <p>Filings that leave the candidate ID blank are matched to a candidate by last name within the race (${n(s.recovered_candidate_id)} rows matched).</p>
     <p>Party coordinated expenditures come from the FEC's committee-to-candidate file (transaction type 24C, ${n(s.rows_coordinated)} rows, general election only)${DATA.source_coordinated?.last_modified ? `, last updated by the FEC ${esc(DATA.source_coordinated.last_modified)}` : ""}${DATA.source_coordinated?.latest_transaction ? `; the latest coordinated expenditure in it is dated ${esc(fmtDate(DATA.source_coordinated.latest_transaction))}` : ""}. Parties disclose coordinated spending only on their monthly and pre-general reports, so recent spending appears weeks later. Memo entries count unless a matching payment is reported.</p>
+    ${(() => { const nf = DATA.source_new_filings || {}; const fl = (nf.filings || []).slice().reverse();
+      return `<h4>New 24/48-hour reports read directly</h4>
+      <p>The FEC's bulk file has filings received through ${esc(fmtDate(nf.bulk_latest))}. Reports filed since then are read straight from the filings, ${n(fl.length)} so far.${nf.error ? ` <strong>Problem:</strong> ${esc(nf.error)}.` : ""}</p>
+      ${fl.length ? tbl(["Filer", "Form", "Filed", "FEC file #", "Lines"], fl.slice(0, 40).map(f => `<tr><td>${esc(f.committee_name)}</td><td>${esc(f.form_type)}</td><td>${esc(fmtDate(f.receipt_date))}</td><td><a href="https://docquery.fec.gov/cgi-bin/forms/${esc(f.committee_id)}/${esc(f.file_number)}/" target="_blank" rel="noopener">${esc(f.file_number)}</a></td><td class="n">${f.rows}</td></tr>`)) : ""}`; })()}
     ${(() => { const sc = DATA.source_coordinated || {}; const rp = sc.reports || [];
       return `<h4>Party reports read directly</h4>
       <p>Coordinated spending in these reports is read from the filings as filed, so it counts the day the party files. Earlier periods come from the FEC's processed bulk file.${sc.raw_error ? ` <strong>Problem:</strong> ${esc(sc.raw_error)}.` : ""}</p>
@@ -314,6 +319,9 @@ $("#tbl").addEventListener("keydown", e => {
   if (th || tr) { e.preventDefault(); th ? sortBy(th) : toggleRow(tr); }
 });
 render(); renderNotes();
+fetch("status.json", {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(st => {
+  if (st) $("#checked").textContent = `Last checked for new filings ${st.last_checked_label} (${st.result}). Checks run hourly and pick up new 24/48-hour reports as they're filed.`;
+}).catch(() => {});
 </script>
 </body>
 </html>

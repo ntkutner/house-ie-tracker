@@ -47,6 +47,12 @@ Tests: `python3 -m unittest discover tests`
 
 ## How the numbers are built
 
+- **Same-day IEs:** the FEC's bulk file is rebuilt about once a day. Every hourly run also lists
+  the 24/48-hour reports (and Form 5s) filed since then, reads each one straight from the filing
+  (via the OpenFEC API and docquery.fec.gov, using your FEC_API_KEY secret), and folds them in.
+  Once a filing shows up in the bulk file, the bulk version is used instead. Amended notices
+  replace the notice they amend. Parsed filings are cached in `cache/ie/`.
+
 - **Party columns (NRCC*, DCCC*)** count party coordinated expenditures as well as any IEs. The
   parties' recent monthly reports are read straight from their e-filings (Schedule F), so they
   count the day they're filed; older periods come from the FEC's processed bulk file. Listing
