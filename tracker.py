@@ -29,7 +29,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = "1.8"
+VERSION = "1.9"
 ROOT = Path(__file__).resolve().parent
 ET = ZoneInfo("America/New_York")
 UA = f"house-ie-tracker/{VERSION}"
@@ -804,11 +804,16 @@ def find_override(overrides: dict, key: str, district: str, names) -> str:
     name for any candidate, e.g. "AK00:HAFNER"."""
     if key in overrides:
         return overrides[key]
-    for n in names:
-        toks, last = name_tokens(n)
-        ln = " ".join(last or toks[-1:])
-        if ln and f"{district}:{ln}" in overrides:
-            return overrides[f"{district}:{ln}"]
+    # RACE:NAME overrides match the name's words in any order, since filers write
+    # "HAFNER, ERIC", "Eric Hafner" and "Hafner Eric" alike.
+    name_sets = [set(name_tokens(n)[0]) for n in names if n]
+    for ok, val in overrides.items():
+        if ":" not in ok:
+            continue
+        od, oname = ok.split(":", 1)
+        want = set(name_tokens(oname)[0])
+        if od == district and want and any(want <= ns for ns in name_sets):
+            return val
     return ""
 
 
