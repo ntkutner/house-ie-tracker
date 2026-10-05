@@ -1,5 +1,7 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,purpose,payee,file_num,tran_id,image_num
 IE,NC10,PAT HARRIGAN,REP,O,C00957100,WE THE PEOPLE...CAN'T EVEN,2359.73,2026-10-05,2026-10-04,Billboard Advertising,Lamar,2016819,B6E8AFA769259D5F996A,
+IE,AZ01,AMISH SHAH,DEM,S,C00891028,AANHPI Rising Tide,4000.0,2026-10-02,2026-10-04,Digtal Ad Buy,Mixed Change Media,2016878,SE.4161,
+IE,AZ06,JOANNA MENDOZA,DEM,S,C00891028,AANHPI Rising Tide,5300.0,2026-10-02,2026-10-04,Digital Ad Buy,Mixed Change Media,2016878,SE.4165,
 IE,AK00,NICHOLAS III BEGICH,REP,O,C00004036,SEIU COPE (Service Employees International Union Committee On Political Education),185000.0,2026-10-02,2026-10-04,Estimated Cost - Digital Advertising,Van Ness Creative Strategies,2016864,500021932,
 IE,PA08,ROB BRESNAHAN,REP,O,C00004036,SEIU COPE (Service Employees International Union Committee On Political Education),71250.0,2026-10-02,2026-10-04,Estimated Cost - Digital Advertising,Van Ness Creative Strategies,2016864,500021933,
 IE,PA07,RYAN EDWARD MACKENZIE,REP,O,C00004036,SEIU COPE (Service Employees International Union Committee On Political Education),8500.0,2026-10-02,2026-10-04,Estimated Cost - Digital Advertising,Van Ness Creative Strategies,2016864,500021934,
