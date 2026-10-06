@@ -60,6 +60,13 @@ ids = ["C00892471"]
 name_patterns = ['^MAGA,? INC', '^NO GOING BACK PAC', '^SAFETY (AND|&) AFFORDABILITY PAC']
 
 [[columns]]
+key = "ELON"
+label = "Elon"
+side = "R"
+ids = ["C00879510"]                # America PAC (Elon Musk)
+name_patterns = ['^AMERICA PAC\b']
+
+[[columns]]
 key = "HMP"
 label = "HMP"
 side = "D"
@@ -119,3 +126,55 @@ candidates = [
 ]
 # Races to leave out entirely (spending there was for special elections).
 races = ["GA14", "CA01", "FL06", "TN07"]
+
+# ---------------------------------------------------------------------------
+# Spending categories for the per-group breakdown (independent expenditures only;
+# coordinated party spending isn't categorized). Each expenditure's purpose text, as
+# the filer wrote it, is checked against these in order; the first match wins, and
+# anything unmatched is "Other". Patterns are case-insensitive regexes.
+# Production catches production-only descriptions ("Media Production"); combined
+# "Advertising & Media Production" buys go to their channel or Paid Media (general).
+# ---------------------------------------------------------------------------
+[[categories]]
+name = "Texting"
+patterns = ['\btext(s|ing|ed)?\b', '\bsms\b', '\bmms\b', 'peer[- ]to[- ]peer', '\bp2p\b']
+
+[[categories]]
+name = "Phones"
+patterns = ['phone', '\bcall(s|ing)?\b', '\bivr\b', 'robo', 'tele-?town']
+
+[[categories]]
+name = "Production"
+patterns = ['^(?!.*(advertis|\bbuy\b|placement|airtime)).*production']
+
+[[categories]]
+name = "CTV/Streaming"
+patterns = ['\bctv\b', '\bott\b', 'connected\s*tv', 'stream', 'over[- ]the[- ]top', '\bhulu\b', '\broku\b']
+
+[[categories]]
+name = "Cable"
+patterns = ['\bcable\b', 'satellite']
+
+[[categories]]
+name = "Radio"
+patterns = ['\bradio\b']
+
+[[categories]]
+name = "Broadcast"
+patterns = ['broadcast', '\btv\b', 'television', '\bairtime\b']
+
+[[categories]]
+name = "Direct Mail"
+patterns = ['(?<![e-])\bmail', 'postage', 'mailer', 'mailing']
+
+[[categories]]
+name = "Canvassing/Lit"
+patterns = ['canvass', '\bdoor', '\bfield\b', '\blit(erature)?\b', 'walk', 'palm ?card', 'door ?hanger', '\bgotv\b']
+
+[[categories]]
+name = "Digital (general)"
+patterns = ['digital', 'online', 'internet', 'social', 'facebook', '\bmeta\b', 'google', 'search', 'display', 'programmatic', 'youtube', 'e-?mail', '\bweb', '\bsem\b', '\bseo\b']
+
+[[categories]]
+name = "Paid Media (general)"
+patterns = ['media', 'advertis', '\bads?\b', 'ad buy', 'production', 'placement', '\bbuy\b', 'commercial', '\bspot']

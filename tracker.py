@@ -29,7 +29,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = "1.9"
+VERSION = "2.1"
 ROOT = Path(__file__).resolve().parent
 ET = ZoneInfo("America/New_York")
 UA = f"house-ie-tracker/{VERSION}"
@@ -919,6 +919,40 @@ def resolve_candidates(rows: list[dict], master: dict, cfg: dict) -> tuple[dict,
 
 # ----------------------------------------------------------------------------- aggregation
 
+# Spending categories: first matching rule wins, checked against each expenditure's purpose
+# text as filed. config.toml can replace these with its own [[categories]] list.
+DEFAULT_CATEGORIES = [
+    ("Texting", [r"\btext(s|ing|ed)?\b", r"\bsms\b", r"\bmms\b", r"peer[- ]to[- ]peer", r"\bp2p\b"]),
+    ("Phones", [r"phone", r"\bcall(s|ing)?\b", r"\bivr\b", r"robo", r"tele-?town"]),
+    # Production on its own; combined "advertising & production" buys go to the channel or Paid Media.
+    ("Production", [r"^(?!.*(advertis|\bbuy\b|placement|airtime)).*production"]),
+    ("CTV/Streaming", [r"\bctv\b", r"\bott\b", r"connected\s*tv", r"stream", r"over[- ]the[- ]top", r"\bhulu\b", r"\broku\b"]),
+    ("Cable", [r"\bcable\b", r"satellite"]),
+    ("Radio", [r"\bradio\b"]),
+    ("Broadcast", [r"broadcast", r"\btv\b", r"television", r"\bairtime\b"]),
+    ("Direct Mail", [r"(?<![e-])\bmail", r"postage", r"mailer", r"mailing"]),
+    ("Canvassing/Lit", [r"canvass", r"\bdoor", r"\bfield\b", r"\blit(erature)?\b", r"walk", r"palm ?card", r"door ?hanger", r"\bgotv\b"]),
+    ("Digital (general)", [r"digital", r"online", r"internet", r"social", r"facebook", r"\bmeta\b", r"google", r"search",
+                           r"display", r"programmatic", r"youtube", r"e-?mail", r"\bweb", r"\bsem\b", r"\bseo\b"]),
+    ("Paid Media (general)", [r"media", r"advertis", r"\bads?\b", r"ad buy", r"production", r"placement", r"\bbuy\b",
+                              r"commercial", r"\bspot"]),
+]
+OTHER_CATEGORY = "Other"
+
+
+def compile_categories(cfg: dict) -> list[tuple[str, list]]:
+    rules = [(c["name"], c.get("patterns", [])) for c in cfg.get("categories", [])] or DEFAULT_CATEGORIES
+    return [(name, [re.compile(p, re.I) for p in pats]) for name, pats in rules]
+
+
+def categorize(purpose: str, rules: list) -> str:
+    text = purpose or ""
+    for name, pats in rules:
+        if any(p.search(text) for p in pats):
+            return name
+    return OTHER_CATEGORY
+
+
 def compile_columns(cfg: dict) -> list[dict]:
     cols = []
     for c in cfg.get("columns", []):
@@ -938,6 +972,7 @@ def classify(spe_id: str, spe_nam: str, side: str, cols: list[dict]) -> str:
 
 def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[dict]) -> dict:
     cols = compile_columns(cfg)
+    cat_rules = compile_categories(cfg)
     named = [c["key"] for c in cols]
     as_of = max((r["filed"] for r in rows if r["filed"]), default=dt.date.today().isoformat())
     week_ago = (dt.date.fromisoformat(as_of) - dt.timedelta(days=6)).isoformat()
@@ -973,7 +1008,13 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
         sk = f"{r['spe_id'] or r['spe_nam']}|{col}|{r['kind']}"
         sp = race["spenders"].setdefault(sk, {"id": r["spe_id"], "name": r["spe_nam"], "col": col,
                                               "side": side, "amount": 0.0, "targets": Counter(),
-                                              "last": "", "n": 0, "kind": r["kind"]})
+                                              "last": "", "n": 0, "kind": r["kind"],
+                                              "cats": Counter(), "items": []})
+        cat = "" if r["kind"] == "COORD" else categorize(r["purpose"], cat_rules)
+        target = f"{'For' if r['so'] == 'S' else 'Against'} {c['name']}"
+        if cat:
+            sp["cats"][cat] += r["amount"]
+        sp["items"].append([r["date"] or r["filed"], round(r["amount"], 2), cat, r["purpose"], r["payee"], target])
         if r["kind"] == "COORD":
             race["coord"][col] += r["amount"]
         sp["amount"] += r["amount"]
@@ -989,6 +1030,7 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
         pc["label"] = (r["spe_nam"], c["name"], d)
 
     out_races = []
+    spend_items: dict[str, dict] = {}
     for d, race in races.items():
         nominees = {}
         for party in ("REP", "DEM"):
@@ -1000,11 +1042,14 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
         r_total = sum(v for k, v in cvals.items() if k in [c["key"] for c in cols if c["side"] == "R"] + ["OTH_R"])
         d_total = sum(v for k, v in cvals.items() if k in [c["key"] for c in cols if c["side"] == "D"] + ["OTH_D"])
         spenders = sorted(
-            ({"id": s["id"], "name": s["name"], "col": s["col"], "side": s["side"], "kind": s["kind"],
+            ({"key": k, "id": s["id"], "name": s["name"], "col": s["col"], "side": s["side"], "kind": s["kind"],
               "amount": round(s["amount"], 2), "last": s["last"], "n": s["n"],
+              "cats": [[c, round(v, 2)] for c, v in s["cats"].most_common() if round(v, 2) != 0],
               "targets": [t for t, _ in s["targets"].most_common()]}
-             for s in race["spenders"].values()),
+             for k, s in race["spenders"].items()),
             key=lambda s: -s["amount"])
+        spend_items[d] = {k: sorted(s["items"], key=lambda x: (x[0], x[1]), reverse=True)
+                          for k, s in race["spenders"].items()}
         st, dn = d[:2], d[2:]
         out_races.append({
             "district": d, "pres": pres.get(d),
@@ -1068,6 +1113,8 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
 
     return {
         "as_of": as_of, "week_start": week_ago, "columns": columns, "races": out_races,
+        "categories": [n for n, _ in cat_rules] + [OTHER_CATEGORY],
+        "_spend_items": {d: v for d, v in spend_items.items() if d in {r["district"] for r in out_races}},
         "default_view": cfg.get("filters", {}).get("races", "party"),
         "diagnostics": {
             "unassigned": sorted(({"key": k, **v, "amount": round(v["amount"], 2)}
@@ -1084,7 +1131,10 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
 def write_outputs(result: dict, rows: list[dict], cands: dict, out: Path, cfg: dict,
                   excluded: list[dict]) -> None:
     out.mkdir(parents=True, exist_ok=True)
+    spend = result.pop("_spend_items", {})
+    (out / "spend.json").write_text(json.dumps(spend, separators=(",", ":")))
     (out / "data.json").write_text(json.dumps(result, separators=(",", ":")))
+    cat_rules = compile_categories(cfg)
 
     keys = [c["key"] for c in result["columns"]]
     with open(out / "races.csv", "w", newline="") as fh:
@@ -1101,11 +1151,11 @@ def write_outputs(result: dict, rows: list[dict], cands: dict, out: Path, cfg: d
     with open(out / "transactions.csv", "w", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["type", "district", "candidate", "candidate_party", "support_oppose", "spender_id", "spender",
-                    "amount", "date", "filed", "purpose", "payee", "file_num", "tran_id", "image_num"])
+                    "amount", "date", "filed", "category", "purpose", "payee", "file_num", "tran_id", "image_num"])
         for r in sorted(rows, key=lambda r: (r["filed"], r["date"]), reverse=True):
             c = cands[r["cand_key"]]
             w.writerow([r["kind"], c["district"], c["name"], c["party"], r["so"], r["spe_id"], r["spe_nam"],
-                        r["amount"], r["date"], r["filed"], r["purpose"], r["payee"],
+                        r["amount"], r["date"], r["filed"], "" if r["kind"] == "COORD" else categorize(r["purpose"], cat_rules), r["purpose"], r["payee"],
                         r["file_num"], r["tran_id"], r["image_num"]])
 
     with open(out / "not_counted.csv", "w", newline="") as fh:

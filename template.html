@@ -124,6 +124,29 @@ tr.detail td{padding:0 0 14px;background:var(--paper);text-align:left}
 .empty{padding:28px;text-align:center;color:var(--muted)}
 
 .foot{font:400 13px var(--cond);color:var(--muted);margin:8px 0 0}
+
+/* Group spending breakdown */
+.sp[data-sp]{cursor:pointer;border-radius:4px}
+.sp[data-sp]:hover{background:var(--alt)}
+.sp .chev{display:inline-block;width:0;height:0;margin-right:6px;border:4px solid transparent;border-left:5px solid currentColor;vertical-align:1px;transition:transform .15s ease}
+.sp[aria-expanded="true"] .chev{transform:rotate(90deg) translate(2px,-2px)}
+.sp-panel{grid-column:1/-1;margin:6px 0 4px;padding:10px 12px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);cursor:default}
+.cats{display:grid;grid-template-columns:minmax(110px,max-content) 1fr auto;gap:5px 10px;align-items:center;font:500 12px/1.2 var(--cond)}
+.cats .track{height:8px;background:var(--alt);border-radius:2px;overflow:hidden}
+.cats .fill{height:100%;border-radius:2px}
+.side-r .cats .fill{background:var(--r)} .side-d .cats .fill{background:var(--d)}
+.cats .v{font-variant-numeric:tabular-nums;font-weight:700;text-align:right}
+.cats .pct{color:var(--muted);font-weight:400;margin-left:4px}
+.items{margin-top:10px;max-height:300px;overflow:auto;border-top:1px solid var(--rule)}
+.it{display:grid;grid-template-columns:48px 1fr auto;gap:1px 10px;padding:6px 0;border-bottom:1px solid var(--rule);font:400 12px/1.3 var(--cond)}
+.it:last-child{border-bottom:0}
+.it .dt{color:var(--muted);white-space:nowrap}
+.it .ds{font-weight:600;color:var(--ink)}
+.it .n{font-weight:700;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.it .sub{grid-column:2/-1;color:var(--muted)}
+.sp-panel .fec{margin-top:8px;font:500 12px var(--cond)}
+.items .loading{padding:8px 0;color:var(--muted)}
+
 /* Notes */
 details.notes{margin-top:28px;border-top:1px solid var(--rule);padding-top:12px;font-size:14px;max-width:1100px}
 details.notes summary{font:700 15px var(--sans);cursor:pointer}
@@ -210,7 +233,7 @@ const FIELDS = [
   {key:"total", label:"TOTAL", cls:"sum", get:r => r.total},
 ];
 const NUMERIC = new Set(FIELDS.filter(f => !f.sort && f.key !== "pres").map(f => f.key));
-const state = {view: DATA.default_view === "all" ? "all" : "party", q: "", sort: "total", dir: -1, open: new Set()};
+const state = {view: DATA.default_view === "all" ? "all" : "party", q: "", sort: "total", dir: -1, open: new Set(), openSp: new Set()};
 
 function visible() {
   const q = state.q.trim().toLowerCase();
@@ -244,15 +267,47 @@ function cell(f, r) {
   return `<td class="${f.cls}${zero ? " zero" : ""}">${money(v)}</td>`;
 }
 
+let SPEND = null, spendState = "idle";
+function loadSpend() {
+  if (spendState !== "idle") return;
+  spendState = "loading";
+  fetch("spend.json", {cache: "no-store"}).then(r => r.ok ? r.json() : Promise.reject(r.status))
+    .then(j => { SPEND = j; spendState = "ready"; render(); })
+    .catch(() => { spendState = "error"; render(); });
+}
+
+function spPanel(r, s) {
+  const total = s.cats.reduce((a, c) => a + Math.max(c[1], 0), 0) || 1;
+  const max = Math.max(...s.cats.map(c => c[1]), 1);
+  const cats = s.cats.map(([name, v]) => `<span>${esc(name)}</span><div class="track"><div class="fill" style="width:${Math.max(v, 0) / max * 100}%"></div></div><span class="v">${money(v)}<span class="pct">${Math.round(Math.max(v, 0) / total * 100)}%</span></span>`).join("");
+  let items;
+  if (spendState === "ready") {
+    const list = (SPEND[r.district] || {})[s.key] || [];
+    const oneTarget = new Set(list.map(x => x[5])).size <= 1;
+    items = list.map(x => `<div class="it"><span class="dt">${esc(fmtDate(x[0]))}</span><span class="ds">${esc(x[3] || "No description filed")}</span><span class="n">${money(x[1])}</span>` +
+      `<span class="sub">${esc([x[2], x[4], oneTarget ? "" : x[5]].filter(Boolean).join(" · "))}</span></div>`).join("") || `<div class="loading">No itemized expenditures.</div>`;
+  } else if (spendState === "error") {
+    items = `<div class="loading">Expenditure detail couldn't be loaded. It's available once the page is published (spend.json).</div>`;
+  } else {
+    items = `<div class="loading">Loading expenditures…</div>`;
+  }
+  const fec = s.id ? `<div class="fec"><a href="https://www.fec.gov/data/committee/${esc(s.id)}/" target="_blank" rel="noopener">${esc(s.name)} on FEC.gov</a></div>` : "";
+  const top = s.kind === "COORD" || !s.cats.length ? "" : `<div class="cats">${cats}</div>`;
+  return `<div class="sp-panel">${top}<div class="items"${top ? "" : ' style="margin-top:0;border-top:0"'}>${items}</div>${fec}</div>`;
+}
+
 function detail(r) {
   const block = (side, title) => {
     const list = r.spenders.filter(s => s.side === side);
     if (!list.length) return `<div class="side-${side.toLowerCase()}"><h3>${title}</h3><div class="sp"><span class="meta">No reported spending.</span></div></div>`;
     const colLabel = k => (COLS.find(c => c.key === k) || {}).label || k;
-    return `<div class="side-${side.toLowerCase()}"><h3>${title}</h3>` + list.map(s => `
-      <div class="sp"><span class="nm">${s.id ? `<a href="https://www.fec.gov/data/committee/${esc(s.id)}/" target="_blank" rel="noopener">${esc(s.name)}</a>` : esc(s.name)}<span class="tag">${esc(colLabel(s.col))}${s.kind === "COORD" ? " coordinated" : ""}</span></span>
+    return `<div class="side-${side.toLowerCase()}"><h3>${title}</h3>` + list.map(s => {
+      const open = state.openSp.has(`${r.district}|${s.key}`);
+      return `
+      <div class="sp" data-sp="${esc(s.key)}" data-d="${esc(r.district)}" tabindex="0" role="button" aria-expanded="${open}"><span class="nm"><span class="chev" aria-hidden="true"></span>${esc(s.name)}<span class="tag">${esc(colLabel(s.col))}${s.kind === "COORD" ? " coordinated" : ""}</span></span>
       <span class="am">${money(s.amount)}</span>
-      <span class="meta">${esc(s.targets.join("; "))}. ${s.n} ${s.kind === "COORD" ? "coordinated " : ""}${s.n === 1 ? "expenditure" : "expenditures"}, latest ${esc(fmtDate(s.last))}.</span></div>`).join("") + `</div>`;
+      <span class="meta">${esc(s.targets.join("; "))}. ${s.n} ${s.kind === "COORD" ? "coordinated " : ""}${s.n === 1 ? "expenditure" : "expenditures"}, latest ${esc(fmtDate(s.last))}.</span>${open ? spPanel(r, s) : ""}</div>`;
+    }).join("") + `</div>`;
   };
   return `<tr class="detail"><td colspan="${FIELDS.length}"><div class="detail-inner">
     ${block("R", "Helping Republicans " + money(r.r_total))}${block("D", "Helping Democrats " + money(r.d_total))}
@@ -343,13 +398,23 @@ $("#q").addEventListener("input", e => { state.q = e.target.value; render(); });
 document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { state.view = b.dataset.view; render(); }));
 const toggleRow = tr => { const d = tr.dataset.d; state.open.has(d) ? state.open.delete(d) : state.open.add(d); render(); document.querySelector(`tr.race[data-d="${d}"]`)?.focus(); };
 const sortBy = th => { const k = th.dataset.key; if (state.sort === k) state.dir *= -1; else { state.sort = k; state.dir = NUMERIC.has(k) || k === "pres" ? -1 : 1; } render(); document.querySelector(`th[data-key="${k}"]`)?.focus(); };
+const toggleSp = el => {
+  const k = `${el.dataset.d}|${el.dataset.sp}`;
+  state.openSp.has(k) ? state.openSp.delete(k) : state.openSp.add(k);
+  loadSpend(); render();
+  document.querySelector(`.sp[data-d="${el.dataset.d}"][data-sp="${CSS.escape(el.dataset.sp)}"]`)?.focus();
+};
 $("#tbl").addEventListener("click", e => {
   if (e.target.closest("a")) return;
+  if (e.target.closest(".sp-panel")) return;
+  const sp = e.target.closest(".sp[data-sp]"); if (sp) return toggleSp(sp);
   const th = e.target.closest("th[data-key]"); if (th) return sortBy(th);
   const tr = e.target.closest("tr.race"); if (tr) toggleRow(tr);
 });
 $("#tbl").addEventListener("keydown", e => {
   if (e.key !== "Enter" && e.key !== " ") return;
+  const sp = e.target.closest(".sp[data-sp]");
+  if (sp && e.target === sp) { e.preventDefault(); return toggleSp(sp); }
   const th = e.target.closest("th[data-key]"), tr = e.target.closest("tr.race");
   if (th || tr) { e.preventDefault(); th ? sortBy(th) : toggleRow(tr); }
 });

@@ -34,6 +34,13 @@ Tests: `python3 -m unittest discover tests`
 
 ## Customize (config.toml)
 
+- **Spending categories.** Click a race, then click any group in it to see its spending by
+  category (Paid Media, Broadcast, Cable, Radio, CTV/Streaming, Digital, Production, Direct Mail,
+  Canvassing/Lit, Phones, Texting, Other) and every expenditure line. Coordinated party spending
+  is listed line by line but not categorized. Categories come from keyword rules on the
+  purpose text each filer wrote, set in the `[[categories]]` blocks; the first matching rule
+  wins. Line-level detail is published as `docs/spend.json` and loads on first click.
+
 - **Columns.** Each `[[columns]]` block is a group with its own column, matched by FEC ID or name.
   Copy a block to break out another group (e.g. AAN, House Majority Forward, Protect Progress).
   The page's "Data notes" lists the biggest groups currently lumped into OTH R / OTH D.
