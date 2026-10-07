@@ -61,7 +61,7 @@ name_patterns = ['^MAGA,? INC', '^NO GOING BACK PAC', '^SAFETY (AND|&) AFFORDABI
 
 [[columns]]
 key = "ELON"
-label = "Elon"
+label = "ELON"
 side = "R"
 ids = ["C00879510"]                # America PAC (Elon Musk)
 name_patterns = ['^AMERICA PAC\b']
@@ -110,6 +110,43 @@ coordinated = true   # also count party coordinated expenditures (Schedule F) by
 [nominees]
 "IN01" = { rep = "Barb Regnitz" }
 "AK00" = { dem = "Bill Hill (Ind.)" }
+# California (new Prop. 50 lines; top-two results from June 2)
+"CA27" = { rep = "Jason Gibbs" }
+"CA41" = { rep = "Mitch Clemmons", dem = "Linda Sánchez", dem_incumbent = true }
+"CA45" = { rep = "Chuong Vo", dem = "Derek Tran", dem_incumbent = true }
+"CA47" = { rep = "Jenny Rae Le Roux" }
+"CA49" = { rep = "Armen Kurdian" }
+# North Carolina
+"NC03" = { dem = "Raymond Smith Jr." }
+"NC05" = { dem = "Chuck Hubbard" }
+"NC08" = { dem = "Colby Watson" }
+"NC09" = { dem = "Richard Ojeda" }
+# Arkansas, Oregon, Nevada
+"AR02" = { rep = "French Hill", rep_incumbent = true }
+"OR04" = { rep = "Monique DeSpain" }
+"OR05" = { rep = "Patti Adair" }
+"NV04" = { rep = "Cody Whipple" }
+# Louisiana: after Callais, House races are an all-party open primary on Nov. 3
+# (runoff Dec. 12), so there are no nominees yet.
+"LA04" = { dem = "TBD", note = "Open primary Nov. 3" }
+"LA05" = { rep = "TBD", dem = "TBD", note = "Open primary Nov. 3" }
+"LA06" = { rep = "TBD", dem = "TBD", note = "Open primary Nov. 3" }
+
+# ---------------------------------------------------------------------------
+# Top-two races where both general-election candidates are from the same party.
+# All spending in these races is counted on that party's side, and the table shows
+# both candidates with a "D v D" / "R v R" tag.
+# ---------------------------------------------------------------------------
+[same_party_races]
+"CA04" = { party = "DEM", candidates = ["Mike Thompson (i)", "Eric Jones"] }
+"CA07" = { party = "DEM", candidates = ["Doris Matsui (i)", "Mai Vang"] }
+"CA11" = { party = "DEM", candidates = ["Scott Wiener", "Connie Chan"] }
+"CA12" = { party = "DEM", candidates = ["Lateefah Simon (i)", "Jamie Joyce"] }
+"CA14" = { party = "DEM", candidates = ["Aisha Wahab (i)", "Melissa Hernandez"] }
+"CA29" = { party = "DEM", candidates = ["Luz Rivas (i)", "Angélica Dueñas"] }
+"CA34" = { party = "DEM", candidates = ["Jimmy Gomez (i)", "Angela Gonzales-Torres"] }
+"CA37" = { party = "DEM", candidates = ["Sydney Kamlager-Dove (i)", "Samantha Mota"] }
+"CA40" = { party = "REP", candidates = ["Young Kim (i)", "Ken Calvert (i)"] }
 
 # ---------------------------------------------------------------------------
 # Candidates to leave out entirely. A name drops every filing naming that person in

@@ -101,6 +101,11 @@ tbody tr.race.alt{background:var(--alt)}
 tbody tr.race:hover td{filter:brightness(.97)}
 tbody tr.race[aria-expanded="true"] td{border-bottom-color:transparent}
 td.dist{font-weight:700}
+.rtag{display:inline-block;margin-left:6px;padding:0 5px;border-radius:3px;background:var(--alt);border:1px solid var(--rule);color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.02em;vertical-align:1px;white-space:nowrap}
+td.none,td.rep.none,td.dem.none{color:var(--muted);font-weight:400;font-style:italic}
+.vs{font-weight:400;color:var(--muted)}
+td.sp-adv{color:var(--muted);font-weight:600}
+.credit{margin:22px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:13px;color:var(--muted);text-align:center}
 td.rep{color:var(--r);font-weight:600} td.dem{color:var(--d);font-weight:600}
 .inc{font-weight:400;opacity:.7;margin-left:3px}
 .adv-r{color:var(--r);font-weight:700} .adv-d{color:var(--d);font-weight:700}
@@ -207,6 +212,7 @@ details.notes summary{font:700 15px var(--sans);cursor:pointer}
   <div class="under"><p class="foot" id="foot"></p><p class="foot" id="checked"></p></div>
 
   <details class="notes" id="notes"><summary>Data notes and methodology</summary><div id="notesBody"></div></details>
+  <p class="credit">A project produced by Noah Kutner using publicly accessible FEC data.</p>
 </div>
 
 <script>
@@ -256,13 +262,25 @@ function presCell(m) {
 
 function cell(f, r) {
   const v = f.get(r);
-  if (f.key === "district") return `<td class="${f.cls}">${esc(v)}</td>`;
+  const sp = r.same_party;
+  if (f.key === "district") {
+    const tag = sp ? `<span class="rtag">${sp.party === "DEM" ? "D v D" : "R v R"}</span>` : (r.note ? `<span class="rtag">${esc(r.note)}</span>` : "");
+    return `<td class="${f.cls}">${esc(v)}${tag}</td>`;
+  }
   if (f.key === "pres") return `<td>${presCell(r.pres)}</td>`;
   if (f.key === "rep" || f.key === "dem") {
+    if (sp) {
+      const mine = (f.key === "dem") === (sp.party === "DEM");
+      return mine ? `<td class="${f.cls}">${sp.candidates.map(esc).join(' <span class="vs">vs.</span> ')}</td>`
+                  : `<td class="${f.cls} none">No ${f.key === "dem" ? "Democrat" : "Republican"} (top-two)</td>`;
+    }
     const c = r[f.key];
     return `<td class="${f.cls}">${c ? esc(c.name) + (c.incumbent ? '<span class="inc">(i)</span>' : "") : "—"}</td>`;
   }
-  if (f.key === "adv") return `<td class="${r.adv > 0 ? "adv-d" : r.adv < 0 ? "adv-r" : ""}">${advText(v)}</td>`;
+  if (f.key === "adv") {
+    if (sp) return `<td class="sp-adv">${sp.party === "DEM" ? "D v D" : "R v R"}</td>`;
+    return `<td class="${r.adv > 0 ? "adv-d" : r.adv < 0 ? "adv-r" : ""}">${advText(v)}</td>`;
+  }
   const zero = Math.round(v) === 0;
   return `<td class="${f.cls}${zero ? " zero" : ""}">${money(v)}</td>`;
 }
@@ -388,6 +406,7 @@ function renderNotes() {
 
 const coordCols = COLS.filter(c => c.coordinated).map(c => c.label);
 if (coordCols.length) $("#foot").textContent = `* ${coordCols.join(" and ")} include party coordinated expenditures as well as independent expenditures. Coordinated spending appears only once the party files its monthly report, so it lags IEs by weeks.`;
+if (DATA.races.some(r => r.same_party)) $("#foot").textContent += " D v D / R v R: top-two races where both nominees are from the same party; all spending there is counted on that party's side.";
 $("#title").textContent = DATA.title;
 document.title = DATA.title;
 $("#kicker").textContent = `General election · Updated ${DATA.generated_label} · FEC filings through ${fmtDate(DATA.as_of)}`;

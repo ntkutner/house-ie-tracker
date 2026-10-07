@@ -29,7 +29,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = "2.1"
+VERSION = "2.2"
 ROOT = Path(__file__).resolve().parent
 ET = ZoneInfo("America/New_York")
 UA = f"house-ie-tracker/{VERSION}"
@@ -973,6 +973,8 @@ def classify(spe_id: str, spe_nam: str, side: str, cols: list[dict]) -> str:
 def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[dict]) -> dict:
     cols = compile_columns(cfg)
     cat_rules = compile_categories(cfg)
+    # Top-two races where both nominees are from one party (e.g. CA D vs D).
+    same_party = {d.strip().upper(): norm_party(v.get("party", "")) for d, v in cfg.get("same_party_races", {}).items()}
     named = [c["key"] for c in cols]
     as_of = max((r["filed"] for r in rows if r["filed"]), default=dt.date.today().isoformat())
     week_ago = (dt.date.fromisoformat(as_of) - dt.timedelta(days=6)).isoformat()
@@ -983,7 +985,8 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
 
     for r in rows:
         c = cands[r["cand_key"]]
-        side = side_of(c["party"], r["so"])
+        sp_party = same_party.get(c["district"])
+        side = ("D" if sp_party == "DEM" else "R") if sp_party and r["so"] in ("S", "O") else side_of(c["party"], r["so"])
         if side is None:
             u = unassigned.setdefault(c["key"], {"name": c["name"], "district": c["district"], "amount": 0.0})
             u["amount"] += r["amount"]
@@ -1071,6 +1074,11 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
         for side, key in (("rep", "rep"), ("dem", "dem")):
             if nom.get(side):
                 r[key] = {"name": nom[side].upper(), "incumbent": bool(nom.get(f"{side}_incumbent")), "id": ""}
+        r["note"] = nom.get("note", "")
+        sp = cfg.get("same_party_races", {}).get(r["district"])
+        if sp:
+            r["same_party"] = {"party": norm_party(sp.get("party", "")),
+                               "candidates": [x.upper() for x in sp.get("candidates", [])]}
     out_races.sort(key=lambda r: -r["total"])
 
     # Biggest groups that don't have their own column, to help decide what to promote.
