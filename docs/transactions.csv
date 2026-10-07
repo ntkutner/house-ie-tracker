@@ -1,8 +1,11 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
 IE,WI07,MICHAEL ALFONSO,REP,S,C00733352,Americans 4 Security PAC,5000.0,2026-10-08,2026-10-07,Radio,Radio,Medium Buying,2017752,SE.4824,
+IE,AZ01,THOMAS JAMES FEELY,REP,O,C00738674,Reproductive Freedom For All Freedom Fund,35228.52,2026-10-07,2026-10-07,Direct Mail,Direct Mail Advertising,Moxie Media,2017773,500002692,
 IE,VA02,JENNIFER KIGGANS,REP,O,C00633248,314 Action Fund,74793.03,2026-10-07,2026-10-07,Direct Mail,Direct Mail Services,"GDA Wins, LLC",2017685,500110312,
 IE,CA40,YOUNG KIM,REP,O,C00733352,Americans 4 Security PAC,100000.0,2026-10-07,2026-10-07,Paid Media (general),Media buy,Vaulter LLC,2017632,SE.4821,202610079908547632
 IE,CA40,YOUNG KIM,REP,O,C00733352,Americans 4 Security PAC,45045.19,2026-10-07,2026-10-07,Direct Mail,Mailer,Art & Copy Partners,2017632,SE.4820,202610079908547632
+IE,IA03,ZACH NUNN,REP,O,C00740225,NRDC Action Votes,250000.0,2026-10-06,2026-10-07,Digital (general),Digital Ad Buy (Estimate),Orlattle LLC,2017782,500275451,
+IE,PA07,RYAN EDWARD MACKENZIE,REP,O,C00738674,Reproductive Freedom For All Freedom Fund,33449.0,2026-10-06,2026-10-07,Digital (general),Digital Advertising & Production,Gambit Strategies,2017773,500002693,
 IE,NJ07,THOMAS H. JR. KEAN,REP,O,C00633248,314 Action Fund,49027.19,2026-10-06,2026-10-07,Direct Mail,Direct Mail Services,"Mission Control, Inc.",2017685,500110309,
 IE,CA06,KEVIN KILEY,REP,O,C00633248,314 Action Fund,12548.0,2026-10-06,2026-10-07,Paid Media (general),Advertising,Technicolor Campaigns,2017685,500110311,
 IE,CO08,MANNY RUTINEL,DEM,S,C00633248,314 Action Fund,58338.0,2026-10-06,2026-10-07,Paid Media (general),Advertising,Wavelength Strategy Inc.,2017685,500110310,
