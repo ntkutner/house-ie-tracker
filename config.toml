@@ -126,6 +126,7 @@ coordinated = true   # also count party coordinated expenditures (Schedule F) by
 "OR04" = { rep = "Monique DeSpain" }
 "OR05" = { rep = "Patti Adair" }
 "NV04" = { rep = "Cody Whipple" }
+"MT01" = { rep = "Aaron Flint", dem = "Sam Forstag" }   # open seat; Zinke retired
 # Louisiana: after Callais, House races are an all-party open primary on Nov. 3
 # (runoff Dec. 12), so there are no nominees yet.
 "LA04" = { dem = "TBD", note = "Open primary Nov. 3" }
@@ -160,6 +161,7 @@ candidates = [
   "H6IA01213",      # Michael Bridgford (IA-01), independent
   "H4ME02093",      # John Baldacci, Maine ID filed against an Iowa race
   "CA47:BAUGH",     # Scott Baugh (CA-47)
+  "RYAN ZINKE",     # MT-01 incumbent, retired; not on the November ballot
 ]
 # Races to leave out entirely (spending there was for special elections).
 races = ["GA14", "CA01", "FL06", "TN07"]

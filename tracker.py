@@ -29,7 +29,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = "2.3"
+VERSION = "2.4"
 ROOT = Path(__file__).resolve().parent
 ET = ZoneInfo("America/New_York")
 UA = f"house-ie-tracker/{VERSION}"
@@ -44,6 +44,22 @@ HEADER_ALIASES = {
 
 
 # ----------------------------------------------------------------------------- helpers
+
+AT_LARGE_STATES = {"AK", "DE", "ND", "SD", "VT", "WY"}  # single-seat states (2022-2030 apportionment)
+
+
+def norm_district(state: str, dis: str, fallback: str = "") -> str:
+    """Two-digit district. At-large states are always 00. Elsewhere 00/blank is a filing error,
+    so use the fallback (e.g. the FEC candidate file) when it has a real district."""
+    if state in AT_LARGE_STATES:
+        return "00"
+    d = (dis or "").strip()
+    if d.isdigit() and int(d) > 0:
+        return d.zfill(2)[-2:]
+    f = (fallback or "").strip()
+    if f.isdigit() and int(f) > 0:
+        return f.zfill(2)[-2:]
+    return "00"
 
 def parse_date(s: str | None) -> str:
     """FEC dates look like 28-SEP-26 (sometimes MM/DD/YYYY). Returns ISO or ''."""
@@ -233,11 +249,10 @@ def read_ie(path: Path, cfg: dict, cols: list[dict], master: dict, extra: list[d
                 st = (m.get("state") or (cid[2:4] if cid.startswith("H") else "")).upper()
                 if st:
                     stats["recovered_state"] += 1
-            dis = (r.get("can_office_dis") or "").strip()
-            if not dis.isdigit() and (m.get("district") or "").strip().isdigit():
-                dis = m["district"].strip()
+            raw_dis = (r.get("can_office_dis") or "").strip()
+            dis = norm_district(st, raw_dis, m.get("district", "") if m.get("state", "").upper() == st else "")
+            if dis != (raw_dis.zfill(2)[-2:] if raw_dis.isdigit() else ""):
                 stats["recovered_district"] += 1
-            dis = dis.zfill(2)[-2:] if dis.isdigit() else "00"
 
             name = (r.get("cand_name") or "").strip()
             spe_id = (r.get("spe_id") or "").strip().upper()
@@ -562,7 +577,7 @@ def load_coordinated(path: Path | None, cfg: dict, cols: list[dict], master: dic
     for mcid, mm in master.items():
         if mcid.startswith("H") and mm.get("year") == cycle:
             ds = mm.get("district", "").strip()
-            by_race[mm["state"].upper() + (ds.zfill(2)[-2:] if ds.isdigit() else "00")][mcid] = mm["name"]
+            by_race[mm["state"].upper() + norm_district(mm["state"].upper(), ds)][mcid] = mm["name"]
 
     def lines():
         if path is None or not path.exists():
@@ -617,8 +632,7 @@ def load_coordinated(path: Path | None, cfg: dict, cols: list[dict], master: dic
         if not m or not m.get("state"):
             drop(col, "Coordinated: candidate not in FEC candidate file", amount, date, p, cid)
             continue
-        dis = m.get("district", "").strip()
-        dis = dis.zfill(2)[-2:] if dis.isdigit() else "00"
+        dis = norm_district(m["state"].upper(), m.get("district", ""))
         row = {
             "kind": "COORD", "named": col["key"], "memo": memo,
             "cand_key": cid, "cand_id": cid, "cand_name": m.get("name", ""), "district": m["state"].upper() + dis,
@@ -640,7 +654,7 @@ def load_coordinated(path: Path | None, cfg: dict, cols: list[dict], master: dic
         cid = x["cand_id"] if x["cand_id"].startswith(("H", "S", "P")) else by_pcc.get(x["cand_committee"], "")
         if not cid and x["office"] in ("H", "") and x["state"]:
             ds = x["district"]
-            race = x["state"] + (ds.zfill(2)[-2:] if ds.isdigit() else "00")
+            race = x["state"] + norm_district(x["state"], ds)
             nm = f"{x['cand_last']}, {x['cand_first']}"
             hits = [k for k, v in by_race.get(race, {}).items() if same_person(nm, v)]
             cid = hits[0] if len(hits) == 1 else ""
@@ -656,8 +670,7 @@ def load_coordinated(path: Path | None, cfg: dict, cols: list[dict], master: dic
         if not m or not m.get("state"):
             drop(col, "Coordinated: candidate not in FEC candidate file", x["amount"], x["date"], pseudo, cid)
             continue
-        dis = m.get("district", "").strip()
-        dis = dis.zfill(2)[-2:] if dis.isdigit() else "00"
+        dis = norm_district(m["state"].upper(), m.get("district", ""))
         row = {
             "kind": "COORD", "named": col["key"], "memo": x["memo"],
             "cand_key": cid, "cand_id": cid, "cand_name": m.get("name", ""), "district": m["state"].upper() + dis,
@@ -724,8 +737,7 @@ def resolve_missing_ids(rows: list[dict], master: dict, cfg: dict, stats: Counte
     for cid, m in master.items():
         if not cid.startswith("H") or m.get("year") != cycle:
             continue
-        dis = m.get("district", "").strip()
-        dis = dis.zfill(2)[-2:] if dis.isdigit() else "00"
+        dis = norm_district(m["state"].upper(), m.get("district", ""))
         by_race[m["state"].upper() + dis][cid] = m["name"]
         by_state[m["state"].upper()][cid] = m["name"]
 
@@ -845,7 +857,7 @@ def apply_exclusions_and_aliases(rows: list[dict], master: dict, cfg: dict, stat
 
     def party(k):
         i = info[k]
-        if find_override(overrides, k, i["districts"].most_common(1)[0][0],
+        if find_override(overrides, k, best_district(i["districts"]),
                          list(i["names"]) + [master.get(k, {}).get("name", "")]):
             return "override"
         reported = next((p for p, _ in info[k]["parties"].most_common() if p), "")
@@ -855,18 +867,18 @@ def apply_exclusions_and_aliases(rows: list[dict], master: dict, cfg: dict, stat
     for k, target in aliases.items():  # explicit: "TX28:CUELLER" = "CUELLAR"
         if k not in info:
             continue
-        d = info[k]["districts"].most_common(1)[0][0]
+        d = best_district(info[k]["districts"])
         hits = [(o["money"], ok) for ok, o in info.items() if ok != k
-                and o["districts"].most_common(1)[0][0] == d
+                and best_district(o["districts"]) == d
                 and same_person(target, o["names"].most_common(1)[0][0])]
         if hits:
             remap[k] = max(hits)[1]
     for k, i in info.items():
         if k in remap or party(k):
             continue
-        d, nm = i["districts"].most_common(1)[0][0], i["names"].most_common(1)[0][0]
+        d, nm = best_district(i["districts"]), i["names"].most_common(1)[0][0]
         targets = [(o["money"], ok) for ok, o in info.items() if ok != k and party(ok)
-                   and o["districts"].most_common(1)[0][0] == d
+                   and best_district(o["districts"]) == d
                    and same_person(nm, o["names"].most_common(1)[0][0])]
         if targets and len({party(t[1]) for t in targets}) == 1:
             remap[k] = max(targets)[1]
@@ -875,6 +887,12 @@ def apply_exclusions_and_aliases(rows: list[dict], master: dict, cfg: dict, stat
             r["cand_key"] = remap[r["cand_key"]]
             stats["merged_into_known_candidate"] += 1
     return kept
+
+
+def best_district(districts: Counter) -> str:
+    """Most-used district for a candidate, ignoring 00 (a filing error outside at-large states)."""
+    real = [(n, d) for d, n in districts.items() if d[2:] != "00" or d[:2] in AT_LARGE_STATES]
+    return max(real)[1] if real else districts.most_common(1)[0][0]
 
 
 def resolve_candidates(rows: list[dict], master: dict, cfg: dict) -> tuple[dict, list[dict]]:
@@ -893,7 +911,7 @@ def resolve_candidates(rows: list[dict], master: dict, cfg: dict) -> tuple[dict,
         m = master.get(key, {})
         reported = next((p for p, _ in a["parties"].most_common() if p), "")
         mparty = norm_party(m.get("party"))
-        ov = find_override(overrides, key, a["districts"].most_common(1)[0][0],
+        ov = find_override(overrides, key, best_district(a["districts"]),
                            list(a["names"]) + [m.get("name", "")])
         if ov:
             party, how = ov, "override"
@@ -904,14 +922,14 @@ def resolve_candidates(rows: list[dict], master: dict, cfg: dict) -> tuple[dict,
         if how in ("fec_master", "unknown") or (how == "filers" and mparty and mparty != reported) or \
                 (how == "override" and ov != (reported or mparty)):
             notes.append({"key": key, "name": display_name(m.get("name") or a["names"].most_common(1)[0][0]),
-                          "district": a["districts"].most_common(1)[0][0],
+                          "district": best_district(a["districts"]),
                           "filers_say": a["texts"].most_common(1)[0][0] or "blank",
                           "fec_master_says": m.get("party", "") or "n/a", "counted_as": party or "unassigned"})
         cands[key] = {
             "key": key,
             "name": display_name(m.get("name") or a["names"].most_common(1)[0][0]),
             "party": party,
-            "district": a["districts"].most_common(1)[0][0],
+            "district": best_district(a["districts"]),
             "incumbent": m.get("ici") == "I",
         }
     return cands, notes
