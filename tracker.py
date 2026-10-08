@@ -29,7 +29,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = "2.2"
+VERSION = "2.3"
 ROOT = Path(__file__).resolve().parent
 ET = ZoneInfo("America/New_York")
 UA = f"house-ie-tracker/{VERSION}"
@@ -1012,11 +1012,16 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
         sp = race["spenders"].setdefault(sk, {"id": r["spe_id"], "name": r["spe_nam"], "col": col,
                                               "side": side, "amount": 0.0, "targets": Counter(),
                                               "last": "", "n": 0, "kind": r["kind"],
-                                              "cats": Counter(), "items": []})
+                                              "cats": Counter(), "items": [], "catn": Counter(),
+                                              "cat7": Counter(), "catlast": {}})
         cat = "" if r["kind"] == "COORD" else categorize(r["purpose"], cat_rules)
         target = f"{'For' if r['so'] == 'S' else 'Against'} {c['name']}"
         if cat:
             sp["cats"][cat] += r["amount"]
+            sp["catn"][cat] += 1
+            if r["filed"] >= week_ago:
+                sp["cat7"][cat] += r["amount"]
+            sp["catlast"][cat] = max(sp["catlast"].get(cat, ""), r["date"] or r["filed"])
         sp["items"].append([r["date"] or r["filed"], round(r["amount"], 2), cat, r["purpose"], r["payee"], target])
         if r["kind"] == "COORD":
             race["coord"][col] += r["amount"]
@@ -1048,6 +1053,8 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
             ({"key": k, "id": s["id"], "name": s["name"], "col": s["col"], "side": s["side"], "kind": s["kind"],
               "amount": round(s["amount"], 2), "last": s["last"], "n": s["n"],
               "cats": [[c, round(v, 2)] for c, v in s["cats"].most_common() if round(v, 2) != 0],
+              "cat_n": dict(s["catn"]), "cat_last": s["catlast"],
+              "cat_new7": {c: round(v, 2) for c, v in s["cat7"].items() if round(v, 2) != 0},
               "targets": [t for t, _ in s["targets"].most_common()]}
              for k, s in race["spenders"].items()),
             key=lambda s: -s["amount"])

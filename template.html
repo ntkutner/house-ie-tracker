@@ -152,6 +152,12 @@ tr.detail td{padding:0 0 14px;background:var(--paper);text-align:left}
 .sp-panel .fec{margin-top:8px;font:500 12px var(--cond)}
 .items .loading{padding:8px 0;color:var(--muted)}
 
+/* Spending-type filter */
+.catpick{display:inline-flex;align-items:center;gap:8px;font:600 14px var(--cond);color:var(--muted)}
+.catpick select{height:36px;padding:0 10px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink);font:500 14px var(--cond)}
+.catpick select.on{border-color:var(--d);box-shadow:0 0 0 1px var(--d)}
+.catnote{margin:0 0 10px;padding:8px 12px;border-radius:4px;background:var(--d-wash);color:var(--ink);font:500 14px var(--cond)}
+.cats span.sel{font-weight:800}
 /* Notes */
 details.notes{margin-top:28px;border-top:1px solid var(--rule);padding-top:12px;font-size:14px;max-width:1100px}
 details.notes summary{font:700 15px var(--sans);cursor:pointer}
@@ -204,9 +210,13 @@ details.notes summary{font:700 15px var(--sans);cursor:pointer}
       <button type="button" data-view="party" aria-pressed="true">Party races</button>
       <button type="button" data-view="all" aria-pressed="false">All races</button>
     </div>
+    <label class="catpick">Spending type
+      <select id="cat"><option value="">All spending</option></select>
+    </label>
     <div class="dl"><a href="races.csv">Download races CSV</a><a href="transactions.csv">Download transactions CSV</a></div>
   </div>
 
+  <p class="catnote" id="catnote" hidden></p>
   <div class="scroller"><table id="tbl"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
 
   <div class="under"><p class="foot" id="foot"></p><p class="foot" id="checked"></p></div>
@@ -239,11 +249,31 @@ const FIELDS = [
   {key:"total", label:"TOTAL", cls:"sum", get:r => r.total},
 ];
 const NUMERIC = new Set(FIELDS.filter(f => !f.sort && f.key !== "pres").map(f => f.key));
-const state = {view: DATA.default_view === "all" ? "all" : "party", q: "", sort: "total", dir: -1, open: new Set(), openSp: new Set()};
+const state = {view: DATA.default_view === "all" ? "all" : "party", q: "", sort: "total", dir: -1, open: new Set(), openSp: new Set(), cat: ""};
+
+// With a spending type selected, rebuild each race from its groups' spending in that category.
+// Coordinated party spending isn't categorized, so it drops out.
+function view(r) {
+  const cat = state.cat;
+  if (!cat) return r;
+  const cols = {}, spenders = [];
+  let rt = 0, dt = 0, n7 = 0;
+  for (const s of r.spenders) {
+    if (s.kind === "COORD") continue;
+    const amt = (s.cats.find(c => c[0] === cat) || [0, 0])[1];
+    if (!amt) continue;
+    cols[s.col] = (cols[s.col] || 0) + amt;
+    if (s.side === "R") rt += amt; else dt += amt;
+    n7 += (s.cat_new7 || {})[cat] || 0;
+    spenders.push({...s, amount: amt, n: (s.cat_n || {})[cat] || 0, last: (s.cat_last || {})[cat] || s.last});
+  }
+  spenders.sort((a, b) => b.amount - a.amount);
+  return {...r, cols, spenders, r_total: rt, d_total: dt, total: rt + dt, adv: dt - rt, new7: n7};
+}
 
 function visible() {
   const q = state.q.trim().toLowerCase();
-  let rows = DATA.races.filter(r => state.view === "all" || r.party_race);
+  let rows = DATA.races.map(view).filter(r => (state.view === "all" || r.party_race) && (!state.cat || Math.round(r.total) !== 0));
   if (q) rows = rows.filter(r => [r.district, r.rep?.name, r.dem?.name, ...r.spenders.map(s => s.name)]
                                   .some(v => (v || "").toLowerCase().includes(q)));
   const f = FIELDS.find(f => f.key === state.sort);
@@ -297,10 +327,11 @@ function loadSpend() {
 function spPanel(r, s) {
   const total = s.cats.reduce((a, c) => a + Math.max(c[1], 0), 0) || 1;
   const max = Math.max(...s.cats.map(c => c[1]), 1);
-  const cats = s.cats.map(([name, v]) => `<span>${esc(name)}</span><div class="track"><div class="fill" style="width:${Math.max(v, 0) / max * 100}%"></div></div><span class="v">${money(v)}<span class="pct">${Math.round(Math.max(v, 0) / total * 100)}%</span></span>`).join("");
+  const cats = s.cats.map(([name, v]) => `<span${name === state.cat ? ' class="sel"' : ""}>${esc(name)}</span><div class="track"><div class="fill" style="width:${Math.max(v, 0) / max * 100}%"></div></div><span class="v">${money(v)}<span class="pct">${Math.round(Math.max(v, 0) / total * 100)}%</span></span>`).join("");
   let items;
   if (spendState === "ready") {
-    const list = (SPEND[r.district] || {})[s.key] || [];
+    const all = (SPEND[r.district] || {})[s.key] || [];
+    const list = state.cat ? all.filter(x => x[2] === state.cat) : all;
     const oneTarget = new Set(list.map(x => x[5])).size <= 1;
     items = list.map(x => `<div class="it"><span class="dt">${esc(fmtDate(x[0]))}</span><span class="ds">${esc(x[3] || "No description filed")}</span><span class="n">${money(x[1])}</span>` +
       `<span class="sub">${esc([x[2], x[4], oneTarget ? "" : x[5]].filter(Boolean).join(" · "))}</span></div>`).join("") || `<div class="loading">No itemized expenditures.</div>`;
@@ -358,11 +389,12 @@ function render() {
     `<tr class="counts"><td class="l sticky" colspan="${lead}">Races with spending</td>${FIELDS.slice(lead).map(f => f.key === "adv" ? "<td></td>" : `<td>${cnt[f.key]}</td>`).join("")}</tr>`;
 
   const r = tot.r_total || 0, d = tot.d_total || 0, all = r + d || 1;
-  const millions = n => "$" + (Math.abs(n) / 1e6).toFixed(1) + "M";
+  const millions = n => { const a = Math.abs(n);
+    return a >= 1e6 ? "$" + (a / 1e6).toFixed(1) + "M" : a >= 1e3 ? "$" + Math.round(a / 1e3) + "K" : "$" + Math.round(a); };
   $("#dTot").textContent = millions(d); $("#rTot").textContent = millions(r);
   $("#barD").style.width = (d / all * 100) + "%"; $("#barR").style.width = (r / all * 100) + "%";
   $("#bar").setAttribute("aria-label", `Democratic side ${money(d)}, Republican side ${money(r)}`);
-  $("#pctD").textContent = `${Math.round(d / all * 100)}% Democratic side · ${rows.length} ${rows.length === 1 ? "seat" : "seats"}`;
+  $("#pctD").textContent = `${Math.round(d / all * 100)}% Democratic side · ${rows.length} ${rows.length === 1 ? "seat" : "seats"}${state.cat ? ` · ${state.cat} only` : ""}`;
   $("#gap").textContent = Math.round(d - r) === 0 ? "Even" : (d > r ? "Democrats +" : "Republicans +") + millions(d - r);
   document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === state.view)));
 }
@@ -436,6 +468,18 @@ $("#tbl").addEventListener("keydown", e => {
   if (sp && e.target === sp) { e.preventDefault(); return toggleSp(sp); }
   const th = e.target.closest("th[data-key]"), tr = e.target.closest("tr.race");
   if (th || tr) { e.preventDefault(); th ? sortBy(th) : toggleRow(tr); }
+});
+const ORDER = ["Paid Media (general)", "Broadcast", "Cable", "CTV/Streaming", "Radio", "Digital (general)", "Production",
+               "Direct Mail", "Canvassing/Lit", "Phones", "Texting", "Other"];
+const catList = [...ORDER.filter(c => (DATA.categories || []).includes(c)), ...(DATA.categories || []).filter(c => !ORDER.includes(c))];
+$("#cat").insertAdjacentHTML("beforeend", catList.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join(""));
+$("#cat").addEventListener("change", e => {
+  state.cat = e.target.value;
+  e.target.classList.toggle("on", !!state.cat);
+  const note = $("#catnote");
+  note.hidden = !state.cat;
+  if (state.cat) note.textContent = `Showing ${state.cat} spending only. Party coordinated spending isn't broken out by type, so NRCC* and DCCC* show independent expenditures only.`;
+  render();
 });
 render(); renderNotes();
 fetch("status.json", {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(st => {
