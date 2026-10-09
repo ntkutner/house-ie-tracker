@@ -1,5 +1,9 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
 IE,NY17,CAIT CONLEY,DEM,O,C00737411,The Governing Majority Fund,17451.66,2026-10-09,2026-10-09,Direct Mail,direct mail services,Rhumb Line Strategies LLC,2018632,SE.6101,
+IE,CO08,TIMOTHY GABRIEL JOSEPH EVANS,REP,O,C00633248,314 Action Fund,54218.08,2026-10-08,2026-10-09,Direct Mail,Direct Mail Services,Agency,2018668,500110650,
+IE,NJ07,THOMAS H. JR. KEAN,REP,O,C00633248,314 Action Fund,10398.86,2026-10-08,2026-10-09,Direct Mail,Direct Mail Services,"Mission Control, Inc.",2018668,500110651,
+IE,WY00,CHUCK GRAY,REP,S,C00963041,WY Action,85000.0,2026-10-08,2026-10-09,Production,Media Pleasement and Production,Right Target Media,2018657,SE.4105,
+IE,WY00,CHUCK GRAY,REP,S,C00963041,WY Action,21570.32,2026-10-08,2026-10-09,Texting,"Web Ads, Media Placement and Texting",RMC,2018657,SE.4109,
 IE,FL22,PIA DANDIYA,DEM,O,C00959833,Stronger America Together,2548.0,2026-10-08,2026-10-09,Texting,voter contact/text messagiing,Public Concepts LLC,2018637,SE.4122,
 IE,CA40,KEN CALVERT,REP,O,C00927426,CFF,3570.39,2026-10-07,2026-10-09,Texting,P2P MESSAGING,P2P MESSAGING SOLUTIONS,2018639,SE24.36428,
 IE,CA40,KEN CALVERT,REP,O,C00927426,CFF,66535.88,2026-10-07,2026-10-09,Direct Mail,PRINTING / POSTAGE,WHISTLESTOP STRATEGIES LLC,2018639,SE24.36263,
