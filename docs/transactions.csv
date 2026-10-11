@@ -1,6 +1,7 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
 IE,AZ01,AMISH SHAH,DEM,S,C00961045,"WILDERNESS ACTION, INC.",25041.12,2026-10-14,2026-10-11,Direct Mail,Direct Mail - Estimate,Production Solutions Inc,2019434,SE.4169,
 IE,NM02,GABRIEL VASQUEZ,DEM,S,C00961045,"WILDERNESS ACTION, INC.",25041.12,2026-10-14,2026-10-11,Direct Mail,Direct Mail - Estimate,Production Solutions Inc,2019434,SE.4170,
+IE,NE02,DENISE POWELL,DEM,S,C00612820,Community Change Voters,9324.63,2026-10-09,2026-10-11,Production,Mail Production & Postage,Jean DBA Blue Nation Strategies LLC,2019514,E-2217,
 IE,NY03,MIKE LIPETRI,REP,O,C00931774,Article One PAC,86300.0,2026-10-09,2026-10-11,Digital (general),Digital Media Buy - Estimate,GPS IMPACT,2019488,500215922,
 IE,AK00,BILL HILL,DEM,S,C00944389,WHEEL DOG PAC,52941.0,2026-10-09,2026-10-11,Digital (general),Digital Ad Buy,True Blue Strategies LLC,2019450,SE.4693,
 IE,AK00,HAFNER ERIC,REP,O,C00944389,WHEEL DOG PAC,52941.0,2026-10-09,2026-10-11,Digital (general),Digital Ad Buy,True Blue Strategies LLC,2019450,SE.4696,
@@ -44,6 +45,8 @@ IE,NY17,MICHAEL VINCENT LAWLER,REP,O,C00489799,Planned Parenthood Votes,500.0,20
 IE,NY17,MICHAEL VINCENT LAWLER,REP,O,C00489799,Planned Parenthood Votes,2221.89,2026-10-01,2026-10-11,Other,Estimated Cost of Staff Time for Voter Communications,"Planned Parenthood Hudson Peconic Action Fund, Inc",2019415,500768893,
 IE,NY17,MICHAEL VINCENT LAWLER,REP,O,C00489799,Planned Parenthood Votes,291.0,2026-10-01,2026-10-11,Other,Estimated Cost of List Rentals,"Planned Parenthood Hudson Peconic Action Fund, Inc",2019415,500768895,
 IE,NY17,MICHAEL VINCENT LAWLER,REP,O,C00489799,Planned Parenthood Votes,1000.0,2026-10-01,2026-10-11,Other,Estimated Cost of Supplies,"Planned Parenthood Hudson Peconic Action Fund, Inc",2019415,500768896,
+IE,NE02,DENISE POWELL,DEM,S,C00612820,Community Change Voters,46.27,2026-09-30,2026-10-11,Other,"In-Kind Staff: Services to plan, draft & distribute communications & events",Community Change Action,2019514,E-2086,
+IE,NE02,DENISE POWELL,DEM,S,C00612820,Community Change Voters,644.48,2026-09-30,2026-10-11,Other,"In-Kind Staff: Services to plan, draft & distribute communications & events",Community Change Action,2019514,E-2099,
 IE,NY17,MICHAEL VINCENT LAWLER,REP,O,C00489799,Planned Parenthood Votes,444.86,2026-09-27,2026-10-11,Other,Estimated Cost of Staff Time for Voter Communications,"Planned Parenthood Action Fund, Inc.",2019415,500768891,
 IE,NY17,MICHAEL VINCENT LAWLER,REP,O,C00489799,Planned Parenthood Votes,318.48,2026-09-13,2026-10-11,Other,Estimated Cost of Staff Time for Voter Communications,"Planned Parenthood Action Fund, Inc.",2019415,500768890,
 IE,WI01,MITCHELL BERMAN,DEM,O,C00960435,NO GOING BACK PAC INC.,39020.47,2026-10-13,2026-10-10,Direct Mail,DIRECT MAIL: PRINTING AND POSTAGE,CREATIVE DIRECT,2019351,SE.1190250,202610109908608604
