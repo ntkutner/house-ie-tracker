@@ -1,6 +1,12 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
 IE,AZ01,AMISH SHAH,DEM,S,C00961045,"WILDERNESS ACTION, INC.",25041.12,2026-10-14,2026-10-11,Direct Mail,Direct Mail - Estimate,Production Solutions Inc,2019434,SE.4169,
 IE,NM02,GABRIEL VASQUEZ,DEM,S,C00961045,"WILDERNESS ACTION, INC.",25041.12,2026-10-14,2026-10-11,Direct Mail,Direct Mail - Estimate,Production Solutions Inc,2019434,SE.4170,
+IE,IA01,MARIANNETTE JANE MILLER-MEEKS,REP,S,C00875450,Center Forward Initiative Inc (CFI),39000.0,2026-10-10,2026-10-11,Digital (general),Digital Advertising,Prevail Strategies,2019550,SE.4317,
+IE,NC03,GREGORY FRANCIS MURPHY,REP,S,C00875450,Center Forward Initiative Inc (CFI),50000.0,2026-10-09,2026-10-11,Digital (general),Digital Advertising,Targeted Victory,2019550,SE.4318,
+IE,OH07,BRIAN POINDEXTER,DEM,S,C90022476,STAND UP FOR OHIO (OHIO ORGANIZING CAMPAIGN),66265.05,2026-10-09,2026-10-11,Canvassing/Lit,Estimated Cost: Canvass- Deserve Better Literature,Field Forward Ohio,2019547,F57.000001,
+IE,OH07,MAX MILLER,REP,O,C90022476,STAND UP FOR OHIO (OHIO ORGANIZING CAMPAIGN),66265.05,2026-10-09,2026-10-11,Canvassing/Lit,Estimated Cost: Canvass- Deserves Better Literature,Field Forward Ohio,2019547,F57.000002,
+IE,OH01,GREG LANDSMAN,DEM,S,C90022476,STAND UP FOR OHIO (OHIO ORGANIZING CAMPAIGN),43500.05,2026-10-09,2026-10-11,Canvassing/Lit,Estimated Cost: Canvass Program- Deserve Better Lit,Field Forward Ohio,2019541,F57.000001,
+IE,OH01,ERIC CONROY,REP,O,C90022476,STAND UP FOR OHIO (OHIO ORGANIZING CAMPAIGN),43500.05,2026-10-09,2026-10-11,Canvassing/Lit,Estimated Cost: Canvass Program- Deserve Better Lit,Field Forward Ohio,2019541,F57.000002,
 IE,NE02,DENISE POWELL,DEM,S,C00612820,Community Change Voters,9324.63,2026-10-09,2026-10-11,Production,Mail Production & Postage,Jean DBA Blue Nation Strategies LLC,2019514,E-2217,
 IE,NY03,MIKE LIPETRI,REP,O,C00931774,Article One PAC,86300.0,2026-10-09,2026-10-11,Digital (general),Digital Media Buy - Estimate,GPS IMPACT,2019488,500215922,
 IE,AK00,BILL HILL,DEM,S,C00944389,WHEEL DOG PAC,52941.0,2026-10-09,2026-10-11,Digital (general),Digital Ad Buy,True Blue Strategies LLC,2019450,SE.4693,
