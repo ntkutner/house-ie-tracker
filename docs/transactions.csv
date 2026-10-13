@@ -1,6 +1,13 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
+IE,NC01,DON DAVIS,DEM,S,C00898890,"WITH HONOR FUND III, INC.",998700.0,2026-10-13,2026-10-13,Broadcast,Media Placement: TV,Thematic Campaigns LLC,2020335,E4352351DC5474253BF8,
 IE,IA02,JOE MITCHELL,REP,O,C00685297,Elect Democratic Women,95000.0,2026-10-13,2026-10-13,Broadcast,Television/Digital Advertising,Symmetry Media LLC,2020272,500685161,
 IE,IA02,JOE MITCHELL,REP,O,C00685297,Elect Democratic Women,14454.22,2026-10-13,2026-10-13,Production,Television/Digital Production,Symmetry Media LLC,2020272,500685163,
+IE,IL14,LAUREN UNDERWOOD,DEM,S,C00173153,American Association of Nurse Anesthetists Separate Segregated Fund (CRNA-PAC),10000.0,2026-10-12,2026-10-13,Other,IE-Underwood-Polling,Sagac Public Affairs,2020333,V01EC8ADEAC3A6547F0E,
+IE,IL14,LAUREN UNDERWOOD,DEM,S,C00173153,American Association of Nurse Anesthetists Separate Segregated Fund (CRNA-PAC),12567.2,2026-10-12,2026-10-13,Digital (general),IE-Underwood-Social Media & Display Ads,Sagac Public Affairs,2020333,V09C3B8499CA03DC29CF,
+IE,IL14,LAUREN UNDERWOOD,DEM,S,C00173153,American Association of Nurse Anesthetists Separate Segregated Fund (CRNA-PAC),8548.13,2026-10-12,2026-10-13,Other,IE-Underwood-General & Administrative,Sagac Public Affairs,2020333,V56256B7777C07BBBC73,
+IE,IL14,LAUREN UNDERWOOD,DEM,S,C00173153,American Association of Nurse Anesthetists Separate Segregated Fund (CRNA-PAC),29452.5,2026-10-12,2026-10-13,Direct Mail,IE-Underwood-Direct Mail,Sagac Public Affairs,2020333,VA6EE3B6DFEA49D23ED6,
+IE,ME02,PAUL LEPAGE,REP,S,C00902577,Poverty To Prosperity,180000.0,2026-10-12,2026-10-13,Paid Media (general),Media Placement,Alamo Intelligence LLC,2020314,SE.4158,
+IE,ME02,PAUL LEPAGE,REP,S,C00902577,Poverty To Prosperity,10000.0,2026-10-12,2026-10-13,Production,Media Production,SLMG LLC,2020314,SE.4155,
 IE,AR02,CHRIS JONES,DEM,O,C00957175,COMMITTEE FOR AMERICAN LEADERSHIP,514463.0,2026-10-11,2026-10-13,Paid Media (general),MEDIA PLACEMENT,MHB MEDIA INC,2020293,SE24.36583,
 IE,IA01,CHRISTINA BOHANNAN,DEM,S,C00580068,Progressive Turnout Project,43597.71,2026-10-10,2026-10-13,Canvassing/Lit,field organizing,Merrimack Services LLC,2020244,500342471,202610139908677877
 IE,FL14,KATHY CASTOR,DEM,S,C00580068,Progressive Turnout Project,113080.64,2026-10-10,2026-10-13,Canvassing/Lit,field organizing,Merrimack Services LLC,2020244,500342468,202610139908677875
