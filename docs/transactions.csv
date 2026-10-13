@@ -1,4 +1,6 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
+IE,IA02,JOE MITCHELL,REP,O,C00685297,Elect Democratic Women,95000.0,2026-10-13,2026-10-13,Broadcast,Television/Digital Advertising,Symmetry Media LLC,2020272,500685161,
+IE,IA02,JOE MITCHELL,REP,O,C00685297,Elect Democratic Women,14454.22,2026-10-13,2026-10-13,Production,Television/Digital Production,Symmetry Media LLC,2020272,500685163,
 IE,IA01,CHRISTINA BOHANNAN,DEM,S,C00580068,Progressive Turnout Project,43597.71,2026-10-10,2026-10-13,Canvassing/Lit,field organizing,Merrimack Services LLC,2020244,500342471,202610139908677877
 IE,FL14,KATHY CASTOR,DEM,S,C00580068,Progressive Turnout Project,113080.64,2026-10-10,2026-10-13,Canvassing/Lit,field organizing,Merrimack Services LLC,2020244,500342468,202610139908677875
 IE,FL22,PIA DANDIYA,DEM,S,C00580068,Progressive Turnout Project,112239.39,2026-10-10,2026-10-13,Canvassing/Lit,field organizing,Merrimack Services LLC,2020244,500342469,202610139908677876
@@ -224,6 +226,8 @@ IE,CA22,DAVID VALADAO,REP,O,C00556860,Planned Parenthood Affiliates of Californi
 IE,CA22,DAVID VALADAO,REP,O,C00556860,Planned Parenthood Affiliates of California VOTES PAC,31694.14,2026-10-07,2026-10-12,Direct Mail,Mailer (Estimate),"The Pivot Group, Inc.",2019990,EDT.E.136,202610129908654448
 IE,CA48,MARNI VON WILPERT,,S,C00556860,Planned Parenthood Affiliates of California VOTES PAC,120000.0,2026-10-07,2026-10-12,Digital (general),Digital Ads (Estimate),76 Words Company,2019990,PDT.E.234,202610129908654445
 IE,CA48,MARNI VON WILPERT,,S,C00556860,Planned Parenthood Affiliates of California VOTES PAC,804.19,2026-10-07,2026-10-12,Digital (general),Staff Time for Digital Ads (Estimate),Planned Parenthood Affiliates of California,2019990,PDT.E.238,202610129908654447
+IE,AZ06,JUAN CISCOMANI,REP,S,C90023706,United Dairymen of Arizona,10000.0,2026-10-06,2026-10-12,Digital (general),Digital Advertising,"FirstStrategic, LLC",2020271,F57.000001,
+IE,AZ06,JUAN CISCOMANI,REP,S,C90023680,"Grand Canyon State Electric Cooperative Association, Inc.",20000.0,2026-10-06,2026-10-12,Digital (general),Digital Advertising,FirstStrategic Communications and Public Affairs,2020268,F57.000001,
 IE,WI01,MITCHELL BERMAN,DEM,S,C00612820,Community Change Voters,960.99,2026-09-30,2026-10-12,Other,"In-Kind Staff: Services to plan, draft & distribute communications & events",Community Change Action,2020218,E-2115,202610129908676610
 IE,WI01,MITCHELL BERMAN,DEM,S,C00612820,Community Change Voters,46.27,2026-09-30,2026-10-12,Other,"In-Kind Staff: Services to plan, draft & distribute communications & events",Community Change Action,2020218,E-2088,202610129908676609
 IE,VA05,THOMAS PERRIELLO,DEM,S,C00612820,Community Change Voters,90.0,2026-09-29,2026-10-12,Phones,Organzing for volunteer phonebanking and postcard event,"Chappell, Michelle",2020218,E-2065,202610129908676606
