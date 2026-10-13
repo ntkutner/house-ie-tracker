@@ -1,6 +1,7 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
 IE,IA02,JOE MITCHELL,REP,O,C00685297,Elect Democratic Women,95000.0,2026-10-13,2026-10-13,Broadcast,Television/Digital Advertising,Symmetry Media LLC,2020272,500685161,
 IE,IA02,JOE MITCHELL,REP,O,C00685297,Elect Democratic Women,14454.22,2026-10-13,2026-10-13,Production,Television/Digital Production,Symmetry Media LLC,2020272,500685163,
+IE,AR02,CHRIS JONES,DEM,O,C00957175,COMMITTEE FOR AMERICAN LEADERSHIP,514463.0,2026-10-11,2026-10-13,Paid Media (general),MEDIA PLACEMENT,MHB MEDIA INC,2020293,SE24.36583,
 IE,IA01,CHRISTINA BOHANNAN,DEM,S,C00580068,Progressive Turnout Project,43597.71,2026-10-10,2026-10-13,Canvassing/Lit,field organizing,Merrimack Services LLC,2020244,500342471,202610139908677877
 IE,FL14,KATHY CASTOR,DEM,S,C00580068,Progressive Turnout Project,113080.64,2026-10-10,2026-10-13,Canvassing/Lit,field organizing,Merrimack Services LLC,2020244,500342468,202610139908677875
 IE,FL22,PIA DANDIYA,DEM,S,C00580068,Progressive Turnout Project,112239.39,2026-10-10,2026-10-13,Canvassing/Lit,field organizing,Merrimack Services LLC,2020244,500342469,202610139908677876
