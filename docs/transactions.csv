@@ -1,4 +1,10 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
+IE,VA09,JOY POWERS,DEM,S,C00893529,Rural America Rising,2409.0,2026-10-19,2026-10-13,Other,3 billboards in Carroll County,Lamar Companies,2020379,SE.4613,
+IE,OR04,VALERIE HOYLE,DEM,O,C00921262,SAFER STRONGER OREGON PAC,125000.0,2026-10-13,2026-10-13,Digital (general),Digital Advertising,Acquire Digital LLC,2020366,SE.4257,
+IE,OR04,MONIQUE DESPAIN,REP,S,C00921262,SAFER STRONGER OREGON PAC,125000.0,2026-10-13,2026-10-13,Digital (general),Digital Advertising,Acquire Digital LLC,2020366,SE.4258,
+IE,PA10,SCOTT PERRY,REP,O,C00012476,UA Union Plumbers & Pipefitters Vote! PAC (United Association of Journeymen and Apprentices of the Plumbing & Pipefitting Industry of the United States and Canada),340498.0,2026-10-13,2026-10-13,Radio,Digital and Radio Advertisement,"Nuckels Media Partners, Inc.",2020360,SE.25024,
+IE,LA06,RICK EDMONDS,REP,O,C00487470,Club for Growth Action,56245.86,2026-10-13,2026-10-13,Production,MAIL PRODUCTION/POSTAGE,WHISTLESTOP STRATEGIES,2020358,SE24.11748,
+IE,LA06,RICK EDMONDS,REP,O,C00487470,Club for Growth Action,176.64,2026-10-13,2026-10-13,Production,MAIL PRODUCTION (FROM ADVANCE LINE 21),CLUB FOR GROWTH,2020358,SE24.11750,
 IE,NC01,DON DAVIS,DEM,S,C00898890,"WITH HONOR FUND III, INC.",998700.0,2026-10-13,2026-10-13,Broadcast,Media Placement: TV,Thematic Campaigns LLC,2020335,E4352351DC5474253BF8,
 IE,IA02,JOE MITCHELL,REP,O,C00685297,Elect Democratic Women,95000.0,2026-10-13,2026-10-13,Broadcast,Television/Digital Advertising,Symmetry Media LLC,2020272,500685161,
 IE,IA02,JOE MITCHELL,REP,O,C00685297,Elect Democratic Women,14454.22,2026-10-13,2026-10-13,Production,Television/Digital Production,Symmetry Media LLC,2020272,500685163,
