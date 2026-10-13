@@ -1,4 +1,5 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
+IE,FL13,LEELA J GRAY,DEM,O,C00904342,ADVANCING PRINCIPLED LEADERSHIP,50000.0,2026-10-12,2026-10-12,Digital (general),Digital Ads,Breakpoint Media LLC,2020227,SE.4196,
 IE,CO08,TIMOTHY GABRIEL JOSEPH EVANS,REP,S,C00851410,Protect Liberty PAC,6000.0,2026-10-12,2026-10-12,Production,IE-Evans-Media Production,The Herald Group,2020195,V337B77E18738799D935,
 IE,CO08,TIMOTHY GABRIEL JOSEPH EVANS,REP,S,C00851410,Protect Liberty PAC,34000.0,2026-10-12,2026-10-12,Paid Media (general),IE-Evans-Media Buy,The Herald Group,2020195,V3621CDCBE1590443F00,
 IE,PA10,SCOTT PERRY,REP,S,C00851410,Protect Liberty PAC,34000.0,2026-10-12,2026-10-12,Paid Media (general),IE-Perry-Media Buy,The Herald Group,2020195,V5F3DA4FC68C56A67B2D,
@@ -22,6 +23,9 @@ IE,OH15,DON RALPH LEONARD,DEM,O,C00903559,BUCKEYE PROSPERITY PAC,5550.7,2026-10-
 IE,OH15,DON RALPH LEONARD,DEM,O,C00903559,BUCKEYE PROSPERITY PAC,50000.0,2026-10-11,2026-10-12,Digital (general),Digital Advertising,"H2H Strategies, LLC",2020211,SE.4147,
 IE,MT01,SAMUEL KELLEY FORSTAG,DEM,S,C00868604,Montanans for Public Lands,1820.0,2026-10-11,2026-10-12,Canvassing/Lit,Canvassing Literature - Estimate,Alphagraphics Missoula,2019787,SE.4676,
 IE,MT01,SAMUEL KELLEY FORSTAG,DEM,S,C00868604,Montanans for Public Lands,9000.0,2026-10-11,2026-10-12,Other,"Staff Salary, Taxes, Benefits. and Overhead - Estimate",Wild Montana Action Fund,2019787,SE.4678,
+IE,TX15,BOBBY PULIDO,DEM,S,C00724203,Somos PAC,240000.0,2026-10-10,2026-10-12,Digital (general),Digital Advertising - Estimate,Conexion Political LLC,2020234,500276563,
+IE,TX15,BOBBY PULIDO,DEM,S,C00724203,Somos PAC,48439.68,2026-10-10,2026-10-12,Production,Media Production - Estimate,Conexion Political LLC,2020234,500276564,
+IE,FL13,LEELA J GRAY,DEM,O,C00904342,ADVANCING PRINCIPLED LEADERSHIP,52500.0,2026-10-10,2026-10-12,Direct Mail,Direct Mail- (Estimated Cost),"Majority Syndicate, LLC",2020227,SE.4195,
 IE,VA05,THOMAS PERRIELLO,DEM,S,C00612820,Community Change Voters,134.51,2026-10-10,2026-10-12,Other,Staff Support Salaries,Community Change Action,2020218,E-1919,
 IE,VA05,THOMAS PERRIELLO,DEM,S,C00612820,Community Change Voters,1102.0,2026-10-10,2026-10-12,Canvassing/Lit,Canvass digital communications,Julienne Kaleta,2020218,E-1923,
 IE,VA05,THOMAS PERRIELLO,DEM,S,C00612820,Community Change Voters,518.0,2026-10-10,2026-10-12,Canvassing/Lit,Canvasser Transportation,Divvy,2020218,E-1946,
