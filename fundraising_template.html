@@ -1,0 +1,597 @@
+<title>House Battlefield Fundraising</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;600;700&family=Public+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: blue headline band with the D/R split, then battlefield summary, edge chart, and the race table with click-to-expand candidate detail (same system as the House IE Tracker). */
+:root{
+  --paper:#ffffff; --ink:#1a1d23; --muted:#5d6572; --rule:#d9dde3; --alt:#f5f6f8;
+  --r:#b0222b; --r-tint:#f7d9db; --r-wash:#fcefef;
+  --d:#1c4c9c; --d-tint:#d8e3f5; --d-wash:#eef3fb;
+  --o:#6b6f78; --focus:#1c4c9c; --band:#1747C9; --tip:#1a1d23; --tip-ink:#ffffff;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --cond:"IBM Plex Sans Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
+  --display:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#16181d; --ink:#e7e9ed; --muted:#9aa2ae; --rule:#2f343c; --alt:#1c1f25;
+  --r:#ff7a7f; --r-tint:#4a2226; --r-wash:#2a1d20; --d:#86aef5; --d-tint:#1f3358; --d-wash:#1b2333;
+  --o:#9aa2ae; --focus:#86aef5; --band:#173a9e; --tip:#e7e9ed; --tip-ink:#16181d; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#16181d; --ink:#e7e9ed; --muted:#9aa2ae; --rule:#2f343c; --alt:#1c1f25;
+  --r:#ff7a7f; --r-tint:#4a2226; --r-wash:#2a1d20; --d:#86aef5; --d-tint:#1f3358; --d-wash:#1b2333;
+  --o:#9aa2ae; --focus:#86aef5; --band:#173a9e; --tip:#e7e9ed; --tip-ink:#16181d; color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1680px;margin:0 auto;padding-block:8px 48px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+
+/* Band */
+header.band{background:var(--band);color:#fff;font-family:var(--display)}
+.band-inner{max-width:1680px;margin:0 auto;display:flex;flex-direction:column;gap:32px;padding-block:36px 40px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.toprow{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:24px}
+.titleblock{display:flex;flex-direction:column;gap:12px;flex:1 1 560px;min-width:0}
+.kicker{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;opacity:.85}
+.band h1{margin:0;max-width:900px;font:800 40px/1.08 var(--display);letter-spacing:-.02em;text-wrap:balance}
+.band nav{display:flex;gap:24px;font-size:15px;font-weight:600;padding-top:2px}
+.band nav a{text-decoration:none} .band nav a:hover{text-decoration:underline}
+.totals{display:flex;flex-direction:column;gap:14px}
+.nums{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px}
+.lbl{font-size:14px;font-weight:600;opacity:.85}
+.band .amt{font-size:40px;line-height:1.1;font-weight:800;font-variant-numeric:tabular-nums}
+.band .amt.r{color:#FFC9C4} .right{text-align:right}
+.band .bar{display:flex;height:14px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,.2)}
+.band .bar i{display:block;height:100%;transition:width .5s ease}
+.band .bar .d{background:#fff} .band .bar .r{background:#F08A82}
+.caption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:14px;font-weight:600}
+.band :focus-visible{outline-color:#fff}
+@media (max-width:700px){.band h1{font-size:28px}.band .amt{font-size:30px}}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:26px 0 8px}
+.controls input[type=search]{flex:1 1 240px;max-width:380px;font:15px var(--sans);padding:8px 12px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink)}
+.controls select{font:600 14px var(--cond);height:38px;padding:0 10px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink)}
+.ctl{display:flex;align-items:center;gap:8px;font:600 13px var(--cond);color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden;flex-wrap:wrap}
+.seg button{font:600 14px var(--cond);padding:8px 12px;border:0;background:var(--paper);color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+
+/* Sections */
+section.blk{margin-top:30px}
+.blk h2{font:700 20px/1.2 var(--display);margin:0;letter-spacing:-.01em}
+.blk .sub{margin:4px 0 14px;font:400 14px var(--cond);color:var(--muted)}
+
+/* Party comparison */
+.cmp-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:980px){.cmp-grid{grid-template-columns:1fr}}
+.pc{width:100%;border-collapse:collapse;font:500 14px/1.3 var(--cond);font-variant-numeric:tabular-nums}
+.pc th,.pc td{padding:7px 10px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap}
+.pc th{font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--ink)}
+.pc th.d,.pc td.d{background:var(--d-wash)} .pc th.r,.pc td.r{background:var(--r-wash)}
+.pc th.d{color:var(--d)} .pc th.r{color:var(--r)}
+.pc td.l,.pc th.l{text-align:left;white-space:normal}
+.pc td.l small{display:block;color:var(--muted);font-weight:400;font-size:12px}
+.pc td.v{font-weight:700}
+.pc tr.hl td{font-weight:700}
+.adv-r{color:var(--r);font-weight:700} .adv-d{color:var(--d);font-weight:700}
+.tally{display:flex;flex-direction:column;gap:16px}
+.tal{border:1px solid var(--rule);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.tal .t{font:700 13px var(--cond);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.tal .n{display:flex;justify-content:space-between;font:700 22px/1 var(--cond);font-variant-numeric:tabular-nums}
+.tal .n .dn{color:var(--d)} .tal .n .rn{color:var(--r)}
+.tal .n small{font:500 13px var(--cond);color:var(--muted)}
+.wbar{display:flex;height:10px;border-radius:2px;overflow:hidden;background:var(--rule);gap:2px}
+.wbar i{display:block;height:100%}
+.wbar .d{background:var(--d)} .wbar .r{background:var(--r)} .wbar .e{background:var(--muted);opacity:.4}
+
+/* Edge chart */
+.chartbox{position:relative;overflow-x:auto;border:1px solid var(--rule);border-radius:4px;padding:10px 6px 4px}
+#edge{display:block}
+#edge text{font:500 11px var(--cond);fill:var(--muted)}
+#edge .zero{stroke:var(--ink);stroke-width:1}
+#edge .grid{stroke:var(--rule);stroke-width:1}
+#edge rect.bd{fill:var(--d)} #edge rect.br{fill:var(--r)}
+#edge rect.hit{fill:transparent;cursor:pointer}
+#edge g.col.dim rect.bd,#edge g.col.dim rect.br{opacity:.35}
+#edge text.lab{font-weight:700;fill:var(--ink)}
+.tip{position:absolute;pointer-events:none;background:var(--tip);color:var(--tip-ink);font:500 13px/1.35 var(--cond);padding:8px 10px;border-radius:4px;max-width:280px;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.tip b{font-weight:700}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font:500 13px var(--cond);color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:2px;display:inline-block}
+
+/* Table */
+.scroller{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.races{border-collapse:collapse;width:100%;font:500 13px/1.25 var(--cond);font-variant-numeric:tabular-nums}
+.races th,.races td{padding:6px 8px;white-space:nowrap;border-bottom:1px solid var(--rule)}
+.races thead th{position:sticky;top:0;z-index:2;background:var(--paper);font-weight:700;text-align:right;cursor:pointer;user-select:none;border-bottom:2px solid var(--ink)}
+.races thead tr.groups th{position:static;cursor:default;border-bottom:0;font-weight:600;font-size:12px;text-align:center;padding:4px 8px}
+.races thead tr.groups th.g-r{background:var(--r-tint);color:var(--r)} .races thead tr.groups th.g-d{background:var(--d-tint);color:var(--d)}
+.races th.l,.races td.l{text-align:left}
+.races thead th.rc{background:var(--r-tint)} .races thead th.dc{background:var(--d-tint)}
+.races thead th[aria-sort] span::after{content:"";display:inline-block;margin-left:3px;border:4px solid transparent}
+.races thead th[aria-sort="descending"] span::after{border-top-color:currentColor;transform:translateY(2px)}
+.races thead th[aria-sort="ascending"] span::after{border-bottom-color:currentColor;transform:translateY(-2px)}
+.races td{text-align:right}
+.races td.rc{background:var(--r-wash)} .races td.dc{background:var(--d-wash)}
+.races td.sel{font-weight:700}
+.races td.na{color:var(--muted);opacity:.6}
+.sticky{position:sticky;left:0;z-index:1;background:inherit}
+.races thead th.sticky{z-index:3}
+tbody tr.race{cursor:pointer;background:var(--paper)}
+tbody tr.race.alt{background:var(--alt)}
+tbody tr.race:hover td{filter:brightness(.97)}
+tbody tr.race[aria-expanded="true"] td{border-bottom-color:transparent}
+td.dist{font-weight:700}
+td.rep{color:var(--r);font-weight:600} td.dem{color:var(--d);font-weight:600}
+td.grp{color:var(--muted);text-align:left}
+.inc{font-weight:400;opacity:.7;margin-left:3px}
+.split{display:flex;height:8px;width:120px;border-radius:2px;overflow:hidden;background:var(--rule);gap:2px;margin-left:auto}
+.split i{display:block;height:100%} .split .d{background:var(--d)} .split .r{background:var(--r)}
+tfoot td{font-weight:700;background:var(--paper);border-top:2px solid var(--ink)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.foot{font:400 13px var(--cond);color:var(--muted);margin:8px 0 0}
+
+/* Drill-down */
+tr.detail>td{padding:0 0 18px;background:var(--paper);text-align:left;white-space:normal}
+.detail-inner{padding:6px 14px 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 28px;max-width:1200px}
+@media (max-width:860px){.detail-inner{grid-template-columns:1fr;position:sticky;left:0;width:calc(100vw - 42px)}}
+.h2h{grid-column:1/-1}
+.detail h3{font:700 13px var(--cond);margin:0 0 6px;padding-bottom:4px;border-bottom:2px solid currentColor;text-transform:uppercase;letter-spacing:.04em}
+.h2h h3{color:var(--ink)}
+.hh{display:grid;grid-template-columns:minmax(96px,150px) minmax(0,1fr) minmax(0,1fr) minmax(84px,110px);gap:4px 10px;align-items:center;font:500 13px/1.25 var(--cond);font-variant-numeric:tabular-nums}
+.hh .hd{font-weight:700;font-size:12px;color:var(--muted);padding-bottom:2px}
+.hh .hd.rs{color:var(--r);text-align:right} .hh .hd.ds{color:var(--d)}
+.hh .m{color:var(--muted)}
+.hh .rcell{display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.hh .dcell{display:flex;align-items:center;gap:8px}
+.hh .trk{flex:1 1 auto;height:10px;display:flex;min-width:30px}
+.hh .rcell .trk{justify-content:flex-end}
+.hh .trk i{display:block;height:100%;border-radius:2px}
+.hh .rcell i{background:var(--r)} .hh .dcell i{background:var(--d)}
+.hh .val{font-weight:700;min-width:84px}
+.hh .rcell .val{text-align:right}
+.hh .ed{text-align:right;font-weight:700}
+.card{display:flex;flex-direction:column;gap:10px;min-width:0}
+.card.r h3{color:var(--r)} .card.d h3{color:var(--d)}
+.card .nm{font:700 16px/1.2 var(--sans)}
+.card .nm small{font:500 13px var(--cond);color:var(--muted);margin-left:6px}
+.kv{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font:500 13px/1.35 var(--cond);font-variant-numeric:tabular-nums}
+.kv span:nth-child(even){font-weight:700;text-align:right}
+.kv .m{color:var(--muted);font-weight:400}
+.sh{font:700 12px var(--cond);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:4px}
+.mix{display:flex;height:12px;border-radius:2px;overflow:hidden;gap:2px;background:var(--rule)}
+.mix i{display:block;height:100%}
+.card.r .mix .a{background:var(--r)} .card.r .mix .b{background:var(--r-tint)}
+.card.d .mix .a{background:var(--d)} .card.d .mix .b{background:var(--d-tint)}
+.mixkey{display:flex;justify-content:space-between;gap:12px;font:500 12px var(--cond);color:var(--muted)}
+.prog{display:inline-block;padding:0 6px;border-radius:3px;font:700 11px/16px var(--cond);letter-spacing:.02em;white-space:nowrap;vertical-align:1px;border:1px solid var(--d)}
+.prog.FL{background:var(--d);color:var(--paper)}
+.prog.R2B{background:var(--d-wash);color:var(--d)}
+.prog.DIP{border-color:var(--rule);border-style:dashed;color:var(--muted);background:transparent}
+.prog.PAT{background:var(--r);color:var(--paper);border-color:var(--r)}
+.prog.MM{background:var(--r-wash);color:var(--r);border-color:var(--r)}
+.prog.NONE{border-color:transparent;background:transparent;color:var(--muted);font-weight:500}
+.byprog{margin-top:22px;display:flex;flex-direction:column;gap:6px}
+.byprog .pc td.l .prog{margin-right:6px}
+.chip{display:inline-block;padding:1px 7px;border-radius:999px;border:1px solid var(--rule);font:600 12px var(--cond);color:var(--muted);margin-left:6px;vertical-align:1px}
+.note{font:400 13px var(--cond);color:var(--muted)}
+.lnk{font:600 13px var(--cond)}
+.extra{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;font:500 13px var(--cond);border-top:1px solid var(--rule);padding-top:10px}
+.extra .row{display:flex;flex-wrap:wrap;gap:4px 14px}
+.extra b{font-weight:700}
+
+details.notes{margin-top:28px;border-top:1px solid var(--rule);padding-top:12px;font-size:14px;max-width:1100px}
+details.notes summary{font:700 15px var(--sans);cursor:pointer}
+.notes p,.notes li{color:var(--muted);max-width:80ch}
+.credit{margin:22px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:13px;color:var(--muted);text-align:center}
+@media (max-width:700px){.controls .ctl{flex-wrap:wrap}}
+@media (prefers-reduced-motion:reduce){.band .bar i{transition:none}}
+</style>
+
+<header class="band">
+  <div class="band-inner">
+    <div class="toprow">
+      <div class="titleblock">
+        <div class="kicker">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"></path></svg>
+          <span id="kicker">Q3 2026 · Pre-primary and October Quarterly reports, through Sep 30</span>
+        </div>
+        <h1>2026 House Battlefield Fundraising Dashboard</h1>
+      </div>
+      <nav aria-label="Sections"><a href="#summary">Battlefield</a><a href="#chart">Edge by race</a><a href="#tblsec">Races</a><a href="#notes" id="notesLink">Notes</a><!--NAV_EXTRA--></nav>
+    </div>
+    <div class="totals">
+      <div class="nums">
+        <div><div class="lbl" id="dLbl">Democrats raised</div><div class="amt" id="dTot"></div></div>
+        <div class="right"><div class="lbl" id="rLbl">Republicans raised</div><div class="amt r" id="rTot"></div></div>
+      </div>
+      <div class="bar" role="img" id="bar"><i class="d" id="barD"></i><i class="r" id="barR"></i></div>
+      <div class="caption"><span id="capL"></span><span id="capR"></span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <div class="ctl"><span id="metricLbl">Compare</span>
+      <div class="seg" role="group" aria-labelledby="metricLbl" id="metricSeg">
+        <button type="button" data-m="q3" aria-pressed="true">Raised Q3</button>
+        <button type="button" data-m="coh" aria-pressed="false">Cash on hand</button>
+        <button type="button" data-m="ctd" aria-pressed="false">Raised cycle</button>
+        <button type="button" data-m="sp" aria-pressed="false">Spent Q3</button>
+      </div>
+    </div>
+    <div class="ctl"><span id="progLbl">DCCC program</span>
+      <div class="seg" role="group" aria-labelledby="progLbl" id="progSeg">
+        <button type="button" data-p="" aria-pressed="true">All</button>
+        <button type="button" data-p="FL" aria-pressed="false">Frontline</button>
+        <button type="button" data-p="R2B" aria-pressed="false">Red to Blue</button>
+        <button type="button" data-p="DIP" aria-pressed="false">Districts in Play</button>
+      </div>
+    </div>
+    <div class="ctl"><span id="rprogLbl">NRCC program</span>
+      <div class="seg" role="group" aria-labelledby="rprogLbl" id="rprogSeg">
+        <button type="button" data-p="" aria-pressed="true">All</button>
+        <button type="button" data-p="PAT" aria-pressed="false">Patriots</button>
+        <button type="button" data-p="MM" aria-pressed="false">MAGA Majority</button>
+        <button type="button" data-p="NONE" aria-pressed="false">Neither</button>
+      </div>
+    </div>
+    <input type="search" id="q" placeholder="Filter by district or candidate" aria-label="Filter races">
+  </div>
+
+  <section class="blk" id="summary" aria-labelledby="sumH">
+    <h2 id="sumH">Across the battlefield</h2>
+    <p class="sub" id="sumSub"></p>
+    <div class="cmp-grid">
+      <div class="scroller" style="border:0"><table class="pc" id="pc"></table></div>
+      <div class="tally" id="tally"></div>
+    </div>
+    <div class="byprog">
+      <h2 style="font-size:17px">By DCCC program</h2>
+      <p class="sub" style="margin-bottom:6px">Campaign totals for the measure picked above, grouped by the Democrat's DCCC program.</p>
+      <div class="scroller" style="border:0"><table class="pc" id="pp"></table></div>
+      <h2 style="font-size:17px;margin-top:22px">By NRCC program</h2>
+      <p class="sub" style="margin-bottom:6px">The same totals, grouped by the Republican's NRCC program.</p>
+      <div class="scroller" style="border:0"><table class="pc" id="rpp"></table></div>
+    </div>
+  </section>
+
+  <section class="blk" id="chart" aria-labelledby="chH">
+    <h2 id="chH">Edge by race</h2>
+    <p class="sub" id="chSub"></p>
+    <div class="chartbox" id="chartbox"><svg id="edge" role="img" aria-labelledby="chH"></svg><div class="tip" id="tip" hidden></div></div>
+    <div class="legend"><span><i style="background:var(--d)"></i>Democrat ahead</span><span><i style="background:var(--r)"></i>Republican ahead</span><span>Click a bar to open that race below.</span></div>
+  </section>
+
+  <section class="blk" id="tblsec" aria-labelledby="tH">
+    <h2 id="tH">Races</h2>
+    <p class="sub">Click a race for the head-to-head, each campaign's donor mix and spending, and outside money. Click a column to sort.</p>
+    <div class="scroller"><table class="races" id="tbl"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+    <p class="foot" id="foot"></p>
+  </section>
+
+  <details class="notes" id="notes"><summary>Data notes</summary>
+    <ul>
+      <li><b>Raised Q3</b> is total receipts (Line 16) on the pre-primary report plus the October Quarterly, so it covers July 1 through September 30 for every candidate. Receipts include candidate loans and transfers, not only contributions.</li>
+      <li><b>Spent Q3</b> is total disbursements (Line 22) for the same reports. <b>Burn rate</b> is spent divided by raised; over 100% means the campaign spent down its bank.</li>
+      <li><b>Cash on hand</b> is Line 27 as of September 30. <b>Raised cycle</b> and <b>Spent cycle</b> are cycle-to-date totals (Lines 16 and 22, column B).</li>
+      <li><b>Small-dollar share</b> is unitemized individual contributions (Line 11(a)(ii), donors giving $200 or less this cycle) divided by total receipts. Party totals pool every candidate's dollars rather than averaging percentages.</li>
+      <li><b>Candidate loans</b> are loans made by the candidate (Line 13(a)) and <b>debt</b> is debts owed by the committee (Line 10), where the research sheet recorded them. The Frontier and Horizon tabs didn't track these, so they show as zero there.</li>
+      <li>Kevin Kiley (CA-06) filed as an independent and is counted with Republicans. Bill Hill (AK-AL), an independent, is counted on the Democratic side, matching the IE tracker. Other third-party candidates appear in each race's detail but aren't in the party totals.</li>
+      <li><b>Outside spending</b> in each race's detail comes from the House IE Tracker (independent expenditures plus party coordinated spending, filings through <span id="ieAsOf"></span>).</li>
+      <li><b>DCCC program</b> comes from the DCCC's 2026 Frontline and Red to Blue pages as of Oct 16, 2026 (26 Frontline members, 46 Red to Blue candidates). Every other race is marked Districts in Play.</li>
+      <li><b>NRCC program</b> comes from the NRCC's Patriots and MAGA Majority sheets (17 Patriots, 27 MAGA Majority). James Gallagher (CA-01, Patriots) isn't in the research sheet. Republicans on neither list show a dash.</li>
+      <li>Incumbents are marked (i). Source: FEC Master Sheet, 2026 Q3, research tabs.</li>
+    </ul>
+  </details>
+  <p class="credit">Built by Noah Kutner from FEC filings. Figures reflect reports as filed and may change with amendments.</p>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => n == null ? "—" : (n < 0 ? "-$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
+const mil = n => { if (n == null) return "—"; const a = Math.abs(n), s = n < 0 ? "-" : "";
+  return a >= 1e6 ? s + "$" + (a / 1e6).toFixed(a >= 1e7 ? 1 : 2) + "M" : a >= 1e3 ? s + "$" + Math.round(a / 1e3) + "K" : s + "$" + Math.round(a); };
+const pct = (a, b) => b > 0 ? Math.round(a / b * 100) + "%" : "—";
+const edgeText = (e, short) => e == null ? "—" : Math.round(e) === 0 ? "EVEN" : (e > 0 ? "D +" : "R +") + (short ? mil(Math.abs(e)) : money(Math.abs(e)));
+const edgeCls = e => e > 0 ? "adv-d" : e < 0 ? "adv-r" : "";
+const last = n => n.replace(/^Dr\.\s+/, "").replace(/\s+(Jr\.|Sr\.|III|II)$/, "").replace(/\(.*?\)\s*/, "").trim().split(/\s+/).pop();
+
+const METRICS = {
+  q3:  {label:"Raised Q3",    verb:"raised in Q3",            short:"Q3 raised"},
+  coh: {label:"Cash on hand", verb:"cash on hand, Sep 30",     short:"cash on hand"},
+  ctd: {label:"Raised cycle", verb:"raised this cycle",        short:"cycle raised"},
+  sp:  {label:"Spent Q3",     verb:"spent in Q3",              short:"Q3 spending"},
+};
+const state = {m: "q3", prog: "", rprog: "", q: "", sort: "tot", dir: -1, open: new Set()};
+const PROG = {FL: {name: "Frontline", short: "Frontline", rank: 0, org: "DCCC"}, R2B: {name: "Red to Blue", short: "Red to Blue", rank: 1, org: "DCCC"}, DIP: {name: "Districts in Play", short: "In Play", rank: 2, org: "DCCC"},
+  PAT: {name: "Patriots", short: "Patriots", rank: 0, org: "NRCC"}, MM: {name: "MAGA Majority", short: "MAGA Majority", rank: 1, org: "NRCC"}, NONE: {name: "Neither NRCC program", short: "—", rank: 2, org: "NRCC"}};
+const progBadge = p => p === "NONE" ? `<span class="prog NONE" title="Not in an NRCC program">—</span>` : `<span class="prog ${p}" title="${PROG[p].org} ${esc(PROG[p].name)}">${esc(PROG[p].short)}</span>`;
+const val = (c, k) => c && c.f ? (c[k] ?? 0) : null;
+const edge = (r, k) => { const d = val(r.D, k), rr = val(r.R, k); return d == null || rr == null ? null : d - rr; };
+
+function visible() {
+  const q = state.q.trim().toLowerCase();
+  return DATA.races.filter(r => (!state.prog || r.pr === state.prog) && (!state.rprog || r.rp === state.rprog) &&
+    (!q || [r.d, r.d.replace("-", ""), r.R?.n, r.D?.n, ...r.o.map(o => o.n)].some(v => (v || "").toLowerCase().includes(q))));
+}
+const both = rows => rows.filter(r => r.R?.f && r.D?.f);
+
+/* ---------- Hero ---------- */
+function renderHero(rows) {
+  const k = state.m, M = METRICS[k];
+  const d = rows.reduce((a, r) => a + (val(r.D, k) || 0), 0), rr = rows.reduce((a, r) => a + (val(r.R, k) || 0), 0), all = d + rr || 1;
+  $("#dLbl").textContent = "Democrats · " + M.verb; $("#rLbl").textContent = "Republicans · " + M.verb;
+  $("#dTot").textContent = mil(d); $("#rTot").textContent = mil(rr);
+  $("#barD").style.width = (d / all * 100) + "%"; $("#barR").style.width = (rr / all * 100) + "%";
+  $("#bar").setAttribute("aria-label", `Democrats ${money(d)}, Republicans ${money(rr)}`);
+  const b = both(rows), dA = b.filter(r => edge(r, k) > 0).length;
+  $("#capL").textContent = `${Math.round(d / all * 100)}% Democratic · D ahead in ${dA} of ${b.length} races`;
+  $("#capR").textContent = Math.round(d - rr) === 0 ? "Even" : (d > rr ? "Democrats +" : "Republicans +") + mil(Math.abs(d - rr));
+}
+
+/* ---------- Battlefield comparison ---------- */
+function median(a) { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
+function renderSummary(rows) {
+  const side = p => rows.map(r => r[p]).filter(c => c && c.f);
+  const D = side("D"), R = side("R");
+  const sum = (L, k) => L.reduce((a, c) => a + (c[k] || 0), 0);
+  const med = (L, k) => median(L.map(c => c[k] || 0));
+  const reg = [state.prog ? "DCCC " + PROG[state.prog].name : "", state.rprog ? (state.rprog === "NONE" ? "no NRCC program" : "NRCC " + PROG[state.rprog].name) : ""].filter(Boolean).join(" + ") + (state.prog || state.rprog ? ` races (${rows.length})` : "all " + rows.length + " races");
+  $("#sumSub").textContent = `Party totals for ${reg}${state.q ? " matching “" + state.q + "”" : ""}: ${D.length} Democratic and ${R.length} Republican campaigns.`;
+  const lines = [
+    ["Raised Q3", "Total receipts, Jul 1–Sep 30", L => sum(L, "q3"), "m", "q3"],
+    ["Median raised Q3", "Per campaign", L => med(L, "q3"), "m"],
+    ["Spent Q3", "Total disbursements", L => sum(L, "sp"), "m", "sp", true],
+    ["Burn rate", "Spent ÷ raised, Q3", L => sum(L, "sp") / (sum(L, "q3") || 1), "p", null, true],
+    ["Cash on hand", "As of Sep 30", L => sum(L, "coh"), "m", "coh"],
+    ["Median cash on hand", "Per campaign", L => med(L, "coh"), "m"],
+    ["Raised cycle", "Cycle to date", L => sum(L, "ctd"), "m", "ctd"],
+    ["Small-dollar share", "Unitemized ÷ receipts, Q3", L => sum(L, "un") / (sum(L, "q3") || 1), "p"],
+    ["Unitemized raised Q3", "Donors at $200 or less", L => sum(L, "un"), "m"],
+    ["Candidate loans", "Owed to the candidate", L => sum(L, "loans"), "m", null, true],
+    ["Debt", "Owed by the committee", L => sum(L, "debt"), "m", null, true],
+  ];
+  const fmt = (v, t) => v == null ? "—" : t === "p" ? Math.round(v * 100) + "%" : money(v);
+  $("#pc").innerHTML = `<thead><tr><th class="l">Measure</th><th class="d">Democrats</th><th class="r">Republicans</th><th>Edge</th></tr></thead><tbody>` +
+    lines.map(([l, s, f, t, mk, lowerBetter]) => {
+      const dv = f(D), rv = f(R);
+      let e = "";
+      if (dv != null && rv != null) {
+        if (t === "p") { const diff = Math.round((dv - rv) * 100); e = diff === 0 ? "Even" : `<span class="${lowerBetter ? "" : diff > 0 ? "adv-d" : "adv-r"}">${diff > 0 ? "D +" : "R +"}${Math.abs(diff)} pts</span>`; }
+        else { const diff = dv - rv; e = Math.round(diff) === 0 ? "Even" : `<span class="${lowerBetter ? "" : diff > 0 ? "adv-d" : "adv-r"}">${diff > 0 ? "D +" : "R +"}${mil(Math.abs(diff))}</span>`; }
+      }
+      return `<tr${mk === state.m ? ' class="hl"' : ""}><td class="l">${esc(l)}<small>${esc(s)}</small></td><td class="d v">${fmt(dv, t)}</td><td class="r v">${fmt(rv, t)}</td><td>${e}</td></tr>`;
+    }).join("") + `</tbody>`;
+
+  const b = both(rows);
+  const tal = (k, title) => {
+    const dA = b.filter(r => edge(r, k) > 0).length, rA = b.filter(r => edge(r, k) < 0).length, ev = b.length - dA - rA, n = b.length || 1;
+    return `<div class="tal"><div class="t">${esc(title)}</div><div class="n"><span class="dn">D ${dA}</span><small>of ${b.length} races${ev ? ` · ${ev} even` : ""}</small><span class="rn">R ${rA}</span></div>
+      <div class="wbar" role="img" aria-label="Democrats ahead in ${dA}, Republicans ahead in ${rA}"><i class="d" style="width:${dA / n * 100}%"></i>${ev ? `<i class="e" style="width:${ev / n * 100}%"></i>` : ""}<i class="r" style="width:${rA / n * 100}%"></i></div></div>`;
+  };
+  const both2 = b.filter(r => edge(r, "q3") > 0 && edge(r, "coh") > 0).length, neither = b.filter(r => edge(r, "q3") < 0 && edge(r, "coh") < 0).length;
+  $("#tally").innerHTML = tal("q3", "Who outraised whom in Q3") + tal("coh", "Who has more cash on hand") + tal("ctd", "Who has raised more this cycle") +
+    `<p class="note" style="margin:0">Democrats lead on both Q3 raising and cash on hand in ${both2} races; Republicans lead on both in ${neither}.</p>`;
+
+  const k = state.m, M = METRICS[k];
+  const gl = (p, L) => {
+    const B = both(L), dv = L.reduce((a, r) => a + (val(r.D, k) || 0), 0), rv = L.reduce((a, r) => a + (val(r.R, k) || 0), 0), e = dv - rv;
+    const dA = B.filter(r => edge(r, k) > 0).length, md = median(B.map(r => edge(r, k)));
+    const label = !p ? "<b>All shown</b>" : p === "NONE" ? "Neither program" : progBadge(p) + esc(PROG[p].name);
+    return `<tr><td class="l">${label}</td><td>${L.length}</td><td class="d v">${money(dv)}</td><td class="r v">${money(rv)}</td><td class="${edgeCls(e)}">${esc(edgeText(e, true))}</td><td>${dA} of ${B.length}</td><td class="${edgeCls(md)}">${esc(edgeText(md, true))}</td></tr>`;
+  };
+  const progTable = (sel, keys, field) => {
+    const groups = keys.map(p => [p, rows.filter(r => r[field] === p)]).filter(([, L]) => L.length);
+    $(sel).innerHTML = `<thead><tr><th class="l">Program</th><th>Races</th><th class="d">Democrats</th><th class="r">Republicans</th><th>Edge</th><th>D ahead in</th><th>Median race edge</th></tr></thead><tbody>` +
+      groups.map(([p, L]) => gl(p, L)).join("") + (groups.length > 1 ? gl("", rows).replace("<tr>", '<tr class="hl">') : "") + `</tbody>` +
+      `<caption style="caption-side:bottom;text-align:left;padding-top:6px;font:400 13px var(--cond);color:var(--muted)">Measure: ${esc(M.label)}.</caption>`;
+  };
+  progTable("#pp", ["FL", "R2B", "DIP"], "pr");
+  progTable("#rpp", ["PAT", "MM", "NONE"], "rp");
+}
+
+/* ---------- Edge chart ---------- */
+let chartRows = [];
+function niceStep(span) { const raw = span / 4, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
+function renderChart(rows) {
+  const k = state.m, M = METRICS[k];
+  chartRows = both(rows).map(r => ({r, e: edge(r, k)})).sort((a, b) => b.e - a.e);
+  const svg = $("#edge"), box = $("#chartbox");
+  $("#chSub").textContent = `Democratic minus Republican ${M.short} in each race, sorted from the biggest Democratic edge to the biggest Republican edge.`;
+  const n = chartRows.length;
+  if (!n) { svg.setAttribute("width", 10); svg.setAttribute("height", 10); svg.innerHTML = ""; return; }
+  const W = Math.max(box.clientWidth - 14, n * 7 + 70), H = 320, padL = 56, padR = 8, padT = 40, padB = 40;
+  const maxV = Math.max(...chartRows.map(x => x.e), 0), minV = Math.min(...chartRows.map(x => x.e), 0);
+  const step = niceStep(Math.max(maxV - minV, 1));
+  const top = Math.ceil(maxV / step) * step || step, bot = Math.floor(minV / step) * step || -step;
+  const y = v => padT + (top - v) / (top - bot) * (H - padT - padB);
+  const bw = (W - padL - padR) / n, gap = bw > 6 ? 2 : 1;
+  let s = "";
+  for (let v = bot; v <= top + 1e-6; v += step) {
+    s += `<line class="grid" x1="${padL}" x2="${W - padR}" y1="${y(v)}" y2="${y(v)}"></line><text x="${padL - 6}" y="${y(v) + 4}" text-anchor="end">${v === 0 ? "$0" : (v > 0 ? "D +" : "R +") + mil(Math.abs(v)).replace(".00M", "M")}</text>`;
+  }
+  chartRows.forEach(({r, e}, i) => {
+    const x = padL + i * bw, h = Math.abs(y(e) - y(0)), cls = e >= 0 ? "bd" : "br";
+    const yy = e >= 0 ? y(e) : y(0), w = Math.max(bw - gap, 1), rad = Math.min(2, w / 2);
+    s += `<g class="col" data-i="${i}"><rect class="${cls}" x="${x}" y="${yy}" width="${w}" height="${Math.max(h, 1)}" rx="${rad}"></rect>`;
+    if ((i === 0 && e > 0) || (i === n - 1 && e < 0)) {
+      const ly = e >= 0 ? yy - 6 : yy + h + 13;
+      s += `<text class="lab" x="${i === 0 ? x : x + w}" y="${ly}" text-anchor="${i === 0 ? "start" : "end"}">${esc(r.d)} ${esc(edgeText(e, true))}</text>`;
+    }
+    s += `<rect class="hit" x="${x}" y="${padT}" width="${bw}" height="${H - padT - padB}" tabindex="0" aria-label="${esc(r.d)} ${esc(edgeText(e))}"></rect></g>`;
+  });
+  s += `<line class="zero" x1="${padL}" x2="${W - padR}" y1="${y(0)}" y2="${y(0)}"></line>`;
+  svg.setAttribute("width", W); svg.setAttribute("height", H); svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.innerHTML = s;
+}
+function showTip(g) {
+  const i = +g.dataset.i, {r, e} = chartRows[i], k = state.m, tip = $("#tip"), box = $("#chartbox");
+  document.querySelectorAll("#edge g.col").forEach(c => c.classList.toggle("dim", c !== g));
+  tip.innerHTML = `<b>${esc(r.d)}</b> · DCCC ${esc(PROG[r.pr].name)}${r.rp !== "NONE" ? " · NRCC " + esc(PROG[r.rp].name) : ""}<br><span>${esc(r.D.n)} (D) ${money(val(r.D, k))}</span><br><span>${esc(r.R.n)} (R) ${money(val(r.R, k))}</span><br><b>${esc(edgeText(e))}</b>`;
+  tip.hidden = false;
+  const hit = g.querySelector("rect.hit").getBBox(), bx = box.getBoundingClientRect(), sv = $("#edge").getBoundingClientRect();
+  let left = sv.left - bx.left + box.scrollLeft + hit.x + hit.width + 8;
+  if (left + 290 > box.scrollLeft + box.clientWidth) left = sv.left - bx.left + box.scrollLeft + hit.x - 8 - tip.offsetWidth;
+  tip.style.left = Math.max(box.scrollLeft + 4, left) + "px"; tip.style.top = "24px";
+}
+function hideTip() { $("#tip").hidden = true; document.querySelectorAll("#edge g.col").forEach(c => c.classList.remove("dim")); }
+$("#edge").addEventListener("mouseover", e => { const g = e.target.closest("g.col"); if (g) showTip(g); });
+$("#edge").addEventListener("focusin", e => { const g = e.target.closest("g.col"); if (g) showTip(g); });
+$("#edge").addEventListener("mouseleave", hideTip);
+$("#edge").addEventListener("focusout", hideTip);
+const jump = g => { const d = chartRows[+g.dataset.i].r.d; state.open.add(d); renderTable(visible()); const tr = document.querySelector(`tr.race[data-d="${d}"]`); tr?.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center"}); tr?.focus({preventScroll: true}); };
+$("#edge").addEventListener("click", e => { const g = e.target.closest("g.col"); if (g) jump(g); });
+$("#edge").addEventListener("keydown", e => { if (e.key !== "Enter" && e.key !== " ") return; const g = e.target.closest("g.col"); if (g) { e.preventDefault(); jump(g); } });
+
+/* ---------- Race table ---------- */
+const SIDE_COLS = [["q3", "RAISED Q3"], ["sp", "SPENT Q3"], ["coh", "COH"], ["ctd", "CYCLE"]];
+function fields() {
+  const k = state.m;
+  return [
+    {key:"d", label:"DIST", cls:"l dist sticky", get:r => r.d, str:true},
+    {key:"rp", label:"NRCC", cls:"l", get:r => PROG[r.rp].rank},
+    {key:"pr", label:"DCCC", cls:"l", get:r => PROG[r.pr].rank},
+    {key:"rep", label:"REP", cls:"l rep", get:r => r.R?.n || "", str:true},
+    {key:"dem", label:"DEM", cls:"l dem", get:r => r.D?.n || "", str:true},
+    ...SIDE_COLS.map(([m, l]) => ({key:"R" + m, m, label:l, cls:"rc", side:"R", get:r => val(r.R, m)})),
+    ...SIDE_COLS.map(([m, l]) => ({key:"D" + m, m, label:l, cls:"dc", side:"D", get:r => val(r.D, m)})),
+    {key:"edge", label:"EDGE · " + METRICS[k].short.toUpperCase(), cls:"", get:r => edge(r, k)},
+    {key:"split", label:"D / R SPLIT", cls:"", get:r => { const d = val(r.D, k) || 0, rr = val(r.R, k) || 0; return d + rr ? d / (d + rr) : null; }},
+    {key:"tot", label:"RACE TOTAL", cls:"", get:r => (val(r.D, k) || 0) + (val(r.R, k) || 0)},
+  ];
+}
+function sorted(rows, F) {
+  const f = F.find(f => f.key === state.sort) || F[F.length - 1];
+  return rows.slice().sort((a, b) => {
+    const x = f.get(a), y = f.get(b);
+    if (f.str) return String(x).localeCompare(String(y)) * state.dir;
+    if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
+    return (x - y) * state.dir || a.d.localeCompare(b.d);
+  });
+}
+function cell(f, r) {
+  const k = state.m;
+  if (f.key === "d") return `<td class="${f.cls}">${esc(r.d)}</td>`;
+  if (f.key === "pr") return `<td class="${f.cls}">${progBadge(r.pr)}</td>`;
+  if (f.key === "rp") return `<td class="${f.cls}">${progBadge(r.rp)}</td>`;
+  if (f.key === "rep" || f.key === "dem") { const c = f.key === "rep" ? r.R : r.D;
+    return `<td class="${f.cls}">${c ? esc(c.n) + (c.inc ? '<span class="inc">(i)</span>' : "") + (c.f ? "" : ' <span class="chip">not filed</span>') : "—"}</td>`; }
+  if (f.key === "edge") { const e = f.get(r); return `<td class="${edgeCls(e)}">${esc(edgeText(e))}</td>`; }
+  if (f.key === "split") { const d = val(r.D, k) || 0, rr = val(r.R, k) || 0, t = d + rr;
+    return `<td>${t ? `<div class="split" role="img" aria-label="Democrat ${pct(d, t)}"><i class="d" style="width:${d / t * 100}%"></i><i class="r" style="width:${rr / t * 100}%"></i></div>` : ""}</td>`; }
+  const v = f.get(r);
+  return `<td class="${f.cls}${f.m === k ? " sel" : ""}${v == null ? " na" : ""}">${money(v)}</td>`;
+}
+function renderTable(rows) {
+  const F = fields(), list = sorted(rows, F);
+  const pre = 5, nR = SIDE_COLS.length, nD = SIDE_COLS.length;
+  $("#tbl thead").innerHTML = `<tr class="groups"><th colspan="${pre}" class="sticky"></th><th colspan="${nR}" class="g-r">Republican campaign</th><th colspan="${nD}" class="g-d">Democratic campaign</th><th colspan="3"></th></tr>` +
+    `<tr>${F.map(f => `<th scope="col" data-key="${f.key}" class="${f.cls.replace(/\b(dist|rep|dem|grp)\b/g, "")}" tabindex="0"${state.sort === f.key ? ` aria-sort="${state.dir < 0 ? "descending" : "ascending"}"` : ""}><span>${esc(f.label)}</span></th>`).join("")}</tr>`;
+  $("#tbl tbody").innerHTML = list.length ? list.map((r, i) => {
+    const open = state.open.has(r.d);
+    return `<tr class="race${i % 2 ? " alt" : ""}" tabindex="0" data-d="${esc(r.d)}" aria-expanded="${open}">${F.map(f => cell(f, r)).join("")}</tr>` + (open ? detail(r, F.length) : "");
+  }).join("") : `<tr><td colspan="${F.length}" class="empty">No races match. Clear the search or set both program filters to All.</td></tr>`;
+  const tot = m => list.reduce((a, r) => [a[0] + (val(r.R, m) || 0), a[1] + (val(r.D, m) || 0)], [0, 0]);
+  const T = Object.fromEntries(SIDE_COLS.map(([m]) => [m, tot(m)]));
+  const te = T[state.m][1] - T[state.m][0];
+  $("#tbl tfoot").innerHTML = `<tr><td class="l sticky" colspan="5">Total ·${list.length} races</td>${SIDE_COLS.map(([m]) => `<td class="rc">${money(T[m][0])}</td>`).join("")}${SIDE_COLS.map(([m]) => `<td class="dc">${money(T[m][1])}</td>`).join("")}<td class="${edgeCls(te)}">${esc(edgeText(te))}</td><td></td><td>${money(T[state.m][0] + T[state.m][1])}</td></tr>`;
+  $("#foot").textContent = "COH = cash on hand, Sep 30. CYCLE = raised cycle to date. The bold column on each side is the measure picked above; EDGE and SPLIT follow it.";
+}
+
+/* ---------- Drill-down ---------- */
+function detail(r, span) {
+  const R = r.R, D = r.D;
+  const rows = [["Raised Q3", "q3"], ["Spent Q3", "sp"], ["Cash on hand", "coh"], ["Raised cycle", "ctd"], ["Spent cycle", "ctds"], ["Unitemized Q3", "un"], ["Candidate loans", "loans"], ["Debt", "debt"]];
+  const mx = Math.max(1, ...rows.flatMap(([, k]) => [val(R, k) || 0, val(D, k) || 0]));
+  const lowerBetter = new Set(["sp", "ctds", "loans", "debt"]);
+  const h2h = `<div class="h2h"><h3>${esc(r.d)} head to head</h3><div class="hh">
+    <span class="hd"></span><span class="hd rs">${R ? esc(R.n) : "No Republican"}</span><span class="hd ds">${D ? esc(D.n) : "No Democrat"}</span><span class="hd" style="text-align:right">Edge</span>` +
+    rows.map(([l, k]) => {
+      const rv = val(R, k), dv = val(D, k), e = rv == null || dv == null ? null : dv - rv;
+      const ec = e == null || Math.round(e) === 0 ? "" : lowerBetter.has(k) ? "" : edgeCls(e);
+      return `<span class="m">${l}</span>
+        <span class="rcell"><span class="val">${money(rv)}</span><span class="trk"><i style="width:${(rv || 0) / mx * 100}%"></i></span></span>
+        <span class="dcell"><span class="trk"><i style="width:${(dv || 0) / mx * 100}%"></i></span><span class="val">${money(dv)}</span></span>
+        <span class="ed ${ec}">${esc(edgeText(e, true))}</span>`;
+    }).join("") + `</div></div>`;
+  const card = (c, side) => {
+    const sideName = side === "R" ? "Republican" : "Democrat";
+    if (!c) return `<div class="card ${side.toLowerCase()}"><h3>${sideName}</h3><p class="note">No ${sideName.toLowerCase()} candidate in this race.</p></div>`;
+    if (!c.f) return `<div class="card ${side.toLowerCase()}"><h3>${sideName}</h3><div class="nm">${esc(c.n)}</div><p class="note">No Q3 report on file in the research sheet.</p></div>`;
+    const un = c.un || 0, other = Math.max((c.q3 || 0) - un, 0), tot = un + other || 1;
+    const burn = c.q3 ? c.sp / c.q3 : null;
+    const burnChip = burn == null ? "" : burn > 1 ? '<span class="chip">spent down bank</span>' : burn < 0.6 ? '<span class="chip">banking it</span>' : "";
+    return `<div class="card ${side.toLowerCase()}"><h3>${sideName}</h3>
+      <div class="nm">${esc(c.n)}${c.inc ? "<small>Incumbent</small>" : ""}${side === "D" ? " " + progBadge(r.pr) : r.rp !== "NONE" ? " " + progBadge(r.rp) : ""}</div>
+      ${c.note ? `<div class="note">${esc(c.note)}</div>` : ""}
+      <div class="sh">Donors · Q3</div>
+      <div class="mix" role="img" aria-label="Unitemized ${pct(un, tot)} of receipts"><i class="a" style="width:${un / tot * 100}%"></i><i class="b" style="width:${other / tot * 100}%"></i></div>
+      <div class="mixkey"><span>Small-dollar (unitemized) ${pct(un, c.q3)}</span><span>Itemized, PAC and other ${pct(other, c.q3)}</span></div>
+      <div class="kv"><span>Unitemized contributions</span><span>${money(un)}</span><span>Itemized, PAC and other receipts</span><span>${money(other)}</span>
+        ${c.pp ? `<span class="m">Pre-primary report</span><span>${money(c.pp)}</span><span class="m">October Quarterly</span><span>${money(c.oq)}</span>` : ""}
+        <span>Candidate loans outstanding</span><span>${money(c.loans)}</span></div>
+      <div class="sh">Spending</div>
+      <div class="kv"><span>Spent Q3</span><span>${money(c.sp)}</span><span>Burn rate${burnChip}</span><span>${burn == null ? "—" : Math.round(burn * 100) + "%"}</span>
+        <span>Cash on hand, Sep 30</span><span>${money(c.coh)}</span><span>Debt</span><span>${money(c.debt)}</span>
+        <span>Raised / spent this cycle</span><span>${mil(c.ctd)} / ${mil(c.ctds)}</span></div>
+      ${c.link ? `<a class="lnk" href="${esc(c.link)}" target="_blank" rel="noopener">October Quarterly on FEC.gov</a>` : ""}
+    </div>`;
+  };
+  const others = r.o.length ? `<div class="row"><b>Also on the ballot:</b>${r.o.map(o => `<span>${esc(o.n)} (${esc(o.p)})${o.f ? `: raised ${money(o.q3)} in Q3, ${money(o.coh)} on hand` : ", no report on file"}${o.note ? " · " + esc(o.note) : ""}</span>`).join("")}</div>` : "";
+  const ie = r.ie ? `<div class="row"><b>Outside spending (IE tracker):</b><span class="adv-d">Helping Democrats ${money(r.ie.d)}</span><span class="adv-r">Helping Republicans ${money(r.ie.r)}</span>${R?.f && D?.f ? `<span>Cash on hand plus outside money: D ${mil(D.coh + r.ie.d)} vs R ${mil(R.coh + r.ie.r)}</span>` : ""}</div>`
+                  : `<div class="row"><b>Outside spending:</b><span>None tracked in this race yet.</span></div>`;
+  return `<tr class="detail"><td colspan="${span}"><div class="detail-inner">${h2h}${card(R, "R")}${card(D, "D")}<div class="extra">${ie}${others}</div></div></td></tr>`;
+}
+
+/* ---------- Wiring ---------- */
+function render() {
+  const rows = visible();
+  renderHero(rows); renderSummary(rows); renderChart(rows); renderTable(rows);
+  document.querySelectorAll("#metricSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.m === state.m)));
+}
+$("#ieAsOf").textContent = DATA.ie_as_of ? new Date(DATA.ie_as_of + "T12:00:00").toLocaleDateString("en-US", {month: "short", day: "numeric", year: "numeric"}) : "the latest update";
+$("#metricSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.m = b.dataset.m; if (/^[RD]/.test(state.sort) || state.sort === "edge" || state.sort === "split" || state.sort === "tot") {} render(); });
+$("#progSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.prog = b.dataset.p;
+  document.querySelectorAll("#progSeg button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); render(); });
+$("#rprogSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.rprog = b.dataset.p;
+  document.querySelectorAll("#rprogSeg button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); render(); });
+$("#q").addEventListener("input", e => { state.q = e.target.value; render(); });
+$("#notesLink").addEventListener("click", () => { $("#notes").open = true; });
+const toggleRow = tr => { const d = tr.dataset.d; state.open.has(d) ? state.open.delete(d) : state.open.add(d); renderTable(visible()); document.querySelector(`tr.race[data-d="${d}"]`)?.focus(); };
+const sortBy = th => { const k = th.dataset.key; if (state.sort === k) state.dir *= -1; else { state.sort = k; state.dir = ["d", "rep", "dem", "pr", "rp"].includes(k) ? 1 : -1; } renderTable(visible()); document.querySelector(`th[data-key="${k}"]`)?.focus(); };
+$("#tbl").addEventListener("click", e => {
+  if (e.target.closest("a")) return;
+  if (e.target.closest("tr.detail")) return;
+  const th = e.target.closest("th[data-key]"); if (th) return sortBy(th);
+  const tr = e.target.closest("tr.race"); if (tr) toggleRow(tr);
+});
+$("#tbl").addEventListener("keydown", e => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const th = e.target.closest("th[data-key]"), tr = e.target.closest("tr.race");
+  if ((th && e.target === th) || (tr && e.target === tr)) { e.preventDefault(); th ? sortBy(th) : toggleRow(tr); }
+});
+// On GitHub Pages this page sits next to the IE tracker, so read its live outside-spending totals.
+fetch("data.json", {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(j => {
+  if (!j || !Array.isArray(j.races)) return;
+  const by = Object.fromEntries(j.races.map(x => [x.district, x]));
+  for (const r of DATA.races) {
+    const x = by[r.d.endsWith("-AL") ? r.d.slice(0, 2) + "00" : r.d.replace("-", "")];
+    r.ie = x ? {r: Math.round(x.r_total), d: Math.round(x.d_total)} : null;
+  }
+  DATA.ie_as_of = j.as_of;
+  $("#ieAsOf").textContent = new Date(j.as_of + "T12:00:00").toLocaleDateString("en-US", {month: "short", day: "numeric", year: "numeric"});
+  renderTable(visible());
+}).catch(() => {});
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => renderChart(visible()), 120); });
+render();
+</script>

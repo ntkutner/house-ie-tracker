@@ -32,6 +32,24 @@ GitHub Pages on a free account requires a public repo; everything in it is publi
 `--force` rebuilds even if the FEC file is unchanged. `--input file.csv` builds from a local copy.
 Tests: `python3 -m unittest discover tests`
 
+## Fundraising page
+
+`docs/fundraising.html` is a companion dashboard of candidate fundraising from the quarterly FEC
+reports: D vs. R raised, spent and cash on hand in each race and across the battlefield, each
+campaign's small-dollar share, burn rate, debt and loans, and DCCC (Frontline, Red to Blue,
+Districts in Play) and NRCC (Patriots, MAGA Majority) program tags. It's live at
+`https://<you>.github.io/<repo>/fundraising.html` and linked from the tracker's header.
+
+It's built from the FEC Master Sheet, not from the FEC directly, so rebuild it when there's a new sheet:
+
+    pip install openpyxl
+    python3 fundraising.py "FEC Master Sheet- 2026 Q3.xlsx"
+
+Then commit `docs/fundraising.html`. The spreadsheet itself is never committed (`*.xlsx` is in
+`.gitignore`). Outside spending on the page is read from `docs/data.json` each time it loads, so it
+stays current as the tracker updates. Program lists and party overrides are at the top of `fundraising.py`;
+the page's design is `fundraising_template.html`.
+
 ## Customize (config.toml)
 
 - **Spending categories.** Click a race, then click any group in it to see its spending by
