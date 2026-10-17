@@ -1,4 +1,7 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
+IE,MI10,CHRISTINA HINES,DEM,S,C00961193,ASIAN AMERICANS VOICES FUND,10263.98,2026-10-16,2026-10-17,Direct Mail,Mailer Printing and Postage,"Deliver Strategies, LLC",2029084,SE.4150,
+IE,PA10,SCOTT PERRY,REP,O,C00771113,Back the Bold,1748.0,2026-10-16,2026-10-17,Paid Media (general),Billboard Ads (Estimate),Liftoff Campaigns,2029074,500035893,
+IE,CO08,TIMOTHY GABRIEL JOSEPH EVANS,REP,O,C00771113,Back the Bold,1687.5,2026-10-16,2026-10-17,Paid Media (general),Billboard Ads (Estimate),Liftoff Campaigns,2029074,500035908,
 IE,AZ06,JUAN CISCOMANI,REP,S,C00879510,America PAC,13926.5,2026-10-25,2026-10-16,Phones,MESSAGE PHONE CALLS,CONNECTION STRATEGY LLC,2028993,SE24.2456,
 IE,OH05,BRIAN ALAN SHAVER,DEM,O,C00879510,America PAC,4102.0,2026-10-24,2026-10-16,Phones,MESSAGE PHONE CALLS,CONNECTION STRATEGY LLC,2028993,SE24.2381,
 IE,OH05,ROBERT EDWARD LATTA,REP,S,C00879510,America PAC,4102.0,2026-10-24,2026-10-16,Phones,MESSAGE PHONE CALLS,CONNECTION STRATEGY LLC,2028993,SE24.2382,
@@ -147,6 +150,7 @@ IE,LA06,BLAKE MIGUEZ,REP,S,C00487470,Club for Growth Action,303.06,2026-10-16,20
 IE,FL12,GUS M BILIRAKIS,REP,S,C00952812,Affordable Florida,50000.0,2026-10-16,2026-10-16,Paid Media (general),media placement,"SRCP Media, Inc.",2028209,SE.4278,
 IE,CA22,RANDY VILLEGAS,DEM,O,C00737411,The Governing Majority Fund,33861.0,2026-10-16,2026-10-16,Direct Mail,direct mail services,Caliber Contact,2028207,SE.6129,
 IE,PA08,PAIGE COGNETTI,DEM,O,C00737411,The Governing Majority Fund,29687.07,2026-10-16,2026-10-16,Direct Mail,direct  mail services,Rhumb Line Strategies LLC,2028204,SE.6126,
+IE,NE02,DENISE POWELL,DEM,S,C90023656,Nebraska Appleseed Action Fund,10000.0,2026-10-15,2026-10-16,Digital (general),Digital Advertising - Estimate,Campaign Workshop,2029071,F57.4125,
 IE,CA22,RANDY VILLEGAS,DEM,S,C00556860,Planned Parenthood Affiliates of California VOTES PAC,20557.37,2026-10-15,2026-10-16,Direct Mail,Mailer (Estimate),"The Pivot Group, Inc.",2029069,EDT.E.146,
 IE,CA22,DAVID VALADAO,REP,O,C00556860,Planned Parenthood Affiliates of California VOTES PAC,10125.27,2026-10-15,2026-10-16,Direct Mail,Mailer (Estimate),"The Pivot Group, Inc.",2029069,EDT.E.147,
 IE,WI03,REBECCA COOKE,DEM,S,C00004036,SEIU COPE (Service Employees International Union Committee On Political Education),1890.0,2026-10-15,2026-10-16,Phones,Estimated Cost - Phone Banking,Scale To Win,2029057,500022076,
