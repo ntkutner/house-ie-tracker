@@ -1,4 +1,12 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
+IE,CA11,SCOTT WIENER,DEM,S,C00958744,GrowUSA,200000.0,2026-10-17,2026-10-17,Broadcast,TV Ads,Polaris Campaigns,2029085,PDT.E.51,
+IE,CA11,CONNIE CHAN,DEM,O,C00958744,GrowUSA,175000.0,2026-10-17,2026-10-17,Digital (general),Digital ads,Polaris Campaigns,2029085,PDT.E.53,
+IE,CA11,CONNIE CHAN,DEM,O,C00958744,GrowUSA,200000.0,2026-10-17,2026-10-17,Broadcast,TV Ads,Polaris Campaigns,2029085,PDT.E.52,
+IE,CA11,SCOTT WIENER,DEM,S,C00958744,GrowUSA,175000.0,2026-10-17,2026-10-17,Digital (general),Digital ads,Polaris Campaigns,2029085,PDT.E.54,
+IE,CA11,CONNIE CHAN,DEM,O,C00958744,GrowUSA,75000.0,2026-10-16,2026-10-17,Digital (general),Google Search Ads,Google,2029085,PDT.E.57,
+IE,CA11,SCOTT WIENER,DEM,S,C00958744,GrowUSA,75000.0,2026-10-16,2026-10-17,Digital (general),Google Search Ads,Google,2029085,PDT.E.58,
+IE,CA11,SCOTT WIENER,DEM,S,C00958744,GrowUSA,3750.0,2026-10-16,2026-10-17,Production,Video Production,Nim Al Inc.,2029085,PDT.E.55,
+IE,CA11,CONNIE CHAN,DEM,O,C00958744,GrowUSA,3750.0,2026-10-16,2026-10-17,Production,Video Production,Nim Al Inc.,2029085,PDT.E.56,
 IE,MI10,CHRISTINA HINES,DEM,S,C00961193,ASIAN AMERICANS VOICES FUND,10263.98,2026-10-16,2026-10-17,Direct Mail,Mailer Printing and Postage,"Deliver Strategies, LLC",2029084,SE.4150,
 IE,PA10,SCOTT PERRY,REP,O,C00771113,Back the Bold,1748.0,2026-10-16,2026-10-17,Paid Media (general),Billboard Ads (Estimate),Liftoff Campaigns,2029074,500035893,
 IE,CO08,TIMOTHY GABRIEL JOSEPH EVANS,REP,O,C00771113,Back the Bold,1687.5,2026-10-16,2026-10-17,Paid Media (general),Billboard Ads (Estimate),Liftoff Campaigns,2029074,500035908,
