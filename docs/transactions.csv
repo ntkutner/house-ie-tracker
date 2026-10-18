@@ -1,5 +1,6 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
 IE,NM02,GABRIEL VASQUEZ,DEM,S,C00797340,BLUE CD2 NEW MEXICO USA,1000.0,2026-10-23,2026-10-18,Digital (general),"postcards re VR and ""Vote for Gabe"" to digitally unreachable people",Printer's Press,2029785,SE.17244,
+IE,FL21,BRIAN MAST,REP,O,C00962753,Serving Florida PAC,10000.0,2026-10-17,2026-10-18,Phones,Paid Phone Program - Estimated,Great Society Strategies,2029824,SE.4113,
 IE,CA14,AISHA WAHAB,DEM,S,C00848440,Protect Progress,12000.0,2026-10-17,2026-10-18,Production,IE-Wahab-Media Production (Estimate),Dockside Strategies,2029805,V0DBE1FB97F3EE185A71,
 IE,CA14,AISHA WAHAB,DEM,S,C00848440,Protect Progress,350000.0,2026-10-17,2026-10-18,Paid Media (general),IE-Wahab-Media Buy,Targeted Platform Media LLC,2029805,V77B501211052BF018C9,
 IE,FL25,SCOTT M. SINGER,REP,O,C00956938,Citizens for a More Affordable Florida,30241.82,2026-10-17,2026-10-18,Direct Mail,ESTIMATED: direct mail,"Potomac Campaigns Group, LLC",2029787,E-15,
