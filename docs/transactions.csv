@@ -1,5 +1,8 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
 IE,NM02,GABRIEL VASQUEZ,DEM,S,C00797340,BLUE CD2 NEW MEXICO USA,1000.0,2026-10-23,2026-10-18,Digital (general),"postcards re VR and ""Vote for Gabe"" to digitally unreachable people",Printer's Press,2029785,SE.17244,
+IE,MI07,WILLIAM LAWRENCE,DEM,S,C00738732,Clean Wave,600.0,2026-10-17,2026-10-18,Canvassing/Lit,Door-to-door voter contact and candidate advocacy,Clean Water Action,2029963,SE.5344,
+IE,CO08,TIMOTHY GABRIEL JOSEPH EVANS,REP,O,C00885707,Mainstream Colorado Fund,37130.75,2026-10-17,2026-10-18,Canvassing/Lit,Canvassing,Grassroots Voter Outreach,2029935,500360440,
+IE,CO08,MANNY RUTINEL,DEM,S,C00885707,Mainstream Colorado Fund,37130.75,2026-10-17,2026-10-18,Canvassing/Lit,Canvassing,Grassroots Voter Outreach,2029935,500360441,
 IE,AL02,SHOMARI C. FIGURES,DEM,S,C00580068,Progressive Turnout Project,22543.92,2026-10-17,2026-10-18,Canvassing/Lit,field organizing,Merrimack Services LLC,2029922,500344326,
 IE,AZ01,AMISH SHAH,DEM,S,C00580068,Progressive Turnout Project,72867.6,2026-10-17,2026-10-18,Canvassing/Lit,field organizing,Merrimack Services LLC,2029922,500344327,
 IE,AZ02,JONATHAN MICHAEL NEZ,DEM,S,C00580068,Progressive Turnout Project,9966.24,2026-10-17,2026-10-18,Canvassing/Lit,field organizing,Merrimack Services LLC,2029922,500344328,
