@@ -1,5 +1,12 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
+IE,NM02,GABRIEL VASQUEZ,DEM,S,C00797340,BLUE CD2 NEW MEXICO USA,1000.0,2026-10-23,2026-10-18,Digital (general),"postcards re VR and ""Vote for Gabe"" to digitally unreachable people",Printer's Press,2029785,SE.17244,
+IE,CA14,AISHA WAHAB,DEM,S,C00848440,Protect Progress,12000.0,2026-10-17,2026-10-18,Production,IE-Wahab-Media Production (Estimate),Dockside Strategies,2029805,V0DBE1FB97F3EE185A71,
+IE,CA14,AISHA WAHAB,DEM,S,C00848440,Protect Progress,350000.0,2026-10-17,2026-10-18,Paid Media (general),IE-Wahab-Media Buy,Targeted Platform Media LLC,2029805,V77B501211052BF018C9,
+IE,FL25,SCOTT M. SINGER,REP,O,C00956938,Citizens for a More Affordable Florida,30241.82,2026-10-17,2026-10-18,Direct Mail,ESTIMATED: direct mail,"Potomac Campaigns Group, LLC",2029787,E-15,
+IE,NM02,GABRIEL VASQUEZ,DEM,S,C00797340,BLUE CD2 NEW MEXICO USA,1000.0,2026-10-17,2026-10-18,Digital (general),"Facebook and Instagram ads urging VR and ""Vote for Gabe",Facebook,2029785,SE.17243,
+IE,NM02,GABRIEL VASQUEZ,DEM,S,C00797340,BLUE CD2 NEW MEXICO USA,500.0,2026-10-17,2026-10-18,Texting,"texts to unregistered people, urging VR and Vote for Gabe",Switchboard,2029785,SE.17242,
 IE,MO02,FREDERICK PAUL WELLMAN,DEM,O,C00929257,PROTECT OUR FAMILY VALUES ACTION,100035.0,2026-10-17,2026-10-18,Paid Media (general),Media Placement,Del Cielo Media,2029769,SE.4118,
+IE,NM02,GABRIEL VASQUEZ,DEM,S,C00797340,BLUE CD2 NEW MEXICO USA,50.0,2026-10-16,2026-10-18,Paid Media (general),location ads to a high school football game--VR and Vote for Gabe,Foundation Blue Media,2029785,SE.17241,
 IE,CA11,CONNIE CHAN,DEM,S,C00945303,SF FOR ALL,7500.0,2026-10-17,2026-10-17,Broadcast,TELEVISION AD,SKY LINK TV SF,2029639,PDT.E.49,202610179916175746
 IE,PA08,ROB BRESNAHAN,REP,S,C00032979,"D.R.I.V.E. - Dem, Rep, Ind Voter Ed (The PAC of the Int'l Brhd of Teamsters)",268.43,2026-10-17,2026-10-17,Digital (general),DIGITAL ADS,"META PLATFORMS, INC.",2029338,77894368,202610179916168262
 IE,NY17,MICHAEL VINCENT LAWLER,REP,S,C00032979,"D.R.I.V.E. - Dem, Rep, Ind Voter Ed (The PAC of the Int'l Brhd of Teamsters)",252.61,2026-10-17,2026-10-17,Digital (general),DIGITAL ADS,"META PLATFORMS, INC.",2029338,77894589,202610179916168262
