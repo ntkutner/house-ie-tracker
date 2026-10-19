@@ -1,7 +1,18 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
 IE,NM02,GABRIEL VASQUEZ,DEM,S,C00797340,BLUE CD2 NEW MEXICO USA,1000.0,2026-10-23,2026-10-18,Digital (general),"postcards re VR and ""Vote for Gabe"" to digitally unreachable people",Printer's Press,2029785,SE.17244,
+IE,NV03,SUSIE LEE,DEM,S,C00568444,CENTER FORWARD COMMITTEE,150000.0,2026-10-20,2026-10-18,Digital (general),Digital Advertising,Ad Beat Strategies,2030113,SE.5047,
+IE,TX34,VICENTE GONZALEZ,DEM,S,C00568444,CENTER FORWARD COMMITTEE,140000.0,2026-10-20,2026-10-18,Digital (general),Digital Advertising,Ad Beat Strategies,2030113,SE.5048,
+IE,MI10,MICHAEL BOUCHARD,REP,O,C00568444,CENTER FORWARD COMMITTEE,100000.0,2026-10-20,2026-10-18,Digital (general),Digital Advertising,Ad Beat Strategies,2030113,SE.5051,
+IE,NC01,DON DAVIS,DEM,S,C00568444,CENTER FORWARD COMMITTEE,945432.12,2026-10-20,2026-10-18,Broadcast,Television Advertising,Waterfront Strategies,2030113,SE.5046,
 IE,PA08,ROB BRESNAHAN,REP,S,C00032979,"D.R.I.V.E. - Dem, Rep, Ind Voter Ed (The PAC of the Int'l Brhd of Teamsters)",268.43,2026-10-18,2026-10-18,Digital (general),DIGITAL ADS,"META PLATFORMS, INC.",2029972,77904260,
 IE,NY17,MICHAEL VINCENT LAWLER,REP,S,C00032979,"D.R.I.V.E. - Dem, Rep, Ind Voter Ed (The PAC of the Int'l Brhd of Teamsters)",252.61,2026-10-18,2026-10-18,Digital (general),DIGITAL ADS,"META PLATFORMS, INC.",2029972,77904495,
+IE,NY17,CAIT CONLEY,DEM,S,C00684969,JDCA PAC,49766.35,2026-10-17,2026-10-18,Digital (general),Digital Advertising - Estimate,Rising Tide Interactive,2030106,500134989,
+IE,PA08,PAIGE COGNETTI,DEM,S,C00684258,UnidosUS Action PAC,22000.0,2026-10-17,2026-10-18,Canvassing/Lit,GOTV Canvass and Events - Estimate,AION Group,2030087,500101282,
+IE,AZ06,JOANNA MENDOZA,DEM,S,C00620427,Pride Fund to End Gun Violence,8000.0,2026-10-17,2026-10-18,Broadcast,Online and TV advertising expenses for campaign ad supporting JoAnna Mendoza for Congress in AZ-06,Blueprint Interactive,2030072,500367966,
+IE,AZ06,JOANNA MENDOZA,DEM,S,C00620427,Pride Fund to End Gun Violence,1626.0,2026-10-17,2026-10-18,Other,Dedicated 1 week staff time on independent expenditure campaign for AZ-06,Paychex,2030072,500367969,
+IE,AZ06,JOANNA MENDOZA,DEM,S,C00620427,Pride Fund to End Gun Violence,5275.0,2026-10-17,2026-10-18,Production,Video production and editing for an independent expenditure campaign ad for AZ-06,Pigs Fly Media,2030072,500367963,
+IE,AZ06,JOANNA MENDOZA,DEM,S,C00489799,Planned Parenthood Votes,135979.9,2026-10-17,2026-10-18,Canvassing/Lit,Estimated Cost of Canvassing,"The Outreach Team, LLC",2030062,500771584,
+IE,AZ06,JUAN CISCOMANI,REP,O,C00489799,Planned Parenthood Votes,135979.9,2026-10-17,2026-10-18,Canvassing/Lit,Estimated Cost of Canvassing,"The Outreach Team, LLC",2030062,500771585,
 IE,MI10,CHRISTINA HINES,DEM,S,C00951269,American Democracy Committee,63818.0,2026-10-17,2026-10-18,Direct Mail,Direct Mail Advertising,"The Pivot Group, Inc.",2030056,SE.4118,
 IE,TX15,BOBBY PULIDO,DEM,S,C00724203,Somos PAC,16180.87,2026-10-17,2026-10-18,Other,Printing - Estimate,Arena Analytics LLC,2030041,500278109,
 IE,TX15,BOBBY PULIDO,DEM,S,C00724203,Somos PAC,649.5,2026-10-17,2026-10-18,Other,Printing - Estimate,Arena Analytics LLC,2030041,500278110,
@@ -66,7 +77,13 @@ IE,FL25,SCOTT M. SINGER,REP,O,C00956938,Citizens for a More Affordable Florida,3
 IE,NM02,GABRIEL VASQUEZ,DEM,S,C00797340,BLUE CD2 NEW MEXICO USA,1000.0,2026-10-17,2026-10-18,Digital (general),"Facebook and Instagram ads urging VR and ""Vote for Gabe",Facebook,2029785,SE.17243,
 IE,NM02,GABRIEL VASQUEZ,DEM,S,C00797340,BLUE CD2 NEW MEXICO USA,500.0,2026-10-17,2026-10-18,Texting,"texts to unregistered people, urging VR and Vote for Gabe",Switchboard,2029785,SE.17242,
 IE,MO02,FREDERICK PAUL WELLMAN,DEM,O,C00929257,PROTECT OUR FAMILY VALUES ACTION,100035.0,2026-10-17,2026-10-18,Paid Media (general),Media Placement,Del Cielo Media,2029769,SE.4118,
+IE,CO08,TIMOTHY GABRIEL JOSEPH EVANS,REP,S,C00875450,Center Forward Initiative Inc (CFI),52218.0,2026-10-16,2026-10-18,Direct Mail,Direct Mail,Caliber Contact,2030109,SE.4334,
+IE,CA22,DAVID VALADAO,REP,S,C00875450,Center Forward Initiative Inc (CFI),33138.0,2026-10-16,2026-10-18,Direct Mail,Direct Mail,Caliber Contact,2030109,SE.4335,
+IE,CA22,DAVID VALADAO,REP,S,C00875450,Center Forward Initiative Inc (CFI),125000.0,2026-10-16,2026-10-18,Digital (general),Digital Advertising,Targeted Victory,2030109,SE.4336,
+IE,NY17,MICHAEL VINCENT LAWLER,REP,S,C00875450,Center Forward Initiative Inc (CFI),235000.0,2026-10-16,2026-10-18,Digital (general),Digital Advertising,Targeted Victory,2030109,SE.4337,
 IE,NM02,GABRIEL VASQUEZ,DEM,S,C00797340,BLUE CD2 NEW MEXICO USA,50.0,2026-10-16,2026-10-18,Paid Media (general),location ads to a high school football game--VR and Vote for Gabe,Foundation Blue Media,2029785,SE.17241,
+IE,NY17,CAIT CONLEY,DEM,S,C00684969,JDCA PAC,223.92,2026-10-12,2026-10-18,Phones,Phone banking - Estimate,Scale To Win,2030106,500134990,
+IE,NY17,CAIT CONLEY,DEM,S,C00684969,JDCA PAC,4.45,2026-10-12,2026-10-18,Phones,Phone banking - Estimate,Scale To Win,2030106,500134991,
 IE,CA11,CONNIE CHAN,DEM,S,C00945303,SF FOR ALL,7500.0,2026-10-17,2026-10-17,Broadcast,TELEVISION AD,SKY LINK TV SF,2029639,PDT.E.49,202610179916175746
 IE,PA08,ROB BRESNAHAN,REP,S,C00032979,"D.R.I.V.E. - Dem, Rep, Ind Voter Ed (The PAC of the Int'l Brhd of Teamsters)",268.43,2026-10-17,2026-10-17,Digital (general),DIGITAL ADS,"META PLATFORMS, INC.",2029338,77894368,202610179916168262
 IE,NY17,MICHAEL VINCENT LAWLER,REP,S,C00032979,"D.R.I.V.E. - Dem, Rep, Ind Voter Ed (The PAC of the Int'l Brhd of Teamsters)",252.61,2026-10-17,2026-10-17,Digital (general),DIGITAL ADS,"META PLATFORMS, INC.",2029338,77894589,202610179916168262
