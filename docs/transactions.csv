@@ -1,4 +1,5 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
+IE,LA06,MICHAEL CHARLES ECHOLS,REP,S,C00940007,LOUISIANA GROWTH AND FUTURE FUND,60000.0,2026-10-19,2026-10-19,Paid Media (general),MEDIA,ARMADA STRATEGIES LLC,2030196,SE.4231,
 IE,NM02,GABRIEL VASQUEZ,DEM,S,C00797340,BLUE CD2 NEW MEXICO USA,1000.0,2026-10-23,2026-10-18,Digital (general),"postcards re VR and ""Vote for Gabe"" to digitally unreachable people",Printer's Press,2029785,SE.17244,
 IE,NV03,SUSIE LEE,DEM,S,C00568444,CENTER FORWARD COMMITTEE,150000.0,2026-10-20,2026-10-18,Digital (general),Digital Advertising,Ad Beat Strategies,2030113,SE.5047,
 IE,TX34,VICENTE GONZALEZ,DEM,S,C00568444,CENTER FORWARD COMMITTEE,140000.0,2026-10-20,2026-10-18,Digital (general),Digital Advertising,Ad Beat Strategies,2030113,SE.5048,
