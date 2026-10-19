@@ -1,4 +1,5 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
+IE,MI10,CHRISTINA HINES,DEM,S,C00540443,Giffords PAC,23125.99,2026-10-20,2026-10-19,Production,Media Production,SKDKnickerbocker,2030912,500030143,
 IE,WI03,REBECCA COOKE,DEM,S,C00873901,THE WISCO PROJECT PAC,2575.0,2026-10-20,2026-10-19,Paid Media (general),Mobile Truck Ad - Cooke,LED Truck Media Group LLC,2030532,SE.4278,
 IE,PA08,ROB BRESNAHAN,REP,S,C00032979,"D.R.I.V.E. - Dem, Rep, Ind Voter Ed (The PAC of the Int'l Brhd of Teamsters)",677.84,2026-10-19,2026-10-19,Digital (general),DIGITAL ADS,"META PLATFORMS, INC.",2030823,77915445,
 IE,NY17,MICHAEL VINCENT LAWLER,REP,S,C00032979,"D.R.I.V.E. - Dem, Rep, Ind Voter Ed (The PAC of the Int'l Brhd of Teamsters)",759.47,2026-10-19,2026-10-19,Digital (general),DIGITAL ADS,"META PLATFORMS, INC.",2030823,77915446,
@@ -11,6 +12,7 @@ IE,KY06,RALPH A ALVARADO,REP,O,C00573261,End Citizens United,43000.0,2026-10-19,
 IE,MI03,TERRI DEBOER,REP,S,C00574178,Right to Life of Michigan Victory Fund,6516.43,2026-10-19,2026-10-19,Direct Mail,Printing/Postage Priority Race Mailer,WAM Print Mail Inc,2030401,SE.5996,
 IE,FL22,PIA DANDIYA,DEM,O,C00959833,Stronger America Together,58261.0,2026-10-19,2026-10-19,Direct Mail,direct mail services,Public Concepts LLC,2030236,SE.4137,
 IE,LA06,MICHAEL CHARLES ECHOLS,REP,S,C00940007,LOUISIANA GROWTH AND FUTURE FUND,60000.0,2026-10-19,2026-10-19,Paid Media (general),MEDIA,ARMADA STRATEGIES LLC,2030196,SE.4231,202610199916190395
+IE,MI07,WILLIAM LAWRENCE,DEM,S,C00738732,Clean Wave,200.0,2026-10-18,2026-10-19,Canvassing/Lit,Door-to-door voter contact and candidate advocacy,Clean Water Action,2030871,SE.5347,
 IE,PA08,ROB BRESNAHAN,REP,S,C00032979,"D.R.I.V.E. - Dem, Rep, Ind Voter Ed (The PAC of the Int'l Brhd of Teamsters)",268.43,2026-10-18,2026-10-19,Digital (general),DIGITAL ADS,"META PLATFORMS, INC.",2030746,77904260,
 IE,NY17,MICHAEL VINCENT LAWLER,REP,S,C00032979,"D.R.I.V.E. - Dem, Rep, Ind Voter Ed (The PAC of the Int'l Brhd of Teamsters)",252.61,2026-10-18,2026-10-19,Digital (general),DIGITAL ADS,"META PLATFORMS, INC.",2030746,77904495,
 IE,KY06,RALPH A ALVARADO,REP,O,C00742080,"Planned Parenthood Alliance PAC , Serving WA, AK, ID, HI, IN, KY",49.5,2026-10-18,2026-10-19,Canvassing/Lit,Canvassing,Planned Parenthood Alliance Advocates,2030670,500278733,
