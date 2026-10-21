@@ -29,7 +29,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-VERSION = "2.4"
+VERSION = "2.5"
 ROOT = Path(__file__).resolve().parent
 ET = ZoneInfo("America/New_York")
 UA = f"house-ie-tracker/{VERSION}"
@@ -981,6 +981,20 @@ def compile_columns(cfg: dict) -> list[dict]:
     return cols
 
 
+def compile_groups(cfg: dict) -> list[dict]:
+    """Outside-group filters ([[spender_groups]]): a named set of spenders matched by ID or name."""
+    return [{"name": g["name"], "members": list(g.get("members", [])),
+             "ids": {i.upper() for i in g.get("ids", [])},
+             "pats": [re.compile(p, re.I) for p in g.get("name_patterns", [])]}
+            for g in cfg.get("spender_groups", [])]
+
+
+def groups_of(spe_id: str, spe_nam: str, groups: list[dict]) -> list[str]:
+    name = (spe_nam or "").strip()
+    return [g["name"] for g in groups
+            if (spe_id or "").upper() in g["ids"] or any(p.search(name) for p in g["pats"])]
+
+
 def classify(spe_id: str, spe_nam: str, side: str, cols: list[dict]) -> str:
     for c in cols:
         if spe_id in c["ids"] or any(p.search(spe_nam) for p in c["pats"]):
@@ -991,6 +1005,7 @@ def classify(spe_id: str, spe_nam: str, side: str, cols: list[dict]) -> str:
 def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[dict]) -> dict:
     cols = compile_columns(cfg)
     cat_rules = compile_categories(cfg)
+    groups = compile_groups(cfg)
     # Top-two races where both nominees are from one party (e.g. CA D vs D).
     same_party = {d.strip().upper(): norm_party(v.get("party", "")) for d, v in cfg.get("same_party_races", {}).items()}
     named = [c["key"] for c in cols]
@@ -1031,7 +1046,8 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
                                               "side": side, "amount": 0.0, "targets": Counter(),
                                               "last": "", "n": 0, "kind": r["kind"],
                                               "cats": Counter(), "items": [], "catn": Counter(),
-                                              "cat7": Counter(), "catlast": {}})
+                                              "cat7": Counter(), "catlast": {}, "new7": 0.0,
+                                              "groups": groups_of(r["spe_id"], r["spe_nam"], groups)})
         cat = "" if r["kind"] == "COORD" else categorize(r["purpose"], cat_rules)
         target = f"{'For' if r['so'] == 'S' else 'Against'} {c['name']}"
         if cat:
@@ -1043,6 +1059,8 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
         sp["items"].append([r["date"] or r["filed"], round(r["amount"], 2), cat, r["purpose"], r["payee"], target])
         if r["kind"] == "COORD":
             race["coord"][col] += r["amount"]
+        if r["filed"] >= week_ago:
+            sp["new7"] += r["amount"]
         sp["amount"] += r["amount"]
         sp["targets"][f"{'For' if r['so'] == 'S' else 'Against'} {c['name']}"] += r["amount"]
         sp["last"] = max(sp["last"], r["date"] or r["filed"])
@@ -1073,6 +1091,7 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
               "cats": [[c, round(v, 2)] for c, v in s["cats"].most_common() if round(v, 2) != 0],
               "cat_n": dict(s["catn"]), "cat_last": s["catlast"],
               "cat_new7": {c: round(v, 2) for c, v in s["cat7"].items() if round(v, 2) != 0},
+              "new7": round(s["new7"], 2), "groups": s["groups"],
               "targets": [t for t, _ in s["targets"].most_common()]}
              for k, s in race["spenders"].items()),
             key=lambda s: -s["amount"])
@@ -1120,6 +1139,23 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
                         for (k, sd), o in sorted(other.items(), key=lambda kv: -kv[1]["amount"]) if sd == side][:12]
                  for side in ("R", "D")}
 
+    # Which filers each outside-group filter picked up, so the patterns can be checked.
+    group_info = []
+    for g in groups:
+        hits = defaultdict(lambda: {"amount": 0.0, "races": set(), "R": 0.0, "D": 0.0})
+        for race in out_races:
+            for s in race["spenders"]:
+                if g["name"] in s["groups"]:
+                    h = hits[(s["id"], s["name"])]
+                    h["amount"] += s["amount"]
+                    h[s["side"]] += s["amount"]
+                    h["races"].add(race["district"])
+        group_info.append({
+            "name": g["name"], "members": g["members"],
+            "matched": [{"id": i, "name": n, "amount": round(h["amount"], 2), "r": round(h["R"], 2),
+                         "d": round(h["D"], 2), "races": len(h["races"])}
+                        for (i, n), h in sorted(hits.items(), key=lambda kv: -kv[1]["amount"])]})
+
     over = [{"spender": v["label"][0], "candidate": v["label"][1], "district": v["label"][2],
              "counted": round(v["sum"], 2),
              "filer_aggregate": round(v["agg"], 2)}
@@ -1147,6 +1183,7 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
     return {
         "as_of": as_of, "week_start": week_ago, "columns": columns, "races": out_races,
         "categories": [n for n, _ in cat_rules] + [OTHER_CATEGORY],
+        "spender_groups": group_info,
         "_spend_items": {d: v for d, v in spend_items.items() if d in {r["district"] for r in out_races}},
         "default_view": cfg.get("filters", {}).get("races", "party"),
         "diagnostics": {
@@ -1168,6 +1205,7 @@ def write_outputs(result: dict, rows: list[dict], cands: dict, out: Path, cfg: d
     (out / "spend.json").write_text(json.dumps(spend, separators=(",", ":")))
     (out / "data.json").write_text(json.dumps(result, separators=(",", ":")))
     cat_rules = compile_categories(cfg)
+    groups = compile_groups(cfg)
 
     keys = [c["key"] for c in result["columns"]]
     with open(out / "races.csv", "w", newline="") as fh:
@@ -1184,12 +1222,14 @@ def write_outputs(result: dict, rows: list[dict], cands: dict, out: Path, cfg: d
     with open(out / "transactions.csv", "w", newline="") as fh:
         w = csv.writer(fh)
         w.writerow(["type", "district", "candidate", "candidate_party", "support_oppose", "spender_id", "spender",
-                    "amount", "date", "filed", "category", "purpose", "payee", "file_num", "tran_id", "image_num"])
+                    "amount", "date", "filed", "category", "purpose", "payee", "file_num", "tran_id", "image_num",
+                    "outside_group"])
         for r in sorted(rows, key=lambda r: (r["filed"], r["date"]), reverse=True):
             c = cands[r["cand_key"]]
             w.writerow([r["kind"], c["district"], c["name"], c["party"], r["so"], r["spe_id"], r["spe_nam"],
                         r["amount"], r["date"], r["filed"], "" if r["kind"] == "COORD" else categorize(r["purpose"], cat_rules), r["purpose"], r["payee"],
-                        r["file_num"], r["tran_id"], r["image_num"]])
+                        r["file_num"], r["tran_id"], r["image_num"],
+                        "; ".join(groups_of(r["spe_id"], r["spe_nam"], groups))])
 
     with open(out / "not_counted.csv", "w", newline="") as fh:
         w = csv.writer(fh)

@@ -166,6 +166,8 @@ tr.detail td{padding:0 0 14px;background:var(--paper);text-align:left}
 .catbtns button{border:0;background:none;padding:2px 0;color:var(--d);font:600 13px var(--cond);cursor:pointer;text-decoration:underline}
 .catnote{margin:0 0 10px;padding:8px 12px;border-radius:4px;background:var(--d-wash);color:var(--ink);font:500 14px var(--cond)}
 .cats span.sel{font-weight:800}
+.catmenu.radio label{padding:6px 2px}
+.sp .tag.grp{background:var(--d-wash);color:var(--ink);border-color:transparent}
 /* Notes */
 details.notes{margin-top:28px;border-top:1px solid var(--rule);padding-top:12px;font-size:14px;max-width:1100px}
 details.notes summary{font:700 15px var(--sans);cursor:pointer}
@@ -196,7 +198,7 @@ details.notes summary{font:700 15px var(--sans);cursor:pointer}
         </div>
         <h1 id="title"></h1>
       </div>
-      <nav aria-label="Sections"><a href="#tbl">Races</a><a href="#groups" data-open-notes>Groups</a><a href="#notes" data-open-notes>Methodology</a><a href="fundraising.html">Fundraising</a></nav>
+      <nav aria-label="Sections"><a href="#tbl">Races</a><a href="#groups" data-open-notes>Groups</a><a href="#notes" data-open-notes>Methodology</a></nav>
     </div>
     <div class="totals">
       <div class="nums">
@@ -224,6 +226,10 @@ details.notes summary{font:700 15px var(--sans);cursor:pointer}
         <div class="catbtns"><button type="button" id="catall">Select all</button><button type="button" id="catclear">Clear</button></div>
         <div id="catboxes"></div>
       </div>
+    </details>
+    <details class="catpick" id="grppick" hidden>
+      <summary>Outside groups: <b id="grpsum">All</b></summary>
+      <div class="catmenu radio" role="radiogroup" aria-label="Outside groups to include" id="grpboxes"></div>
     </details>
     <div class="dl"><a href="races.csv">Download races CSV</a><a href="transactions.csv">Download transactions CSV</a></div>
   </div>
@@ -261,26 +267,33 @@ const FIELDS = [
   {key:"total", label:"TOTAL", cls:"sum", get:r => r.total},
 ];
 const NUMERIC = new Set(FIELDS.filter(f => !f.sort && f.key !== "pres").map(f => f.key));
-const state = {view: DATA.default_view === "all" ? "all" : "party", q: "", sort: "total", dir: -1, open: new Set(), openSp: new Set(), cats: null};
+const state = {view: DATA.default_view === "all" ? "all" : "party", q: "", sort: "total", dir: -1, open: new Set(), openSp: new Set(), cats: null, group: ""};
 
-// With a spending type selected, rebuild each race from its groups' spending in that category.
-// Coordinated party spending isn't categorized, so it drops out.
-const filtering = () => state.cats.size < catList.length;
+// With a spending type or outside group selected, rebuild each race from the matching groups'
+// spending. Coordinated party spending isn't categorized, so it drops out of type filters.
+const catFiltering = () => state.cats.size < catList.length;
+const filtering = () => catFiltering() || !!state.group;
 function view(r) {
-  const sel = state.cats;
   if (!filtering()) return r;
+  const sel = state.cats, cf = catFiltering();
   const cols = {}, spenders = [];
   let rt = 0, dt = 0, n7 = 0;
   for (const s of r.spenders) {
-    if (s.kind === "COORD") continue;
-    const amt = s.cats.reduce((a, c) => a + (sel.has(c[0]) ? c[1] : 0), 0);
+    if (state.group && !(s.groups || []).includes(state.group)) continue;
+    if (cf && s.kind === "COORD") continue;
+    let amt = s.amount, n = s.n, last = s.last, new7 = s.new7 || 0;
+    if (cf) {
+      const pick = o => [...sel].map(c => (o || {})[c]).filter(Boolean);
+      amt = s.cats.reduce((a, c) => a + (sel.has(c[0]) ? c[1] : 0), 0);
+      n = pick(s.cat_n).reduce((a, v) => a + v, 0);
+      last = pick(s.cat_last).sort().pop() || s.last;
+      new7 = pick(s.cat_new7).reduce((a, v) => a + v, 0);
+    }
     if (!amt) continue;
     cols[s.col] = (cols[s.col] || 0) + amt;
     if (s.side === "R") rt += amt; else dt += amt;
-    const pick = o => [...sel].map(c => (o || {})[c]).filter(Boolean);
-    n7 += pick(s.cat_new7).reduce((a, v) => a + v, 0);
-    spenders.push({...s, amount: amt, n: pick(s.cat_n).reduce((a, v) => a + v, 0),
-                   last: pick(s.cat_last).sort().pop() || s.last});
+    n7 += new7;
+    spenders.push({...s, amount: amt, n, last});
   }
   spenders.sort((a, b) => b.amount - a.amount);
   return {...r, cols, spenders, r_total: rt, d_total: dt, total: rt + dt, adv: dt - rt, new7: n7};
@@ -342,11 +355,11 @@ function loadSpend() {
 function spPanel(r, s) {
   const total = s.cats.reduce((a, c) => a + Math.max(c[1], 0), 0) || 1;
   const max = Math.max(...s.cats.map(c => c[1]), 1);
-  const cats = s.cats.map(([name, v]) => `<span${filtering() && state.cats.has(name) ? ' class="sel"' : ""}>${esc(name)}</span><div class="track"><div class="fill" style="width:${Math.max(v, 0) / max * 100}%"></div></div><span class="v">${money(v)}<span class="pct">${Math.round(Math.max(v, 0) / total * 100)}%</span></span>`).join("");
+  const cats = s.cats.map(([name, v]) => `<span${catFiltering() && state.cats.has(name) ? ' class="sel"' : ""}>${esc(name)}</span><div class="track"><div class="fill" style="width:${Math.max(v, 0) / max * 100}%"></div></div><span class="v">${money(v)}<span class="pct">${Math.round(Math.max(v, 0) / total * 100)}%</span></span>`).join("");
   let items;
   if (spendState === "ready") {
     const all = (SPEND[r.district] || {})[s.key] || [];
-    const list = filtering() ? all.filter(x => state.cats.has(x[2])) : all;
+    const list = catFiltering() ? all.filter(x => state.cats.has(x[2])) : all;
     const oneTarget = new Set(list.map(x => x[5])).size <= 1;
     items = list.map(x => `<div class="it"><span class="dt">${esc(fmtDate(x[0]))}</span><span class="ds">${esc(x[3] || "No description filed")}</span><span class="n">${money(x[1])}</span>` +
       `<span class="sub">${esc([x[2], x[4], oneTarget ? "" : x[5]].filter(Boolean).join(" · "))}</span></div>`).join("") || `<div class="loading">No itemized expenditures.</div>`;
@@ -368,7 +381,7 @@ function detail(r) {
     return `<div class="side-${side.toLowerCase()}"><h3>${title}</h3>` + list.map(s => {
       const open = state.openSp.has(`${r.district}|${s.key}`);
       return `
-      <div class="sp" data-sp="${esc(s.key)}" data-d="${esc(r.district)}" tabindex="0" role="button" aria-expanded="${open}"><span class="nm"><span class="chev" aria-hidden="true"></span>${esc(s.name)}<span class="tag">${esc(colLabel(s.col))}${s.kind === "COORD" ? " coordinated" : ""}</span></span>
+      <div class="sp" data-sp="${esc(s.key)}" data-d="${esc(r.district)}" tabindex="0" role="button" aria-expanded="${open}"><span class="nm"><span class="chev" aria-hidden="true"></span>${esc(s.name)}<span class="tag">${esc(colLabel(s.col))}${s.kind === "COORD" ? " coordinated" : ""}</span>${(s.groups || []).map(g => `<span class="tag grp">${esc(g)}</span>`).join("")}</span>
       <span class="am">${money(s.amount)}</span>
       <span class="meta">${esc(s.targets.join("; "))}. ${s.n} ${s.kind === "COORD" ? "coordinated " : ""}${s.n === 1 ? "expenditure" : "expenditures"}, latest ${esc(fmtDate(s.last))}.</span>${open ? spPanel(r, s) : ""}</div>`;
     }).join("") + `</div>`;
@@ -394,7 +407,7 @@ function render() {
   $("#tbl tbody").innerHTML = rows.length ? rows.map((r, i) => {
     const open = state.open.has(r.district);
     return `<tr class="race${i % 2 ? " alt" : ""}" tabindex="0" data-d="${esc(r.district)}" aria-expanded="${open}">${FIELDS.map(f => cell(f, r)).join("")}</tr>` + (open ? detail(r) : "");
-  }).join("") : `<tr><td colspan="${FIELDS.length}" class="empty">No races match "${esc(state.q)}". Clear the filter or switch to All races.</td></tr>`;
+  }).join("") : `<tr><td colspan="${FIELDS.length}" class="empty">${state.q ? `No races match "${esc(state.q)}". Clear the filter or switch to All races.` : "No races have spending that matches these filters. Try All races, or widen the filters."}</td></tr>`;
 
   const tot = {}, cnt = {};
   for (const f of FIELDS) if (NUMERIC.has(f.key)) { tot[f.key] = rows.reduce((a, r) => a + f.get(r), 0); cnt[f.key] = rows.filter(r => Math.round(f.get(r)) !== 0).length; }
@@ -409,7 +422,7 @@ function render() {
   $("#dTot").textContent = millions(d); $("#rTot").textContent = millions(r);
   $("#barD").style.width = (d / all * 100) + "%"; $("#barR").style.width = (r / all * 100) + "%";
   $("#bar").setAttribute("aria-label", `Democratic side ${money(d)}, Republican side ${money(r)}`);
-  $("#pctD").textContent = `${Math.round(d / all * 100)}% Democratic side · ${rows.length} ${rows.length === 1 ? "seat" : "seats"}${filtering() ? ` · ${catLabel()} only` : ""}`;
+  $("#pctD").textContent = `${Math.round(d / all * 100)}% Democratic side · ${rows.length} ${rows.length === 1 ? "seat" : "seats"}${filtering() ? ` · ${filterLabel()} only` : ""}`;
   $("#gap").textContent = Math.round(d - r) === 0 ? "Even" : (d > r ? "Democrats +" : "Republicans +") + millions(d - r);
   document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === state.view)));
 }
@@ -437,6 +450,9 @@ function renderNotes() {
     <h4>Where each column's money went</h4>
     <p>Spending by each named group that the FEC file contains but the table does not count, by reason. Check this first if a column looks low. Primary-coded money is usually genuine primary spending; rows dated after a race's primary are the ones to question. Row-level detail: <a href="not_counted.csv">not_counted.csv</a>.</p>
     ${tbl(["Column", "Counted IEs", "Counted coordinated", "Not counted"], (g.reconciliation || []).map(c => `<tr><td>${esc(c.label)}</td><td class="n">${money(c.counted_ie)}</td><td class="n">${c.coordinated ? money(c.counted_coordinated) : ""}</td><td>${Object.entries(c.not_counted).map(([k, v]) => `${esc(k)}: ${money(v)}`).join("<br>") || "Nothing"}</td></tr>`))}
+    ${(DATA.spender_groups || []).map(g => `<h4>${esc(g.name)} groups filter</h4>
+      <p>Groups listed: ${g.members.map(esc).join(", ")}. Filers matched in House general-election spending so far are below; edit the list under [[spender_groups]] in config.toml.</p>
+      ${tbl(["Filer", "Races", "Helping R", "Helping D", "Total"], g.matched.map(m => `<tr><td>${esc(m.name)} <span style="opacity:.6">${esc(m.id)}</span></td><td class="n">${m.races}</td><td class="n">${money(m.r)}</td><td class="n">${money(m.d)}</td><td class="n">${money(m.amount)}</td></tr>`))}`).join("")}
     <h4 id="groups">Biggest groups without their own column</h4>
     <p>Add any of these to config.toml to break them out.</p>
     ${["R","D"].map(sd => tbl([sd === "R" ? "Helping Republicans" : "Helping Democrats", "Races", "Amount"],
@@ -461,7 +477,7 @@ document.querySelectorAll("[data-open-notes]").forEach(a => a.addEventListener("
 if (DATA.note) { $("#note").hidden = false; $("#note").textContent = DATA.note; }
 
 $("#q").addEventListener("input", e => { state.q = e.target.value; render(); });
-document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { state.view = b.dataset.view; render(); }));
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => { state.view = b.dataset.view; applyCats(); }));
 const toggleRow = tr => { const d = tr.dataset.d; state.open.has(d) ? state.open.delete(d) : state.open.add(d); render(); document.querySelector(`tr.race[data-d="${d}"]`)?.focus(); };
 const sortBy = th => { const k = th.dataset.key; if (state.sort === k) state.dir *= -1; else { state.sort = k; state.dir = NUMERIC.has(k) || k === "pres" ? -1 : 1; } render(); document.querySelector(`th[data-key="${k}"]`)?.focus(); };
 const toggleSp = el => {
@@ -493,16 +509,47 @@ function catLabel() {
   const n = state.cats.size, picked = catList.filter(c => state.cats.has(c));
   return n === catList.length ? "All" : !n ? "None" : n <= 2 ? picked.join(" + ") : `${n} types`;
 }
+const GROUPS = DATA.spender_groups || [];
+function filterLabel() {
+  return [state.group, catFiltering() ? catLabel() : ""].filter(Boolean).join(", ");
+}
 function applyCats() {
   document.querySelectorAll("#catboxes input").forEach(b => { b.checked = state.cats.has(b.value); });
+  document.querySelectorAll("#grpboxes input").forEach(b => { b.checked = b.value === state.group; });
   $("#catsum").textContent = catLabel();
-  $("#catpick").classList.toggle("on", filtering());
+  $("#grpsum").textContent = state.group || "All";
+  $("#catpick").classList.toggle("on", catFiltering());
+  $("#grppick").classList.toggle("on", !!state.group);
   const note = $("#catnote");
   note.hidden = !filtering();
-  if (filtering()) note.textContent = state.cats.size
-    ? `Showing ${catList.filter(c => state.cats.has(c)).join(", ")} spending only. Party coordinated spending isn't broken out by type, so NRCC* and DCCC* show independent expenditures only.`
-    : "No spending types selected. Check at least one type, or choose Select all.";
+  if (filtering()) {
+    const parts = [];
+    if (catFiltering() && !state.cats.size) parts.push("No spending types selected. Check at least one type, or choose Select all.");
+    else {
+      const types = catFiltering() ? catList.filter(c => state.cats.has(c)).join(", ") + " spending" : "Spending";
+      if (state.group) {
+        const g = GROUPS.find(x => x.name === state.group) || {matched: []};
+        const filers = g.matched.length;
+        parts.push(`${types} by ${state.group} groups only. ${filers} of the listed groups ${filers === 1 ? "has" : "have"} reported House general-election spending; the full list is in Data notes.`);
+        if (state.view === "party") {
+          const more = DATA.races.filter(r => !r.party_race && Math.round(view(r).total) !== 0).length;
+          if (more) parts.push(`${more} more ${more === 1 ? "race" : "races"} with this spending ${more === 1 ? "is" : "are"} under All races.`);
+        }
+      } else parts.push(`Showing ${types} only.`);
+      if (catFiltering()) parts.push("Party coordinated spending isn't broken out by type, so NRCC* and DCCC* show independent expenditures only.");
+    }
+    note.textContent = parts.join(" ");
+  }
   render();
+}
+if (GROUPS.length) {
+  $("#grppick").hidden = false;
+  $("#grpboxes").innerHTML = [{name: ""}, ...GROUPS].map(g =>
+    `<label><input type="radio" name="grp" value="${esc(g.name)}"> ${g.name ? esc(g.name) + " groups only" : "All groups"}</label>`).join("");
+  $("#grpboxes").addEventListener("change", e => {
+    if (!e.target.matches("input")) return;
+    state.group = e.target.value; $("#grppick").open = false; applyCats();
+  });
 }
 $("#catboxes").addEventListener("change", e => {
   if (!e.target.matches("input")) return;
@@ -511,8 +558,11 @@ $("#catboxes").addEventListener("change", e => {
 });
 $("#catall").addEventListener("click", () => { state.cats = new Set(catList); applyCats(); });
 $("#catclear").addEventListener("click", () => { state.cats.clear(); applyCats(); });
-document.addEventListener("click", e => { if (!e.target.closest("#catpick")) $("#catpick").open = false; });
-document.addEventListener("keydown", e => { if (e.key === "Escape") $("#catpick").open = false; });
+document.addEventListener("click", e => {
+  if (!e.target.closest("#catpick")) $("#catpick").open = false;
+  if (!e.target.closest("#grppick")) $("#grppick").open = false;
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") { $("#catpick").open = false; $("#grppick").open = false; } });
 applyCats(); renderNotes();
 fetch("status.json", {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(st => {
   if (st) $("#checked").textContent = `Last checked for new filings ${st.last_checked_label} (${st.result}). Checks run hourly and pick up new 24/48-hour reports as they're filed.`;

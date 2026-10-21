@@ -32,24 +32,6 @@ GitHub Pages on a free account requires a public repo; everything in it is publi
 `--force` rebuilds even if the FEC file is unchanged. `--input file.csv` builds from a local copy.
 Tests: `python3 -m unittest discover tests`
 
-## Fundraising page
-
-`docs/fundraising.html` is a companion dashboard of candidate fundraising from the quarterly FEC
-reports: D vs. R raised, spent and cash on hand in each race and across the battlefield, each
-campaign's small-dollar share, burn rate, debt and loans, and DCCC (Frontline, Red to Blue,
-Districts in Play) and NRCC (Patriots, MAGA Majority) program tags. It's live at
-`https://<you>.github.io/<repo>/fundraising.html` and linked from the tracker's header.
-
-It's built from the FEC Master Sheet, not from the FEC directly, so rebuild it when there's a new sheet:
-
-    pip install openpyxl
-    python3 fundraising.py "FEC Master Sheet- 2026 Q3.xlsx"
-
-Then commit `docs/fundraising.html`. The spreadsheet itself is never committed (`*.xlsx` is in
-`.gitignore`). Outside spending on the page is read from `docs/data.json` each time it loads, so it
-stays current as the tracker updates. Program lists and party overrides are at the top of `fundraising.py`;
-the page's design is `fundraising_template.html`.
-
 ## Customize (config.toml)
 
 - **Spending categories.** Click a race, then click any group in it to see its spending by
@@ -58,6 +40,12 @@ the page's design is `fundraising_template.html`.
   is listed line by line but not categorized. Categories come from keyword rules on the
   purpose text each filer wrote, set in the `[[categories]]` blocks; the first matching rule
   wins. Line-level detail is published as `docs/spend.json` and loads on first click.
+
+- **Outside-group filters.** Each `[[spender_groups]]` block adds an option to the page's
+  "Outside groups" menu (e.g. "AI industry"). Picking it shows only those groups' spending in
+  every race, total and drill-down, and it combines with the Spending type filter. Groups match by
+  FEC ID or name pattern; Data notes lists every filer each filter picked up, and
+  `transactions.csv` has an `outside_group` column.
 
 - **Columns.** Each `[[columns]]` block is a group with its own column, matched by FEC ID or name.
   Copy a block to break out another group (e.g. AAN, House Majority Forward, Protect Progress).

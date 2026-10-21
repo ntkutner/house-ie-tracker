@@ -217,3 +217,41 @@ patterns = ['digital', 'online', 'internet', 'social', 'facebook', '\bmeta\b', '
 [[categories]]
 name = "Paid Media (general)"
 patterns = ['media', 'advertis', '\bads?\b', 'ad buy', 'production', 'placement', '\bbuy\b', 'commercial', '\bspot']
+
+# ---------------------------------------------------------------------------
+# Outside-group filters. Each block adds an option to the page's "Outside groups"
+# menu; picking it shows only that set of groups' spending in every race, total and
+# drill-down. Groups keep their normal columns (most land in OTH R / OTH D), and a
+# network that spends on both sides is split by who each expenditure helps.
+# A spender matches by FEC ID or by name pattern (case-insensitive regex, matched
+# against the spender name as filed). Data notes lists exactly which filers matched.
+# ---------------------------------------------------------------------------
+[[spender_groups]]
+name = "AI industry"
+members = ["Leading the Future", "Think Big PAC", "American Mission PAC", "Build American AI",
+           "Public First Action", "Public First PAC", "Jobs and Democracy PAC", "Defending Our Values PAC",
+           "Guardrails Alliance", "You Can Push Back", "Dream NYC", "Tomorrow Together",
+           "Innovation Council (super PAC)", "Innovation Council Action", "Building the Future",
+           "Race for the Future", "Anthropic PBC Political Action Committee",
+           "NVPAC (NVIDIA Corporation Employees Federal PAC)"]
+ids = ["C00916114",   # Leading the Future
+       "C00923417",   # Think Big
+       "C00916692",   # American Mission
+       "C00930503",   # Public First
+       "C00928374",   # Jobs and Democracy PAC
+       "C00928390",   # Defending Our Values PAC
+       "C00949487",   # Guardrails Alliance
+       "C00946830",   # You Can Push Back
+       "C00928069",   # Dream NYC
+       "C00958603",   # Tomorrow Together
+       "C00922815",   # Innovation Council
+       "C00960328",   # Building the Future
+       "C00909911",   # Race for the Future
+       "C00946111",   # Anthropic PBC PAC (AnthroPAC)
+       "C00960070"]   # NVPAC
+name_patterns = ['^LEADING THE FUTURE\b', '^THINK BIG\b(?!,? AMERICA)', '^AMERICAN MISSION\b',
+                 '^BUILD AMERICAN AI\b', '^PUBLIC FIRST\b', '^JOBS (AND|&) DEMOCRACY\b',
+                 '^DEFENDING OUR VALUES\b', '^(THE )?GUARDRAILS ALLIANCE\b', '^YOU CAN PUSH BACK\b',
+                 '^DREAM NYC\b', '^TOMORROW TOGETHER\b', '^INNOVATION COUNCIL\b',
+                 '^BUILDING THE FUTURE\b', '^RACE FOR THE FUTURE\b', '^ANTHROPIC\b', '^ANTHROPAC\b',
+                 '^NVPAC\b', 'NVIDIA']
