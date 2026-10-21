@@ -133,6 +133,127 @@ coordinated = true   # also count party coordinated expenditures (Schedule F) by
 "LA05" = { rep = "TBD", dem = "TBD", note = "Open primary Nov. 3" }
 "LA06" = { rep = "TBD", dem = "TBD", note = "Open primary Nov. 3" }
 
+# General-election nominees for races where the filings name only one side (or name a
+# primary loser). Researched Oct. 21, 2026 from state candidate lists (The Green Papers)
+# and news reports. Incumbent flags carry over from the FEC when the name matches.
+"CO08" = { rep = "Gabe Evans" }
+"MI07" = { rep = "Tom Barrett" }
+"AL07" = { rep = "Ammie Akin", dem = "Terri Sewell" }
+"AZ05" = { rep = "Mark Lamb", dem = "Elizabeth Lee" }
+"CA19" = { rep = "Peter Verbica", dem = "Jimmy Panetta" }
+"CA23" = { rep = "Jay Obernolte", dem = "Tessa Hodge" }
+"CA33" = { rep = "Stephanie Vargas", dem = "Pete Aguilar" }
+"CA42" = { rep = "Brian Burley", dem = "Robert Garcia" }
+"CO04" = { rep = "Lauren Boebert", dem = "Eileen Laubacher" }
+"CT05" = { rep = "Chris Shea", dem = "Jahana Hayes" }
+"FL01" = { rep = "Jimmy Patronis", rep_incumbent = true, dem = "Gay Valimont" }
+"FL02" = { rep = "Austin Rogers", dem = "Amanda Green" }
+"FL03" = { rep = "Kat Cammack", dem = "Seth Harp" }
+"FL05" = { rep = "John Rutherford", rep_incumbent = true, dem = "Rachel Grage" }
+"FL10" = { dem = "Maxwell Frost", note = "Unopposed" }
+"FL11" = { rep = "Joe Strada", dem = "James Pericola" }
+"FL15" = { rep = "Laurel Lee", dem = "Robert People" }
+"FL20" = { rep = "Brent Andersen", dem = "Debbie Wasserman Schultz" }
+"FL21" = { rep = "Brian Mast", dem = "James Martin" }
+"FL23" = { rep = "Deborah Adeimy", dem = "Lois Frankel" }
+"FL26" = { rep = "Mario Díaz-Balart", rep_incumbent = true, dem = "Nicole Locklin" }
+"GA03" = { rep = "Brian Jack", dem = "Maura Keller" }
+"GA06" = { rep = "Kevin Martin", dem = "Lucy McBath" }
+"GA07" = { rep = "Rich McCormick", dem = "Tony Kozycki" }
+"GA08" = { rep = "Austin Scott", dem = "Kelly Esti" }
+"GA10" = { rep = "Houston Gaines", dem = "Pam DeLancy" }
+"IA04" = { rep = "Chris McGowan", dem = "Dave Dawson" }
+"IL01" = { rep = "Christian Maxwell", dem = "Jonathan Jackson" }
+"IL09" = { rep = "John Elleson", dem = "Daniel Biss" }
+"IL12" = { rep = "Mike Bost", dem = "Julie Fortier" }
+"IL14" = { rep = "Jim Marter", dem = "Lauren Underwood" }
+"IL15" = { rep = "Mary Miller", dem = "Jennifer Todd" }
+"IL16" = { rep = "Darin LaHood", dem = "Paul Nolley" }
+"IL17" = { rep = "Dillan Vancil", dem = "Eric Sorensen" }
+"IN02" = { rep = "Rudy Yakym", dem = "Jamee Decio" }
+"IN09" = { rep = "Erin Houchin", dem = "Brad Meyer" }
+"KS03" = { rep = "Eric Jenkins", dem = "Sharice Davids" }
+"KY04" = { rep = "Ed Gallrein", dem = "Melissa Strange" }
+"MA01" = { dem = "Richard Neal", note = "No Republican" }
+"MA06" = { rep = "Micah Jones", dem = "Dan Koh" }
+"MD06" = { rep = "Robin Ficker", dem = "April McClain Delaney" }
+"MI01" = { rep = "Jack Bergman", dem = "Callie Barr" }
+"MI02" = { rep = "John Moolenaar", dem = "Ben Ambrose" }
+"MI09" = { rep = "Lisa McClain", dem = "Ray Pooley" }
+"MN05" = { rep = "John Nagel", dem = "Ilhan Omar" }
+"MN06" = { rep = "Tom Emmer", dem = "Doug Chapin" }
+"MN07" = { rep = "Michelle Fischbach", dem = "Erik Osberg" }
+"MN08" = { rep = "Pete Stauber", dem = "Trina Swanson" }
+"MO05" = { rep = "Rick Brattin", dem = "Emanuel Cleaver" }
+"MO06" = { rep = "Chris Stigall", dem = "Josh Smead" }
+"MO08" = { rep = "Jason Smith", dem = "Chris Reichard" }
+"MS01" = { rep = "Trent Kelly", rep_incumbent = true, dem = "Cliff Johnson" }
+"MT02" = { rep = "Troy Downing", dem = "Brian Miller" }
+"NC06" = { rep = "Addison McDowell", dem = "Cyril Jefferson" }
+"NC07" = { rep = "David Rouzer", dem = "Kimberly Hardy" }
+"NJ04" = { rep = "Chris Smith", dem = "Rachel Peace" }
+"NJ05" = { rep = "Sean Kirrane", dem = "Josh Gottheimer" }
+"NJ06" = { rep = "Hillary Herzig", dem = "Frank Pallone", dem_incumbent = true }
+"NY01" = { rep = "Nick LaLota", rep_incumbent = true, dem = "Chris Gallant" }
+"NY02" = { rep = "Andrew Garbarino", dem = "Pat Halpin" }
+"NY08" = { rep = "Lewis Mizrahi", dem = "Hakeem Jeffries" }
+"NY13" = { rep = "Jomo Williams", dem = "Darializa Avila Chevalier" }
+"NY15" = { rep = "Stylo Sapaskis", dem = "Ritchie Torres" }
+"NY22" = { rep = "Kailee Buller", dem = "John Mannion" }
+"NY23" = { rep = "Nick Langworthy", dem = "Aaron Gies" }
+"NY25" = { rep = "Virginia McIntyre", dem = "Joe Morelle" }
+"OH02" = { rep = "Dave Taylor", dem = "Jen Mazzuckelli" }
+"OH03" = { rep = "Cleophus Dulaney", dem = "Joyce Beatty", dem_incumbent = true }
+"OH04" = { rep = "Jim Jordan", dem = "Josh Kolasinski" }
+"OH06" = { rep = "Michael Rulli", dem = "Elizabeth Kirtley" }
+"OH08" = { rep = "Warren Davidson", dem = "Vanessa Enoch" }
+"OH11" = { rep = "Mike Kirchner", dem = "Shontel Brown", dem_incumbent = true }
+"OH12" = { rep = "Troy Balderson", dem = "Jerrad Christian" }
+"OH14" = { rep = "Dave Joyce", dem = "Maria Jukic" }
+"OK01" = { rep = "Mark Tedford", dem = "John Croisant" }
+"OK03" = { rep = "Frank Lucas", dem = "Suzie Byrd" }
+"OK05" = { rep = "Stephanie Bice", dem = "Jena Nelson" }
+"PA02" = { rep = "Jessica Arriaga", dem = "Brendan Boyle" }
+"PA11" = { rep = "Lloyd Smucker", dem = "Nancy Mannion" }
+"PA12" = { rep = "James Hayes", dem = "Summer Lee" }
+"PA13" = { rep = "John Joyce", dem = "Beth Farnham" }
+"PA15" = { rep = "Glenn Thompson", dem = "Ray Bilger" }
+"SD00" = { rep = "Marty Jackley", dem = "Nikki Gronli" }
+"TX01" = { rep = "Nathaniel Moran", dem = "Yolanda Prince" }
+"TX03" = { rep = "Keith Self", dem = "Evan Hunt" }
+"TX04" = { rep = "Pat Fallon", dem = "Jason Pearce" }
+"TX05" = { rep = "Lance Gooden", dem = "Chelsey Hockett" }
+"TX06" = { rep = "Jake Ellzey", dem = "Danny Minton" }
+"TX08" = { rep = "Jessica Steinmann", dem = "Laura Jones" }
+"TX10" = { rep = "Chris Gober", dem = "Caitlin Rourk" }
+"TX11" = { rep = "August Pfluger", dem = "Claire Reynolds" }
+"TX12" = { rep = "Craig Goldman", dem = "Heli Rodriguez Prilliman" }
+"TX13" = { rep = "Ronny Jackson", dem = "Mark Nair" }
+"TX14" = { rep = "Randy Weber", dem = "Bill Bartie" }
+"TX16" = { rep = "Adam Bauman", dem = "Veronica Escobar" }
+"TX17" = { rep = "Pete Sessions", dem = "Casey Shepard" }
+"TX18" = { rep = "Ronald Whitfield", dem = "Christian Menefee", dem_incumbent = true }   # won 2026 special
+"TX19" = { rep = "Tom Sell", dem = "Kyle Rable" }
+"TX21" = { rep = "Mark Teixeira", dem = "Kristin Hook" }
+"TX22" = { rep = "Trever Nehls", dem = "Marquette Greene-Scott" }
+"TX24" = { rep = "Beth Van Duyne", dem = "Kevin Burge" }
+"TX26" = { rep = "Brandon Gill", dem = "Steven Shook" }
+"TX27" = { rep = "Michael Cloud", dem = "Tanya Lloyd" }
+"TX29" = { rep = "Martha Fierro", dem = "Sylvia Garcia" }
+"TX31" = { rep = "John Carter", dem = "Justin Early" }
+"TX36" = { rep = "Brian Babin", dem = "Rhonda Hart" }
+"TX38" = { rep = "Jon Bonck", dem = "Melissa McDonough" }
+"UT03" = { rep = "Celeste Maloy", dem = "Kent Udell" }
+"VA06" = { rep = "Ben Cline", dem = "Beth Macy" }
+"VA09" = { rep = "Morgan Griffith", rep_incumbent = true, dem = "Joy Powers" }
+"VA10" = { rep = "Dave Beckwith", dem = "Suhas Subramanyam" }
+"WA04" = { rep = "Amanda McKinney", dem = "John Duresky" }
+"WA05" = { rep = "Michael Baumgartner", dem = "Carmela Conroy" }
+"WI05" = { rep = "Scott Fitzgerald", dem = "Andy Beck" }
+"WI07" = { rep = "Michael Alfonso", dem = "Fred Clark" }
+"WV01" = { rep = "Carol Miller", dem = "Vince George" }
+"WY00" = { rep = "Chuck Gray", dem = "Lisa Kinney" }
+
 # ---------------------------------------------------------------------------
 # Top-two races where both general-election candidates are from the same party.
 # All spending in these races is counted on that party's side, and the table shows
@@ -164,7 +285,8 @@ candidates = [
   "RYAN ZINKE",     # MT-01 incumbent, retired; not on the November ballot
 ]
 # Races to leave out entirely (spending there was for special elections).
-races = ["GA14", "CA01", "FL06", "TN07"]
+races = ["GA14", "CA01", "FL06", "TN07",
+         "KS00", "SC00"]   # KS00/SC00: Senate spending (Marshall, Andrews) mis-filed as House
 
 # ---------------------------------------------------------------------------
 # Spending categories for the per-group breakdown (independent expenditures only;

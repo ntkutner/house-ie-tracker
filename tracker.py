@@ -1122,7 +1122,13 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
         nom = {k.lower(): v for k, v in cfg.get("nominees", {}).get(r["district"], {}).items()}
         for side, key in (("rep", "rep"), ("dem", "dem")):
             if nom.get(side):
-                r[key] = {"name": nom[side].upper(), "incumbent": bool(nom.get(f"{side}_incumbent")), "id": ""}
+                inc = nom.get(f"{side}_incumbent")
+                if inc is None:   # same person as the filings name: keep the FEC incumbent flag
+                    old = r.get(key) or {}
+                    new_last = [t for t in re.findall(r"[A-Z'-]+", nom[side].upper())
+                                if t not in {"JR", "SR", "II", "III", "IV"}][-1:]
+                    inc = bool(old.get("incumbent")) and bool(new_last) and new_last[0] in old.get("name", "").upper()
+                r[key] = {"name": nom[side].upper(), "incumbent": bool(inc), "id": ""}
         r["note"] = nom.get("note", "")
         sp = cfg.get("same_party_races", {}).get(r["district"])
         if sp:

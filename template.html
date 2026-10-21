@@ -81,7 +81,12 @@ header.band{background:#1747C9;color:#fff;font-family:"Public Sans",system-ui,-a
 /* Table */
 .scroller{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
 table{border-collapse:collapse;width:100%;font:500 13px/1.25 var(--cond);font-variant-numeric:tabular-nums}
-th,td{padding:5px 8px;white-space:nowrap;border-bottom:1px solid var(--rule)}
+th,td{padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--rule)}
+/* Names wrap instead of widening the table; long tags drop under the district. */
+td.rep,td.dem{white-space:normal;min-width:96px;max-width:160px;line-height:1.2}
+td.dist .rtag{display:block;margin:2px 0 0;width:max-content;max-width:96px;white-space:normal}
+table.tight{font-size:12px} table.tight th,table.tight td{padding:5px 4px}
+table.compact th,table.compact td{padding:5px 5px}
 thead th{position:sticky;top:0;z-index:2;background:var(--paper);font-weight:700;text-align:right;cursor:pointer;user-select:none;border-bottom:2px solid var(--ink)}
 thead tr.groups th{position:static;cursor:default;border-bottom:0;font-weight:600;font-size:12px;text-align:center;padding:4px 8px}
 thead tr.groups th.g-r{background:var(--r-tint);color:var(--r)} thead tr.groups th.g-d{background:var(--d-tint);color:var(--d)}
@@ -249,7 +254,12 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const money = n => (n < 0 ? "-$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
 const fmtDate = iso => iso ? new Date(iso + "T12:00:00").toLocaleDateString("en-US", {month:"short", day:"numeric"}) : "";
-const advText = a => Math.round(a) === 0 ? "EVEN" : (a > 0 ? "D +" : "R +") + money(Math.abs(a));
+// Table cells switch to $412K / $1.24M only when full figures won't fit the screen.
+let compact = false;
+const short = n => { const a = Math.abs(n), s = n < 0 ? "-$" : "$";
+  return a >= 1e6 ? s + (a / 1e6).toFixed(a >= 1e7 ? 1 : 2) + "M" : a >= 1e3 ? s + Math.round(a / 1e3) + "K" : s + Math.round(a); };
+const cellMoney = n => compact ? short(n) : money(n);
+const advText = a => Math.round(a) === 0 ? "EVEN" : (a > 0 ? "D +" : "R +") + cellMoney(Math.abs(a));
 
 const COLS = DATA.columns;
 const R_COLS = COLS.filter(c => c.side === "R"), D_COLS = COLS.filter(c => c.side === "D");
@@ -340,7 +350,7 @@ function cell(f, r) {
     return `<td class="${r.adv > 0 ? "adv-d" : r.adv < 0 ? "adv-r" : ""}">${advText(v)}</td>`;
   }
   const zero = Math.round(v) === 0;
-  return `<td class="${f.cls}${zero ? " zero" : ""}">${money(v)}</td>`;
+  return `<td class="${f.cls}${zero ? " zero" : ""}"${compact ? ` title="${money(v)}"` : ""}>${cellMoney(v)}</td>`;
 }
 
 let SPEND = null, spendState = "idle";
@@ -401,7 +411,20 @@ function renderHead() {
     `<tr>${FIELDS.map(f => `<th scope="col" data-key="${f.key}" class="${f.cls.replace(/\b(sum|dist|rep|dem)\b/g, "")}" tabindex="0"${state.sort === f.key ? ` aria-sort="${state.dir < 0 ? "descending" : "ascending"}"` : ""}><span>${esc(f.label)}</span></th>`).join("")}</tr>`;
 }
 
+// Fit the table to the screen: full figures, then a tighter full-figure layout, then $K/$M.
+let tight = false;
 function render() {
+  const sc = $(".scroller"), over = () => sc.scrollWidth > sc.clientWidth + 1;
+  drawTable();
+  if (!tight && !compact && over()) { tight = true; drawTable(); }
+  if (!compact && over()) { tight = false; compact = true; drawTable(); }
+}
+let fitTimer;
+window.addEventListener("resize", () => { clearTimeout(fitTimer); fitTimer = setTimeout(() => { compact = tight = false; render(); }, 150); });
+
+function drawTable() {
+  $("#tbl").classList.toggle("compact", compact);
+  $("#tbl").classList.toggle("tight", tight);
   const rows = visible();
   renderHead();
   $("#tbl tbody").innerHTML = rows.length ? rows.map((r, i) => {
@@ -413,7 +436,7 @@ function render() {
   for (const f of FIELDS) if (NUMERIC.has(f.key)) { tot[f.key] = rows.reduce((a, r) => a + f.get(r), 0); cnt[f.key] = rows.filter(r => Math.round(f.get(r)) !== 0).length; }
   const lead = FIELDS.findIndex(f => NUMERIC.has(f.key));
   $("#tbl tfoot").innerHTML =
-    `<tr><td class="l sticky" colspan="${lead}">Total</td>${FIELDS.slice(lead).map(f => f.key === "adv" ? `<td class="${tot.adv > 0 ? "adv-d" : "adv-r"}">${advText(tot.adv)}</td>` : `<td class="${f.cls.replace("sticky", "")}">${money(tot[f.key])}</td>`).join("")}</tr>` +
+    `<tr><td class="l sticky" colspan="${lead}">Total</td>${FIELDS.slice(lead).map(f => f.key === "adv" ? `<td class="${tot.adv > 0 ? "adv-d" : "adv-r"}">${advText(tot.adv)}</td>` : `<td class="${f.cls.replace("sticky", "")}">${cellMoney(tot[f.key])}</td>`).join("")}</tr>` +
     `<tr class="counts"><td class="l sticky" colspan="${lead}">Races with spending</td>${FIELDS.slice(lead).map(f => f.key === "adv" ? "<td></td>" : `<td>${cnt[f.key]}</td>`).join("")}</tr>`;
 
   const r = tot.r_total || 0, d = tot.d_total || 0, all = r + d || 1;
