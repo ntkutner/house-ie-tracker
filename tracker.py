@@ -214,6 +214,7 @@ def read_ie(path: Path, cfg: dict, cols: list[dict], master: dict, extra: list[d
     rows: list[dict] = []
     excluded: list[dict] = []
     stats: Counter = Counter()
+    groups = compile_groups(cfg)
 
     def source():
         with open(path, newline="", encoding="utf-8", errors="replace") as fh:
@@ -264,11 +265,15 @@ def read_ie(path: Path, cfg: dict, cols: list[dict], master: dict, extra: list[d
             nk = named_key(spe_id, spe_nam, cols)
 
             def exclude(reason: str):
-                if nk:
-                    excluded.append({"column": nk, "reason": reason, "spender": spe_nam, "candidate": name,
+                # Named columns and outside-group filters both get a record, so a gap is explainable.
+                cols_hit = ([nk] if nk else []) + [f"{g} (outside group)"
+                                                   for g in groups_of(spe_id, spe_nam, groups)]
+                for col in cols_hit:
+                    excluded.append({"column": col, "reason": reason, "spender": spe_nam, "candidate": name,
                                      "race": f"{st}{dis}" if st else "", "election_type": ele or "blank",
                                      "amount": amount, "date": date, "file_num": fn,
-                                     "tran_id": (r.get("tran_id") or "").strip()})
+                                     "tran_id": (r.get("tran_id") or "").strip(),
+                                     "spender_id": spe_id, "support_oppose": (r.get("sup_opp") or "").strip().upper()[:1]})
 
             if not ele.startswith(etypes):
                 exclude("Coded as primary or other election")
@@ -1150,8 +1155,20 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
                     h["amount"] += s["amount"]
                     h[s["side"]] += s["amount"]
                     h["races"].add(race["district"])
+        skipped = defaultdict(lambda: {"amount": 0.0, "races": set(), "last": "", "id": ""})
+        for e in excluded:
+            if e["column"] == f"{g['name']} (outside group)":
+                k = skipped[(e["spender"], e["reason"])]
+                k["amount"] += e["amount"]
+                k["id"] = e.get("spender_id", "")
+                if e["race"]:
+                    k["races"].add(e["race"])
+                k["last"] = max(k["last"], e["date"] or "")
         group_info.append({
             "name": g["name"], "members": g["members"],
+            "not_counted": [{"name": n, "id": k["id"], "reason": reason, "amount": round(k["amount"], 2),
+                             "races": sorted(k["races"]), "last": k["last"]}
+                            for (n, reason), k in sorted(skipped.items(), key=lambda kv: -kv[1]["amount"])],
             "matched": [{"id": i, "name": n, "amount": round(h["amount"], 2), "r": round(h["R"], 2),
                          "d": round(h["D"], 2), "races": len(h["races"])}
                         for (i, n), h in sorted(hits.items(), key=lambda kv: -kv[1]["amount"])]})
@@ -1235,7 +1252,7 @@ def write_outputs(result: dict, rows: list[dict], cands: dict, out: Path, cfg: d
         w = csv.writer(fh)
         w.writerow(["column", "reason", "spender", "candidate", "race", "election_type", "amount", "date",
                     "file_num", "tran_id"])
-        for e in sorted(excluded, key=lambda e: (e["column"], e["reason"], e["date"]), reverse=True):
+        for e in sorted(excluded, key=lambda e: (e["column"], e["reason"], e["date"] or ""), reverse=True):
             w.writerow([e[k] for k in ("column", "reason", "spender", "candidate", "race", "election_type",
                                        "amount", "date", "file_num", "tran_id")])
 

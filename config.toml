@@ -255,3 +255,17 @@ name_patterns = ['^LEADING THE FUTURE\b', '^THINK BIG\b(?!,? AMERICA)', '^AMERIC
                  '^DREAM NYC\b', '^TOMORROW TOGETHER\b', '^INNOVATION COUNCIL\b',
                  '^BUILDING THE FUTURE\b', '^RACE FOR THE FUTURE\b', '^ANTHROPIC\b', '^ANTHROPAC\b',
                  '^NVPAC\b', 'NVIDIA']
+
+[[spender_groups]]
+name = "Crypto"
+members = ["Fairshake", "Defend American Jobs", "Protect Progress", "Fellowship PAC"]
+ids = ["C00835959",   # Fairshake
+       "C00836221",   # Defend American Jobs (Republican-facing)
+       "C00848440"]   # Protect Progress (Democratic-facing)
+name_patterns = ['^FAIR ?SHAKE\b', '^DEFEND AMERICAN JOBS\b', '^PROTECT PROGRESS\b', '^FELLOWSHIP PAC\b']
+
+[[spender_groups]]
+name = "Energy"
+members = ["Invest in Tomorrow Coalition PAC"]
+ids = ["C00936997"]   # Invest in Tomorrow Coalition PAC
+name_patterns = ['^INVEST IN TOMORROW\b']

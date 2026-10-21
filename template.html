@@ -452,7 +452,9 @@ function renderNotes() {
     ${tbl(["Column", "Counted IEs", "Counted coordinated", "Not counted"], (g.reconciliation || []).map(c => `<tr><td>${esc(c.label)}</td><td class="n">${money(c.counted_ie)}</td><td class="n">${c.coordinated ? money(c.counted_coordinated) : ""}</td><td>${Object.entries(c.not_counted).map(([k, v]) => `${esc(k)}: ${money(v)}`).join("<br>") || "Nothing"}</td></tr>`))}
     ${(DATA.spender_groups || []).map(g => `<h4>${esc(g.name)} groups filter</h4>
       <p>Groups listed: ${g.members.map(esc).join(", ")}. Filers matched in House general-election spending so far are below; edit the list under [[spender_groups]] in config.toml.</p>
-      ${tbl(["Filer", "Races", "Helping R", "Helping D", "Total"], g.matched.map(m => `<tr><td>${esc(m.name)} <span style="opacity:.6">${esc(m.id)}</span></td><td class="n">${m.races}</td><td class="n">${money(m.r)}</td><td class="n">${money(m.d)}</td><td class="n">${money(m.amount)}</td></tr>`))}`).join("")}
+      ${tbl(["Filer", "Races", "Helping R", "Helping D", "Total"], g.matched.map(m => `<tr><td>${esc(m.name)} <span style="opacity:.6">${esc(m.id)}</span></td><td class="n">${m.races}</td><td class="n">${money(m.r)}</td><td class="n">${money(m.d)}</td><td class="n">${money(m.amount)}</td></tr>`))}
+      <p>House spending by these groups that isn't counted, mostly primary spending. If a filer coded general-election ads as primary, it shows up here with a date after the race's primary.</p>
+      ${tbl(["Filer", "Reason", "Races", "Latest", "Amount"], (g.not_counted || []).map(m => `<tr><td>${esc(m.name)} <span style="opacity:.6">${esc(m.id)}</span></td><td>${esc(m.reason)}</td><td>${esc(m.races.slice(0, 8).join(", ") + (m.races.length > 8 ? ` +${m.races.length - 8} more` : ""))}</td><td>${esc(fmtDate(m.last))}</td><td class="n">${money(m.amount)}</td></tr>`))}`).join("")}
     <h4 id="groups">Biggest groups without their own column</h4>
     <p>Add any of these to config.toml to break them out.</p>
     ${["R","D"].map(sd => tbl([sd === "R" ? "Helping Republicans" : "Helping Democrats", "Races", "Amount"],
@@ -530,7 +532,8 @@ function applyCats() {
       if (state.group) {
         const g = GROUPS.find(x => x.name === state.group) || {matched: []};
         const filers = g.matched.length;
-        parts.push(`${types} by ${state.group} groups only. ${filers} of the listed groups ${filers === 1 ? "has" : "have"} reported House general-election spending; the full list is in Data notes.`);
+        const prim = (g.not_counted || []).filter(x => /primary/i.test(x.reason)).reduce((a, x) => a + x.amount, 0);
+        parts.push(`${types} by ${state.group} groups only, general election. ${filers} of the listed groups ${filers === 1 ? "has" : "have"} reported House general-election spending${prim >= 1000 ? `; another ${money(prim)} was spent in primaries and isn't counted` : ""}. Details are in Data notes.`);
         if (state.view === "party") {
           const more = DATA.races.filter(r => !r.party_race && Math.round(view(r).total) !== 0).length;
           if (more) parts.push(`${more} more ${more === 1 ? "race" : "races"} with this spending ${more === 1 ? "is" : "are"} under All races.`);
@@ -548,7 +551,9 @@ if (GROUPS.length) {
     `<label><input type="radio" name="grp" value="${esc(g.name)}"> ${g.name ? esc(g.name) + " groups only" : "All groups"}</label>`).join("");
   $("#grpboxes").addEventListener("change", e => {
     if (!e.target.matches("input")) return;
-    state.group = e.target.value; $("#grppick").open = false; applyCats();
+    state.group = e.target.value; $("#grppick").open = false;
+    if (state.group) state.view = "all";   // these groups mostly spend outside the party battlefield
+    applyCats();
   });
 }
 $("#catboxes").addEventListener("change", e => {
