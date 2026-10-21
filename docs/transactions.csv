@@ -1,4 +1,13 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num
+IE,NY17,CAIT CONLEY,DEM,O,C00737411,The Governing Majority Fund,16399.19,2026-10-21,2026-10-21,Direct Mail,direct mail services,Rhumb Line Strategies LLC,2034032,SE.6188,
+IE,NY17,CAIT CONLEY,DEM,O,C00737411,The Governing Majority Fund,17579.13,2026-10-21,2026-10-21,Direct Mail,direct mail services,Rhumb Line Strategies LLC,2034032,SE.6189,
+IE,VA02,ELAINE LURIA,DEM,O,C00737411,The Governing Majority Fund,15609.58,2026-10-21,2026-10-21,Direct Mail,direct mail services,Rhumb Line Strategies LLC,2034019,SE.6157,
+IE,PA08,PAIGE COGNETTI,DEM,O,C00737411,The Governing Majority Fund,29687.07,2026-10-21,2026-10-21,Direct Mail,direct mail services,Rhumb Line Strategies LLC,2034016,SE.6155,
+IE,VA02,ELAINE LURIA,DEM,S,C00844530,Rolling Sea Action Fund,90000.0,2026-10-21,2026-10-21,Paid Media (general),media placement & production,Symmetry Media LLC,2033985,500859322,
+IE,FL22,PIA DANDIYA,DEM,O,C00959833,Stronger America Together,7500.0,2026-10-20,2026-10-21,Production,media production,BreakPoint Media LLC,2034012,SE.4144,
+IE,FL22,PIA DANDIYA,DEM,O,C00959833,Stronger America Together,145000.0,2026-10-20,2026-10-21,Paid Media (general),media placement,"Mentzer Media Services, Inc.",2034012,SE.4141,
+IE,OR04,MONIQUE DESPAIN,REP,O,C00851584,New Engagement PAC,92500.0,2026-10-20,2026-10-21,Paid Media (general),Media Buy - Estimate,Canal Partners Media,2034008,500368770,
+IE,OR04,MONIQUE DESPAIN,REP,O,C00851584,New Engagement PAC,16500.0,2026-10-20,2026-10-21,Production,Media Production - Estimate,ZTribeca,2034008,500368771,
 IE,KY06,RALPH A ALVARADO,REP,O,C00864785,In This Together PAC,100000.0,2026-10-20,2026-10-21,Broadcast,Digital & Television Advertising,Assemble the Agency,2033975,500369914,
 IE,FL01,JIMMY JR. PATRONIS,REP,S,C00904730,LAND I LOVE PAC,170424.0,2026-10-20,2026-10-21,Paid Media (general),MEDIA PLACEMENT,ONMESSAGE INC.,2033974,SE24.37344,
 IE,FL01,JIMMY JR. PATRONIS,REP,S,C00904730,LAND I LOVE PAC,8770.0,2026-10-20,2026-10-21,Production,MEDIA PRODUCTION,THE O'DONNELL GROUP,2033974,SE24.37345,
@@ -113,7 +122,6 @@ IE,CA48,JIM DESMOND,REP,O,C00685297,Elect Democratic Women,50000.0,2026-10-20,20
 IE,CA48,JIM DESMOND,REP,O,C00685297,Elect Democratic Women,14180.56,2026-10-20,2026-10-20,Production,Television/Digital Production,Symmetry Media LLC,2032374,500690552,202610209916306215
 IE,IA02,JOE MITCHELL,REP,O,C00685297,Elect Democratic Women,95000.0,2026-10-20,2026-10-20,Broadcast,Television/Digital Advertising,Symmetry Media LLC,2032374,500689334,202610209916306214
 IE,MI10,MICHAEL BOUCHARD,REP,O,C00951269,American Democracy Committee,61770.0,2026-10-20,2026-10-20,Direct Mail,Direct Mail Advertising,"The Pivot Group, Inc.",2032242,SE.4145,202610209916299793
-IE,FL22,PIA DANDIYA,DEM,O,C00959833,Stronger America Together,145000.0,2026-10-20,2026-10-20,Paid Media (general),media placement,"Mentzer Media Services, Inc.",2032141,SE.4141,202610209916292858
 IE,CA42,ROBERT GARCIA,DEM,S,C00550970,Equality PAC,42500.0,2026-10-20,2026-10-20,Digital (general),Digital Advertising,"Political Animals, LLC",2032018,500582326,202610209916279471
 IE,IN05,JAMES (J. D. ) DAVID FORD,DEM,S,C00962779,HOOSIER STATE VALUES PAC,29517.13,2026-10-20,2026-10-20,Direct Mail,Direct Mail,Pinwheel Productions,2031987,SE.4125,202610209916275907
 IE,IN05,VICTORIA SPARTZ,REP,O,C00962779,HOOSIER STATE VALUES PAC,29517.12,2026-10-20,2026-10-20,Direct Mail,Direct Mail,Pinwheel Productions,2031987,SE.4126,202610209916275908
