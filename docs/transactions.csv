@@ -1,4 +1,18 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num,outside_group
+IE,WI03,REBECCA COOKE,DEM,S,C00873901,THE WISCO PROJECT PAC,899.32,2026-10-22,2026-10-21,Other,Temporary Tattoos - Cooke,Budget Signs & Specialties,2034594,SE.4300,,
+IE,MT01,AARON FLINT,REP,O,C00949487,Guardrails Alliance,380890.0,2026-10-21,2026-10-21,Broadcast,TV Ad Buy (Estimate),Middle Seat Consulting LLC,2034687,500037414,,AI industry
+IE,NC01,LAURIE BUCKHOUT,REP,O,C00949487,Guardrails Alliance,600000.0,2026-10-21,2026-10-21,Broadcast,TV Ad Buy (Estimate),Challengers LLC,2034687,500037415,,AI industry
+IE,NC01,LAURIE BUCKHOUT,REP,O,C00949487,Guardrails Alliance,12000.0,2026-10-21,2026-10-21,Production,Ad Production (Estimate),Challengers LLC,2034687,500037416,,AI industry
+IE,CA34,ANGELA GONZALES-TORRES,DEM,S,C00949487,Guardrails Alliance,300000.0,2026-10-21,2026-10-21,Digital (general),Digital Ad Buy (Estimate),Challengers LLC,2034687,500037696,,AI industry
+IE,CA34,JIMMY GOMEZ,DEM,O,C00949487,Guardrails Alliance,300000.0,2026-10-21,2026-10-21,Digital (general),Digital Ad Buy (Estimate),Challengers LLC,2034687,500037418,,AI industry
+IE,AZ01,THOMAS JAMES FEELY,REP,O,C00949487,Guardrails Alliance,350000.0,2026-10-21,2026-10-21,Digital (general),Digital Ad Buy (Estimate),Middle Seat Consulting LLC,2034687,500037688,,AI industry
+IE,AZ01,THOMAS JAMES FEELY,REP,O,C00949487,Guardrails Alliance,12500.0,2026-10-21,2026-10-21,Production,Ad Production (Estimate),Middle Seat Consulting LLC,2034687,500037689,,AI industry
+IE,TX23,KATY PADILLA STOUT,DEM,S,C00756940,Texas Organizing Project PAC,146.25,2026-10-21,2026-10-21,Digital (general),Digital Advertising (Estimate),San Antonio Observer,2034671,500003198,,
+IE,CA06,RICHARD PAN,DEM,S,C00011114,American Federation of State County & Municipal Employees PEOPLE,12555.08,2026-10-21,2026-10-21,Production,2026 IE Mail Piece Production and Shipping Costs for CA-06 House Race. ESTIMATE,Moxie Media,2034655,500036116,,
+IE,IA02,JOE MITCHELL,REP,O,C00011114,American Federation of State County & Municipal Employees PEOPLE,50946.76,2026-10-21,2026-10-21,Production,2026 IE Mail Piece Production and Shipping Costs for the IA-02 House Race. ESTIMATE,Moxie Media,2034655,500036117,,
+IE,CO08,MANNY RUTINEL,DEM,S,C00011114,American Federation of State County & Municipal Employees PEOPLE,207015.0,2026-10-21,2026-10-21,Digital (general),2026 IE Media Buy for digital ads for CO-08 House race. ESTIMATE,PRIORITIES USA ACTION,2034655,500036102,,
+IE,PA07,BOB BROOKS,DEM,S,C00738732,Clean Wave,43.75,2026-10-21,2026-10-21,Canvassing/Lit,Door-to-door voter contact and candidate advocacy,Clean Water Action,2034639,SE.5356,,
+IE,OH13,EMILIA SYKES,DEM,S,C00859660,New Democrat Majority,270000.0,2026-10-21,2026-10-21,Digital (general),Digital Advertising Buy & Production,Screen Strategies Media,2034605,500370940,,
 IE,FL13,LEELA J GRAY,DEM,O,C00844613,Win it Back PAC,32369.66,2026-10-21,2026-10-21,Production,MAIL PRODUCTION/POSTAGE,COLD SPARK,2034585,SE24.13117,,
 IE,FL13,LEELA J GRAY,DEM,O,C00844613,Win it Back PAC,48946.03,2026-10-21,2026-10-21,Broadcast,TV AD PLACEMENT,MEDIUM BUYING LLC,2034585,SE24.13122,,
 IE,FL13,LEELA J GRAY,DEM,O,C00844613,Win it Back PAC,266.6,2026-10-21,2026-10-21,Production,MAIL PRODUCTION (FROM ADVANCE LINE 21),CLUB FOR GROWTH,2034585,SE24.13120,,
@@ -37,6 +51,24 @@ IE,NY17,CAIT CONLEY,DEM,O,C00737411,The Governing Majority Fund,17579.13,2026-10
 IE,VA02,ELAINE LURIA,DEM,O,C00737411,The Governing Majority Fund,15609.58,2026-10-21,2026-10-21,Direct Mail,direct mail services,Rhumb Line Strategies LLC,2034019,SE.6157,,
 IE,PA08,PAIGE COGNETTI,DEM,O,C00737411,The Governing Majority Fund,29687.07,2026-10-21,2026-10-21,Direct Mail,direct mail services,Rhumb Line Strategies LLC,2034016,SE.6155,,
 IE,VA02,ELAINE LURIA,DEM,S,C00844530,Rolling Sea Action Fund,90000.0,2026-10-21,2026-10-21,Paid Media (general),media placement & production,Symmetry Media LLC,2033985,500859322,,
+IE,TX18,CHRISTIAN MENEFEE,DEM,S,C00756940,Texas Organizing Project PAC,979.9,2026-10-20,2026-10-21,Other,Printing Services (Estimate),Human Age Digital,2034671,500003186,,
+IE,TX29,SYLVIA R GARCIA,DEM,S,C00756940,Texas Organizing Project PAC,739.51,2026-10-20,2026-10-21,Other,Printing Services (Estimate),Human Age Digital,2034671,500003187,,
+IE,TX18,CHRISTIAN MENEFEE,DEM,S,C00756940,Texas Organizing Project PAC,454.5,2026-10-20,2026-10-21,Digital (general),Digital Advertising (Estimate),Human Age Digital,2034671,500003190,,
+IE,TX29,SYLVIA R GARCIA,DEM,S,C00756940,Texas Organizing Project PAC,343.0,2026-10-20,2026-10-21,Digital (general),Digital Advertising (Estimate),Human Age Digital,2034671,500003191,,
+IE,TX23,KATY PADILLA STOUT,DEM,S,C00756940,Texas Organizing Project PAC,9750.0,2026-10-20,2026-10-21,Broadcast,Digital & TV Advertising (Estimate),WKQ Media,2034671,500003194,,
+IE,TX23,BRANDON HERRERA,REP,O,C00756940,Texas Organizing Project PAC,5250.0,2026-10-20,2026-10-21,Broadcast,Digital & TV Advertising (Estimate),WKQ Media,2034671,500003196,,
+IE,GA01,AMANDA HOLLOWELL,DEM,S,C00606962,Working Families Party PAC,1000.0,2026-10-20,2026-10-21,Texting,Texting,Angle Mastagni Matthews Political Strategies,2034668,500005010,,
+IE,CA22,RANDY VILLEGAS,DEM,S,C00606962,Working Families Party PAC,43333.33,2026-10-20,2026-10-21,Digital (general),Digital ads,LC Media LLC,2034668,500005008,,
+IE,CA22,DAVID VALADAO,REP,O,C00606962,Working Families Party PAC,43333.34,2026-10-20,2026-10-21,Digital (general),Digital ads,LC Media LLC,2034668,500005009,,
+IE,MT01,AARON FLINT,REP,S,C00008086,Montana Republican State Central Committee,5232.15,2026-10-20,2026-10-21,Texting,"Text Messages, Support Aaron Flint",RMC,2034662,E-481028,,
+IE,MI07,WILLIAM LAWRENCE,DEM,S,C00738732,Clean Wave,1300.0,2026-10-20,2026-10-21,Canvassing/Lit,Door-to-door voter contact and candidate advocacy,Clean Water Action,2034641,SE.5358,,
+IE,VA05,THOMAS STUART PRICE PERRIELLO,DEM,S,C00938472,Virginia Patriot PAC,5785.13,2026-10-20,2026-10-21,Other,Billboard,Democracy Builders,2034619,E-93,,
+IE,TX34,ERIC FLORES,REP,O,C00859660,New Democrat Majority,16146.1,2026-10-20,2026-10-21,Digital (general),In-kind: Digital Advertising Production,HMP,2034605,500370939,,
+IE,TX34,ERIC FLORES,REP,O,C00859660,New Democrat Majority,250000.0,2026-10-20,2026-10-21,Digital (general),Digital Advertising Buy,Waterfront Strategies,2034605,500370937,,
+IE,WI01,MITCHELL BERMAN,DEM,S,C00873901,THE WISCO PROJECT PAC,22000.0,2026-10-20,2026-10-21,Digital (general),Digital Ads 10/20 - 10/26/26 - Berman,AL Media,2034594,SE.4295,,
+IE,WI01,BRYAN GEORGE STEIL,REP,O,C00873901,THE WISCO PROJECT PAC,22000.0,2026-10-20,2026-10-21,Digital (general),Digital Ads 10/20 - 10/26/26 - Steil,AL Media,2034594,SE.4296,,
+IE,WI03,REBECCA COOKE,DEM,S,C00873901,THE WISCO PROJECT PAC,27500.0,2026-10-20,2026-10-21,Digital (general),Digital Ads 10/20 - 10/26/26 - Cooke,AL Media,2034594,SE.4297,,
+IE,WI03,DERRICK F. VAN ORDEN,REP,O,C00873901,THE WISCO PROJECT PAC,27500.0,2026-10-20,2026-10-21,Digital (general),Digital Ads 10/20 - 10/26/26 - Van Orden,AL Media,2034594,SE.4298,,
 IE,IN05,VICTORIA SPARTZ,REP,O,C00959346,Commonsense Hoosiers PAC,120000.0,2026-10-20,2026-10-21,Digital (general),Digital Ads,Screen Strategies Media,2034579,IE-48471-E,,
 IE,IN05,VICTORIA SPARTZ,REP,O,C00959346,Commonsense Hoosiers PAC,14921.51,2026-10-20,2026-10-21,Direct Mail,Direct Mailing Services,Clean Message Delivery LLC,2034579,IE-48592-E,,
 IE,IN05,VICTORIA SPARTZ,REP,O,C00959346,Commonsense Hoosiers PAC,18412.4,2026-10-20,2026-10-21,Direct Mail,Direct Mailing Postage,Clean Message Delivery LLC,2034579,IE-48593-E,,
@@ -149,6 +181,7 @@ IE,CO08,MANNY RUTINEL,DEM,S,C00909994,Field Team 6 Inc.,29.36,2026-10-19,2026-10
 IE,WI03,REBECCA COOKE,DEM,S,C90023599,"Campaign for Working Class Communities, Inc.",204.59,2026-10-16,2026-10-21,Texting,GOTV Calls and Texts,Scale to Win,2034574,CDD-0000000454189282,,
 IE,WI03,REBECCA COOKE,DEM,S,C90023599,"Campaign for Working Class Communities, Inc.",467.37,2026-10-16,2026-10-21,Canvassing/Lit,Campaign Literature,Digicopy,2034574,CDD-0000000454189280,,
 IE,WI03,REBECCA COOKE,DEM,S,C90023599,"Campaign for Working Class Communities, Inc.",100.23,2026-10-16,2026-10-21,Canvassing/Lit,Campaign Literature,Digicopy,2034574,CDD-0000000454189281,,
+IE,WI01,MITCHELL BERMAN,DEM,S,C00873901,THE WISCO PROJECT PAC,955.29,2026-10-15,2026-10-21,Other,Flyers - Berman,Wells Print & Digital,2034594,SE.4302,,
 IE,CO08,MANNY RUTINEL,DEM,S,C00909994,Field Team 6 Inc.,77.78,2026-10-15,2026-10-21,Digital (general),ESTIMATE: Email Services,Momentous Outreach Inc,2034403,500279449,,
 IE,MT01,AARON FLINT,REP,O,C90019993,WILD MONTANA ACTION FUND,325.82,2026-10-15,2026-10-21,Digital (general),Digital Voter Guide Ads - Estimate,Google Ads,2034154,F57.4187,,
 IE,MT01,SAMUEL KELLEY FORSTAG,DEM,S,C90019993,WILD MONTANA ACTION FUND,325.82,2026-10-15,2026-10-21,Digital (general),Digital Voter Guide Ads - Estimate,Google Ads,2034154,F57.4188,,
