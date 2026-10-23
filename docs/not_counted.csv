@@ -1,4 +1,5 @@
 column,reason,spender,candidate,race,election_type,amount,date,file_num,tran_id
+TRUMP,No usable party or support/oppose,NO GOING BACK PAC INC.,NICK SHEEDY,MT01,G,1781.24,2026-10-21,2039505,SE.1194695.3
 TRUMP,Coded as primary or other election,MAGA INC.,"FULLER, CLAY",GA14,S,8950.44,2026-03-10,1952643,SE.5218
 TRUMP,Coded as primary or other election,MAGA INC.,"FULLER, CLAY",GA14,S,8950.44,2026-03-09,1952643,SE.5216
 TRUMP,Coded as primary or other election,MAGA INC.,"VAN EPPS, MATTHEW ROBERT",TN07,S,11473.8,2025-12-01,1927215,SE.4743
