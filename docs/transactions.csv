@@ -2,6 +2,10 @@ type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount
 IE,CA34,ANGELA GONZALES-TORRES,DEM,S,C00606962,Working Families Party PAC,10000.0,2026-10-26,2026-10-24,Digital (general),Digital ads,"Challengers, LLC",2041105,500005148,,
 IE,CA07,DORIS MATSUI,DEM,O,C00606962,Working Families Party PAC,75000.0,2026-10-26,2026-10-24,Broadcast,TV ads,LC Media LLC,2041105,500005154,,
 IE,CA07,MAI VANG,DEM,S,C00606962,Working Families Party PAC,25000.0,2026-10-26,2026-10-24,Broadcast,TV ads,LC Media LLC,2041105,500005155,,
+IE,MI10,CHRISTINA HINES,DEM,S,C00473918,Women Vote,1147.81,2026-10-24,2026-10-24,Production,Radio Production,Three Point Media,2041349,500017757,,
+IE,MI10,MICHAEL BOUCHARD,REP,O,C00473918,Women Vote,1147.81,2026-10-24,2026-10-24,Production,Radio Production,Three Point Media,2041349,500017758,,
+IE,MI10,MICHAEL BOUCHARD,REP,O,C00473918,Women Vote,60060.0,2026-10-24,2026-10-24,Radio,Radio Media Buy,Waterfront Strategies,2041349,500017755,,
+IE,MI10,CHRISTINA HINES,DEM,S,C00473918,Women Vote,60060.0,2026-10-24,2026-10-24,Radio,Radio Media Buy,Waterfront Strategies,2041349,500017756,,
 IE,MN01,JACOB JOHNSON,DEM,O,C00962464,MAIN STREET OPPORTUNITY ALLIANCE,20250.0,2026-10-24,2026-10-24,Digital (general),Digital Advertising,Matchstick Media,2041209,SE.4105,,
 IE,MN01,BRAD FINSTAD,REP,S,C00962464,MAIN STREET OPPORTUNITY ALLIANCE,2250.0,2026-10-24,2026-10-24,Digital (general),Digital Advertising,Matchstick Media,2041209,SE.4106,,
 IE,MN01,JACOB JOHNSON,DEM,S,C00738815,TAKEACTION MN FEDERAL FUND,20000.0,2026-10-24,2026-10-24,Digital (general),social media ads,Stage Left Strategies,2041206,SE.7222,,
@@ -10,6 +14,20 @@ IE,TN05,CHAZ MOLDER,DEM,S,C00879205,TENNESSEE RISE PAC,25000.0,2026-10-24,2026-1
 IE,TN09,JUSTIN J. PEARSON,DEM,S,C00879205,TENNESSEE RISE PAC,25000.0,2026-10-24,2026-10-24,Digital (general),Digital Advertising,Canal Partners Media,2041119,SE.5452,,
 IE,AK00,BILL HILL,DEM,S,C00957845,Forward Alaska,2301.05,2026-10-24,2026-10-24,Other,List Acquisition,The Mobilization Center LLC,2041118,500040101,,
 IE,AK00,BILL HILL,DEM,S,C00957845,Forward Alaska,72000.0,2026-10-24,2026-10-24,Phones,Phone Calls - Estimated Cost,Wildfire Contact LLC,2041118,500040104,,
+IE,GA11,JOHN COWAN,REP,S,C00928390,DEFENDING OUR VALUES PAC,249236.0,2026-10-23,2026-10-24,Digital (general),Digital Ad Buy,Apex Strategic,2041366,SE.4512,,AI industry
+IE,GA11,JOHN COWAN,REP,S,C00928390,DEFENDING OUR VALUES PAC,7500.0,2026-10-23,2026-10-24,Production,Digital Ad Production,Gamechangers,2041366,SE.4516,,AI industry
+IE,TX09,ALEXANDRA MEALER,REP,S,C00928390,DEFENDING OUR VALUES PAC,250787.0,2026-10-23,2026-10-24,Digital (general),Digital Ad Buy,Apex Strategic,2041365,SE.4509,,AI industry
+IE,TX09,ALEXANDRA MEALER,REP,S,C00928390,DEFENDING OUR VALUES PAC,7500.0,2026-10-23,2026-10-24,Production,Digital Ad Production,Gamechangers,2041365,SE.4514,,AI industry
+IE,NE01,MIKE FLOOD,REP,O,C00876482,Retire Career Politicians,46103.09,2026-10-23,2026-10-24,Production,Direct Mail Postage and Production (estimate),PAC Services LLC,2041355,IE-48385-E,,
+IE,NE01,MIKE FLOOD,REP,O,C00876482,Retire Career Politicians,41750.0,2026-10-23,2026-10-24,Digital (general),Digital Advertising (estimate),PAC Services LLC,2041355,IE-48986-E,,
+IE,NY04,LAURA GILLEN,DEM,S,C00348540,1199 SEIU United Healthcare Workers East Federal Political Action Fund,6545.04,2026-10-23,2026-10-24,Direct Mail,Mailers (Estimate),Resonance Campaigns,2041343,500372007,,
+IE,NY17,CAIT CONLEY,DEM,S,C00348540,1199 SEIU United Healthcare Workers East Federal Political Action Fund,3483.72,2026-10-23,2026-10-24,Direct Mail,Mailers (Estimate),Resonance Campaigns,2041343,500372008,,
+IE,NJ07,REBECCA BENNETT,DEM,S,C00348540,1199 SEIU United Healthcare Workers East Federal Political Action Fund,1111.68,2026-10-23,2026-10-24,Direct Mail,Mailers (Estimate),Resonance Campaigns,2041343,500372010,,
+IE,FL07,BALE DALTON,DEM,S,C00348540,1199 SEIU United Healthcare Workers East Federal Political Action Fund,2117.07,2026-10-23,2026-10-24,Direct Mail,Mailers (Estimate),Resonance Campaigns,2041343,500372015,,
+IE,FL09,DARREN SOTO,DEM,S,C00348540,1199 SEIU United Healthcare Workers East Federal Political Action Fund,2709.36,2026-10-23,2026-10-24,Direct Mail,Mailers (Estimate),Resonance Campaigns,2041343,500372017,,
+IE,FL14,KATHY CASTOR,DEM,S,C00348540,1199 SEIU United Healthcare Workers East Federal Political Action Fund,2269.73,2026-10-23,2026-10-24,Direct Mail,Mailers (Estimate),Resonance Campaigns,2041343,500372018,,
+IE,FL22,PIA DANDIYA,DEM,S,C00348540,1199 SEIU United Healthcare Workers East Federal Political Action Fund,9557.12,2026-10-23,2026-10-24,Direct Mail,Mailers (Estimate),Resonance Campaigns,2041343,500372020,,
+IE,NY07,CLAIRE VALDEZ,DEM,S,C00689745,MAKE THE ROAD ACTION POLITICAL COMMITTEE,2500.0,2026-10-23,2026-10-24,Other,Videography Services - Estimate,Chris Gomez,2041338,SE.4788,,
 IE,FL21,BRIAN MAST,REP,O,C00962753,Serving Florida PAC,21347.38,2026-10-23,2026-10-24,Direct Mail,Direct Mail - Estimated,"Berlin Rosen, LLC",2041330,SE.4122,,
 IE,CA48,MARNI VON WILPERT,DEM,S,C00909994,Field Team 6 Inc.,43.88,2026-10-23,2026-10-24,Digital (general),ESTIMATE: Email Services,Momentous Outreach Inc,2041326,500280013,,
 IE,CA48,MARNI VON WILPERT,DEM,S,C00909994,Field Team 6 Inc.,69.66,2026-10-23,2026-10-24,Digital (general),ESTIMATE: Email Services,Momentous Outreach Inc,2041326,500280014,,
