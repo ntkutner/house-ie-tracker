@@ -1,5 +1,8 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num,outside_group
 IE,WI02,MARK POCAN,DEM,S,C00905752,Voces de la Frontera Political Fund,99.62,2026-10-26,2026-10-25,Other,Flyers - Pocan,Union Copy Centers,2041519,SE.4258,,
+IE,AL02,RHETT MARQUES,REP,S,C00782656,ALABAMA CHRISTIAN CONSERVATIVES (ACC),100000.0,2026-10-24,2026-10-25,Broadcast,Production and Placement for Broadcast TV Ad,Smart Media Group LLC,2041525,SE.4766,,
+IE,AL02,RHETT MARQUES,REP,S,C00782656,ALABAMA CHRISTIAN CONSERVATIVES (ACC),108000.0,2026-10-24,2026-10-25,Broadcast,Production and Placement for Broadcast TV Ad,Smart Media Group LLC,2041525,SE.4764,,
+IE,AL02,RHETT MARQUES,REP,S,C00782656,ALABAMA CHRISTIAN CONSERVATIVES (ACC),22640.5,2026-10-24,2026-10-25,Cable,Production and Placement for Cable TV Ad,Smart Media Group LLC,2041525,SE.4765,,
 IE,WI05,ANDREW BECK,DEM,S,C00905752,Voces de la Frontera Political Fund,62.0,2026-10-24,2026-10-25,Other,Flyers - Beck,Union Copy Centers,2041519,SE.4254,,
 IE,WI01,MITCHELL BERMAN,DEM,S,C00905752,Voces de la Frontera Political Fund,62.0,2026-10-24,2026-10-25,Other,Flyers - Berman,Union Copy Centers,2041519,SE.4255,,
 IE,WI08,RICK CROSSON,DEM,S,C00905752,Voces de la Frontera Political Fund,62.0,2026-10-24,2026-10-25,Other,Flyers - Crosson,Union Copy Centers,2041519,SE.4256,,
