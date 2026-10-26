@@ -50,6 +50,32 @@ Then commit `docs/fundraising.html`. The spreadsheet itself is never committed (
 stays current as the tracker updates. Program lists and party overrides are at the top of `fundraising.py`;
 the page's design is `fundraising_template.html`.
 
+## 48-hour contribution notices page
+
+`docs/late.html` tracks late money: every 48-hour notice (FEC Form 6) a House campaign files for the
+general election. Inside the last 20 days, a campaign has to report any contribution of $1,000 or more
+within 48 hours, so these are the freshest fundraising numbers there are. The page shows late money by
+race (D vs. R, with the tracker's outside-spending totals for context) or by candidate, split into
+individuals, PACs & orgs, party and self-funding; a feed of the newest notices; and, for each candidate,
+every notice they've filed with every contribution on it and a link to the filing. Search finds
+donors and employers as well as races and candidates. It's live at
+`https://<you>.github.io/<repo>/late.html` and linked from the other pages' headers.
+
+It updates itself in the same hourly run, right after the tracker (`python late.py`), using the same
+FEC_API_KEY secret. Each run lists new Form 6 filings, reads each new one straight from the filing,
+and caches it in `cache/f6/`, so it only reads what's new. On the first run it works back through the
+window newest first, up to 3,000 notices an hour. Amended notices replace the notice they amend, a
+contribution reported twice counts once, and party, same-party races and exclusions follow
+`config.toml`. Downloads: `docs/late_notices.csv` and `docs/late_contributions.csv`.
+
+Optional settings (add to `config.toml` only if you need to change them):
+
+    [late_contributions]
+    election_date = "2026-11-03"        # default: the general election in the cycle year
+    max_new_filings_per_run = 3000
+
+Tests: `python3 -m unittest test_late` (uses the sample filings in `late_fixtures/`).
+
 ## Customize (config.toml)
 
 - **Spending categories.** Click a race, then click any group in it to see its spending by

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;600;700&family=Public+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Same system as the House IE Tracker and fundraising page: blue band with the D/R split, a feed of
+   the newest notices, then the race (or candidate) table with click-to-expand notice detail. */
+:root{
+  --paper:#ffffff; --ink:#1a1d23; --muted:#5d6572; --rule:#d9dde3; --alt:#f5f6f8;
+  --r:#b0222b; --r-tint:#f7d9db; --r-wash:#fcefef;
+  --d:#1c4c9c; --d-tint:#d8e3f5; --d-wash:#eef3fb;
+  --o:#6b6f78; --focus:#1c4c9c; --band:#1747C9; --new:#0f7b4b;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --cond:"IBM Plex Sans Condensed","Arial Narrow","Roboto Condensed",system-ui,sans-serif;
+  --display:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#16181d; --ink:#e7e9ed; --muted:#9aa2ae; --rule:#2f343c; --alt:#1c1f25;
+  --r:#ff7a7f; --r-tint:#4a2226; --r-wash:#2a1d20; --d:#86aef5; --d-tint:#1f3358; --d-wash:#1b2333;
+  --o:#9aa2ae; --focus:#86aef5; --band:#173a9e; --new:#5fd39b; color-scheme:dark;
+}}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1680px;margin:0 auto;padding-block:8px 48px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+
+/* Band */
+header.band{background:var(--band);color:#fff;font-family:var(--display)}
+.band-inner{max-width:1680px;margin:0 auto;display:flex;flex-direction:column;gap:32px;padding-block:36px 40px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.toprow{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:24px}
+.titleblock{display:flex;flex-direction:column;gap:12px;flex:1 1 560px;min-width:0}
+.kicker{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;opacity:.85}
+.band h1{margin:0;max-width:900px;font:800 40px/1.08 var(--display);letter-spacing:-.02em;text-wrap:balance}
+.band nav{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:15px;font-weight:600;padding-top:2px}
+.band nav a{text-decoration:none} .band nav a:hover{text-decoration:underline}
+.totals{display:flex;flex-direction:column;gap:14px}
+.nums{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px}
+.lbl{font-size:14px;font-weight:600;opacity:.85}
+.band .amt{font-size:40px;line-height:1.1;font-weight:800;font-variant-numeric:tabular-nums}
+.band .amt.r{color:#FFC9C4} .right{text-align:right}
+.band .bar{display:flex;height:14px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,.2)}
+.band .bar i{display:block;height:100%;transition:width .5s ease}
+.band .bar .d{background:#fff} .band .bar .r{background:#F08A82}
+.caption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:14px;font-weight:600}
+.band :focus-visible{outline-color:#fff}
+@media (max-width:700px){.band h1{font-size:28px}.band .amt{font-size:30px}}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:26px 0 8px}
+.controls input[type=search]{flex:1 1 260px;max-width:420px;font:15px var(--sans);padding:8px 12px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink)}
+.controls select{font:600 14px var(--cond);height:38px;padding:0 10px;border:1px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink)}
+.ctl{display:flex;align-items:center;gap:8px;font:600 13px var(--cond);color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:4px;overflow:hidden;flex-wrap:wrap}
+.seg button{font:600 14px var(--cond);padding:8px 12px;border:0;background:var(--paper);color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.dl{display:flex;gap:14px;font:600 13px var(--cond);margin-left:auto}
+.alert{margin:18px 0 0;padding:10px 14px;border:1px solid var(--rule);border-left:4px solid var(--band);border-radius:4px;font:500 14px var(--cond);color:var(--muted)}
+
+/* Sections */
+section.blk{margin-top:30px}
+.blk h2{font:700 20px/1.2 var(--display);margin:0;letter-spacing:-.01em}
+.blk .sub{margin:4px 0 14px;font:400 14px var(--cond);color:var(--muted)}
+
+/* Latest feed */
+.feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.fi{border:1px solid var(--rule);border-radius:6px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;font:500 13px/1.3 var(--cond);cursor:pointer;background:var(--paper);text-align:left;color:inherit}
+.fi:hover{border-color:var(--muted)}
+.fi.D{border-left:4px solid var(--d)} .fi.R{border-left:4px solid var(--r)} .fi.O{border-left:4px solid var(--o)}
+.fi .top{display:flex;justify-content:space-between;gap:10px;color:var(--muted)}
+.fi .who{font:700 15px/1.2 var(--sans)}
+.fi .who small{font:600 13px var(--cond);color:var(--muted);margin-left:4px}
+.fi .amt{font:700 18px/1.1 var(--cond);font-variant-numeric:tabular-nums}
+.fi .bot{display:flex;justify-content:space-between;gap:10px;color:var(--muted)}
+.fi .top b{color:var(--ink)}
+.more{margin-top:10px;font:600 13px var(--cond);background:none;border:1px solid var(--rule);border-radius:4px;padding:6px 12px;color:var(--ink);cursor:pointer}
+
+/* Table */
+.scroller{overflow-x:auto;border:1px solid var(--rule);border-radius:4px}
+table.races{border-collapse:collapse;width:100%;font:500 13px/1.25 var(--cond);font-variant-numeric:tabular-nums}
+.races th,.races td{padding:6px 8px;white-space:nowrap;border-bottom:1px solid var(--rule)}
+.races thead th{position:sticky;top:0;z-index:2;background:var(--paper);font-weight:700;text-align:right;cursor:pointer;user-select:none;border-bottom:2px solid var(--ink)}
+.races th.l,.races td.l{text-align:left}
+.races thead th.rc{background:var(--r-tint)} .races thead th.dc{background:var(--d-tint)}
+.races thead th[aria-sort] span::after{content:"";display:inline-block;margin-left:3px;border:4px solid transparent}
+.races thead th[aria-sort="descending"] span::after{border-top-color:currentColor;transform:translateY(2px)}
+.races thead th[aria-sort="ascending"] span::after{border-bottom-color:currentColor;transform:translateY(-2px)}
+.races td{text-align:right}
+.races td.rc{background:var(--r-wash)} .races td.dc{background:var(--d-wash)}
+.races td.na{color:var(--muted);opacity:.6}
+.races td.new{color:var(--new);font-weight:700}
+tbody tr.race{cursor:pointer;background:var(--paper)}
+tbody tr.race.alt{background:var(--alt)}
+tbody tr.race:hover td{filter:brightness(.97)}
+tbody tr.race[aria-expanded="true"] td{border-bottom-color:transparent}
+td.dist{font-weight:700}
+td.rep,.rep{color:var(--r);font-weight:600} td.dem,.dem{color:var(--d);font-weight:600} .oth{color:var(--o);font-weight:600}
+.inc{font-weight:400;opacity:.7;margin-left:3px}
+.tag{display:inline-block;margin-left:6px;padding:0 5px;border-radius:3px;font:700 11px/16px var(--cond);border:1px solid var(--rule);color:var(--muted)}
+.split{display:flex;height:8px;width:110px;border-radius:2px;overflow:hidden;background:var(--rule);gap:2px;margin-left:auto}
+.split i{display:block;height:100%} .split .d{background:var(--d)} .split .r{background:var(--r)}
+.adv-r{color:var(--r);font-weight:700} .adv-d{color:var(--d);font-weight:700}
+tfoot td{font-weight:700;background:var(--paper);border-top:2px solid var(--ink)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.foot{font:400 13px var(--cond);color:var(--muted);margin:8px 0 0}
+
+/* Drill-down */
+tr.detail>td{padding:0 0 18px;background:var(--paper);text-align:left;white-space:normal}
+.detail-inner{padding:8px 14px 0;display:flex;flex-direction:column;gap:18px;max-width:1280px}
+@media (max-width:860px){.detail-inner{position:sticky;left:0;width:calc(100vw - 42px)}}
+.ctx{font:500 13px var(--cond);color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 16px}
+.ctx b{color:var(--ink)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:18px 28px}
+.card{display:flex;flex-direction:column;gap:10px;min-width:0}
+.card h3{font:700 13px var(--cond);margin:0;padding-bottom:4px;border-bottom:2px solid currentColor;text-transform:uppercase;letter-spacing:.04em}
+.card.D h3{color:var(--d)} .card.R h3{color:var(--r)} .card.O h3{color:var(--o)}
+.card .nm{font:700 16px/1.2 var(--sans)}
+.card .nm small{font:500 13px var(--cond);color:var(--muted);margin-left:6px}
+.links{display:flex;flex-wrap:wrap;gap:4px 14px;font:600 13px var(--cond)}
+.mix{display:flex;height:12px;border-radius:2px;overflow:hidden;gap:2px;background:var(--rule)}
+.mix i{display:block;height:100%}
+.t0{background:#2f6fd6} .t1{background:#8a63c9} .t2{background:#d08a1e} .t3{background:#5d6572}
+.mixkey{display:flex;flex-wrap:wrap;gap:4px 14px;font:500 12px var(--cond);color:var(--muted)}
+.mixkey span{display:inline-flex;align-items:center;gap:5px} .mixkey i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.mixkey b{color:var(--ink)}
+table.items{border-collapse:collapse;width:100%;font:500 13px/1.3 var(--cond);font-variant-numeric:tabular-nums}
+.races .items td{padding:4px 6px;border-bottom:1px solid var(--rule);vertical-align:top;text-align:left;white-space:normal}
+.races .items td.a{text-align:right;font-weight:700;white-space:nowrap}
+.items td.dt{white-space:nowrap;color:var(--muted)}
+.items td small{display:block;color:var(--muted);font-weight:400}
+.items tr.nh td{background:var(--alt);font-weight:700;border-bottom:1px solid var(--rule);padding-top:6px}
+.items tr.nh td .m{font-weight:500;color:var(--muted);margin-left:8px}
+.items tr.nh.sup td{opacity:.6}
+.items tr.nc td{color:var(--muted)}
+.items tr.nc td small.why{display:block;text-decoration:none;font-style:italic;color:var(--ink);opacity:.8}
+.items tr.nc td{text-decoration:none} .items tr.nc td.a{text-decoration:line-through}
+.races .items td.dt{width:64px} .races .items td.a{width:96px}
+.ty{display:inline-block;padding:0 5px;border-radius:3px;font:700 10px/15px var(--cond);color:#fff;margin-right:6px;vertical-align:1px;letter-spacing:.02em}
+.new{color:var(--new)}
+mark{background:#ffe58a;color:inherit;border-radius:2px}
+.showall{font:600 13px var(--cond);background:none;border:0;padding:6px 0;color:var(--focus);cursor:pointer;text-decoration:underline}
+
+details.notes{margin-top:28px;border-top:1px solid var(--rule);padding-top:12px;font-size:14px;max-width:1100px}
+details.notes summary{font:700 15px var(--sans);cursor:pointer}
+.notes p,.notes li{color:var(--muted);max-width:80ch}
+.credit{margin:22px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:13px;color:var(--muted);text-align:center}
+@media (prefers-reduced-motion:reduce){.band .bar i{transition:none}}
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="band-inner">
+    <div class="toprow">
+      <div class="titleblock">
+        <div class="kicker">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"></path></svg>
+          <span id="kicker"></span>
+        </div>
+        <h1>__TITLE__</h1>
+      </div>
+      <nav aria-label="Sections"><a href="#latest">Latest</a><a href="#tblsec">Races</a><a href="#notes" id="notesLink">Notes</a><a href="./">Outside spending</a><a href="fundraising.html">Fundraising</a></nav>
+    </div>
+    <div class="totals">
+      <div class="nums">
+        <div><div class="lbl" id="dLbl">Democrats' late money</div><div class="amt" id="dTot"></div></div>
+        <div class="right"><div class="lbl" id="rLbl">Republicans' late money</div><div class="amt r" id="rTot"></div></div>
+      </div>
+      <div class="bar" role="img" id="bar"><i class="d" id="barD"></i><i class="r" id="barR"></i></div>
+      <div class="caption"><span id="capL"></span><span id="capR"></span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <p class="alert" id="alert" hidden></p>
+
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search races, candidates, donors, employers" aria-label="Search">
+    <div class="seg" role="group" aria-label="Which races" id="raceSeg">
+      <button type="button" data-r="bf" aria-pressed="true">Battlefield</button>
+      <button type="button" data-r="all" aria-pressed="false">All House</button>
+    </div>
+    <div class="seg" role="group" aria-label="Rows" id="viewSeg">
+      <button type="button" data-v="races" aria-pressed="true">By race</button>
+      <button type="button" data-v="cands" aria-pressed="false">By candidate</button>
+    </div>
+    <label class="ctl">From
+      <select id="type"><option value="">Everyone</option></select>
+    </label>
+    <div class="seg" role="group" aria-label="When filed" id="whenSeg">
+      <button type="button" data-w="" aria-pressed="true">Whole window</button>
+      <button type="button" data-w="recent" aria-pressed="false">Last 2 days</button>
+    </div>
+    <div class="dl"><a href="late_notices.csv">Notices CSV</a><a href="late_contributions.csv">Contributions CSV</a></div>
+  </div>
+
+  <section class="blk" id="latest">
+    <h2>Latest notices</h2>
+    <p class="sub" id="latestSub"></p>
+    <div class="feed" id="feed"></div>
+    <button type="button" class="more" id="moreFeed" hidden>Show more</button>
+  </section>
+
+  <section class="blk" id="tblsec">
+    <h2 id="tblTitle">Late money by race</h2>
+    <p class="sub" id="tblSub">Click a row for every notice and contribution.</p>
+    <div class="scroller"><table class="races" id="tbl"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+    <p class="foot" id="foot"></p><p class="foot" id="checked"></p>
+  </section>
+
+  <details class="notes" id="notes"><summary>Notes and methodology</summary>
+    <div id="notesBody"></div>
+  </details>
+  <p class="credit">Built by Noah Kutner using public FEC data. Figures reflect filings as reported and may change with amendments.</p>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => (n < 0 ? "-$" : "$") + Math.round(Math.abs(n || 0)).toLocaleString("en-US");
+const mil = n => { const a = Math.abs(n || 0), s = n < 0 ? "-" : "";
+  return a >= 1e6 ? s + "$" + (a / 1e6).toFixed(a >= 1e7 ? 1 : 2) + "M" : a >= 1e3 ? s + "$" + (a >= 1e5 ? Math.round(a / 1e3) : (a / 1e3).toFixed(1).replace(/\.0$/, "")) + "K" : s + "$" + Math.round(a); };
+const dist = d => d.slice(0, 2) + "-" + (d.slice(2) === "00" ? "AL" : d.slice(2));
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const dShort = s => s ? MON[+s.slice(5, 7) - 1] + " " + (+s.slice(8, 10)) : "";
+const when = s => { if (!s) return "";
+  if (s.length <= 10) return dShort(s);
+  const h = +s.slice(11, 13), m = s.slice(14, 16);
+  return `${dShort(s)}, ${(h % 12) || 12}:${m} ${h < 12 ? "AM" : "PM"}`; };
+const SIDE = p => p === "DEM" ? "D" : p === "REP" ? "R" : "O";
+const SIDECLS = {D: "dem", R: "rep", O: "oth"};
+const PLAB = {DEM: "D", REP: "R"};
+const ACRO = /^(Pac|Pacs|Llc|Llp|Nrcc|Dccc|Dnc|Rnc|Usa|Us|Afl|Cio|Seiu|Ibew|Uaw|Afscme|Aft|Nea|Ii|Iii|Iv|Pc|Lp|Cpa|Md|Ceo|Cfo|Ups|Ibm|Att|Nfl|Ufcw|Ab|Emily's)$/;
+const titleCase = s => String(s || "").toLowerCase().replace(/(^|[\s\-'(\/&])([a-z])/g, (m, a, b) => a + b.toUpperCase())
+  .replace(/\bMc([a-z])/g, (m, b) => "Mc" + b.toUpperCase()).replace(/[A-Za-z']+/g, w => ACRO.test(w) ? (w === "Emily's" ? "EMILY's" : w.toUpperCase()) : w);
+const TYCOL = ["#2f6fd6", "#8a63c9", "#d08a1e", "#5d6572"];
+const TYSHORT = ["Indiv.", "PAC/org", "Party", "Self"];
+
+// Unpack: notices [fn, cand, at, amendment, superseded, n, amount, committee, recent]; items [notice, type, name, employer, occupation, city, state, date, amount, note]
+const N = DATA.notices.map(([fn, c, at, amd, sup, n, amt, cmte, recent], i) => ({i, fn, c, at, amd, sup, n, amt, cmte, recent: !!recent, items: []}));
+const C = DATA.cands.map((c, i) => ({...c, i, notices: [], side: SIDE(c.p)}));
+DATA.items.forEach(([ni, t, name, emp, occ, city, st, date, amt, note]) => N[ni].items.push({t, name, emp, occ, city, st, date, amt, note}));
+N.forEach(n => C[n.c].notices.push(n));
+const R = DATA.races.map(r => ({...r, C: r.cands.map(i => C[i])}));
+C.forEach(c => { c.race = R.find(r => r.d === c.d); });
+
+// n.recent: filed in the 48 hours before the page was built (worked out when it's built, in Eastern time).
+const state = {r: R.some(r => r.bf) ? "bf" : "all", v: "races", type: "", w: "", q: "", sort: "tot", dir: -1, open: new Set(), feed: 12, all: new Set()};
+
+// Money for a candidate under the current filters, and the notices/lines behind it.
+function counted(c, q) {
+  let tot = 0, n = 0, notices = 0, recent = 0, by = [0, 0, 0, 0], last = "", big = 0, hits = 0;
+  for (const nt of c.notices) {
+    if (nt.sup) continue;
+    if (state.w === "recent" && !nt.recent) continue;
+    let used = false;
+    for (const it of nt.items) {
+      if (it.note) continue;
+      if (state.type !== "" && it.t !== +state.type) continue;
+      tot += it.amt; n++; by[it.t] += it.amt; big = Math.max(big, it.amt); used = true;
+      if (nt.recent) recent += it.amt;
+      if (q && match(it, q)) hits++;
+    }
+    if (used) { notices++; if (nt.at > last) last = nt.at; }
+  }
+  return {tot, n, notices, recent, by, last, big, hits};
+}
+const match = (it, q) => (it.name + " " + it.emp + " " + it.occ).toLowerCase().includes(q);
+const candMatch = (c, q) => [c.name, c.d, dist(c.d), c.d.replace(/^(..)0/, "$1"), c.cmte_name].some(v => (v || "").toLowerCase().includes(q));
+
+function compute() {
+  const q = state.q.trim().toLowerCase();
+  const races = [];
+  for (const r of R) {
+    if (state.r === "bf" && !r.bf) continue;
+    const cs = r.C.map(c => ({c, s: counted(c, q)}));
+    const raceHit = !q || r.C.some(c => candMatch(c, q)) || dist(r.d).toLowerCase().includes(q);
+    const contribHit = q && cs.some(x => x.s.hits);
+    if (q && !raceHit && !contribHit) continue;
+    const side = k => cs.filter(x => x.c.side === k);
+    const sum = (k, f) => side(k).reduce((a, x) => a + x.s[f], 0);
+    const pick = k => (side(k).sort((a, b) => b.s.tot - a.s.tot)[0] || {}).c;
+    races.push({r, cs, D: sum("D", "tot"), R: sum("R", "tot"), O: sum("O", "tot"), rD: sum("D", "recent"), rR: sum("R", "recent"),
+      notices: cs.reduce((a, x) => a + x.s.notices, 0), n: cs.reduce((a, x) => a + x.s.n, 0),
+      last: cs.reduce((a, x) => x.s.last > a ? x.s.last : a, ""), dem: pick("D"), rep: pick("R"), contribOnly: q && !raceHit});
+  }
+  races.forEach(x => { x.tot = x.D + x.R + x.O; x.edge = x.D - x.R; x.recent = x.rD + x.rR + 0; });
+  return races;
+}
+
+// ---------------------------------------------------------------- header + feed
+function header(races) {
+  const d = races.reduce((a, x) => a + x.D, 0), r = races.reduce((a, x) => a + x.R, 0);
+  const rd = races.reduce((a, x) => a + x.rD, 0), rr = races.reduce((a, x) => a + x.rR, 0);
+  const cnt = k => races.reduce((a, x) => a + x.cs.filter(y => y.c.side === k && y.s.n).length, 0);
+  $("#dTot").textContent = money(d); $("#rTot").textContent = money(r);
+  const t = d + r || 1;
+  $("#barD").style.width = (d / t * 100) + "%"; $("#barR").style.width = (r / t * 100) + "%";
+  $("#bar").setAttribute("aria-label", `Democrats ${money(d)}, Republicans ${money(r)}`);
+  const recent = state.w === "recent";
+  $("#capL").textContent = `${cnt("D")} Democrats · ${recent ? "filed in the last 2 days" : mil(rd) + " filed in the last 2 days"}`;
+  $("#capR").textContent = `${recent ? "filed in the last 2 days" : mil(rr) + " filed in the last 2 days"} · ${cnt("R")} Republicans`;
+  const ty = state.type === "" ? "" : ` from ${DATA.types[+state.type].toLowerCase()}`;
+  $("#dLbl").textContent = `Democrats' late money${ty}`; $("#rLbl").textContent = `Republicans' late money${ty}`;
+}
+
+function feed(races) {
+  const q = state.q.trim().toLowerCase();
+  const inView = new Set(races.flatMap(x => x.cs.map(y => y.c.i)));
+  const list = N.filter(n => !n.sup && inView.has(n.c) && (state.w !== "recent" || n.recent))
+    .map(n => ({n, items: n.items.filter(it => !it.note && (state.type === "" || it.t === +state.type))}))
+    .filter(x => x.items.length && (!q || candMatch(C[x.n.c], q) || x.items.some(it => match(it, q))));
+  $("#latestSub").textContent = list.length ? `Newest first. ${list.length.toLocaleString()} notices in view; click one to open its race.` : "No notices match.";
+  $("#feed").innerHTML = list.slice(0, state.feed).map(({n, items}) => {
+    const c = C[n.c], amt = items.reduce((a, it) => a + it.amt, 0);
+    const top = items.slice().sort((a, b) => b.amt - a.amt)[0];
+    return `<button type="button" class="fi ${c.side}" data-race="${c.d}" data-cand="${c.i}">
+      <span class="top"><b>${dist(c.d)}</b><span>${n.recent ? '<span class="new">● </span>' : ""}${when(n.at)}</span></span>
+      <span class="who ${SIDECLS[c.side]}">${esc(titleCase(c.name))}<small>${PLAB[c.p] || esc(c.p)}${c.inc ? ", inc." : ""}</small></span>
+      <span class="amt">${money(amt)}</span>
+      <span class="bot"><span>${items.length} contribution${items.length === 1 ? "" : "s"}${n.amd ? " · amended" : ""}</span><span>Top: ${esc(titleCase(top.name))} ${mil(top.amt)}</span></span></button>`;
+  }).join("");
+  $("#moreFeed").hidden = list.length <= state.feed;
+}
+
+// ---------------------------------------------------------------- table
+const RACE_COLS = [
+  {k: "d", lab: "District", l: 1, v: x => x.r.d},
+  {k: "dem", lab: "Democrat", l: 1, cls: "dc", v: x => x.dem ? x.dem.name : ""},
+  {k: "D", lab: "Dem late $", cls: "dc", v: x => x.D},
+  {k: "R", lab: "Rep late $", cls: "rc", v: x => x.R},
+  {k: "rep", lab: "Republican", l: 1, cls: "rc", v: x => x.rep ? x.rep.name : ""},
+  {k: "edge", lab: "Edge", v: x => x.edge},
+  {k: "split", lab: "D / R", v: x => x.D / ((x.D + x.R) || 1), nosort: 0},
+  {k: "recent", lab: "Last 2 days", v: x => x.rD + x.rR},
+  {k: "n", lab: "Contribs", v: x => x.n},
+  {k: "notices", lab: "Notices", v: x => x.notices},
+  {k: "last", lab: "Last filed", v: x => x.last},
+];
+const CAND_COLS = () => [
+  {k: "d", lab: "District", l: 1, v: x => x.c.d},
+  {k: "name", lab: "Candidate", l: 1, v: x => x.c.name},
+  {k: "tot", lab: "Late $", v: x => x.s.tot},
+  ...DATA.types.map((t, i) => ({k: "t" + i, lab: t, v: x => x.s.by[i]})),
+  {k: "big", lab: "Largest", v: x => x.s.big},
+  {k: "recent", lab: "Last 2 days", v: x => x.s.recent},
+  {k: "n", lab: "Contribs", v: x => x.s.n},
+  {k: "notices", lab: "Notices", v: x => x.s.notices},
+  {k: "last", lab: "Last filed", v: x => x.s.last},
+];
+
+function candName(c, short) {
+  if (!c) return "—";
+  return `${esc(titleCase(c.name))}${c.inc ? '<span class="inc">(i)</span>' : ""}`;
+}
+
+function rows(races) {
+  if (state.v === "races") return races.map(x => ({...x, key: x.r.d}));
+  const out = [];
+  races.forEach(x => x.cs.forEach(y => { if (y.s.n || !state.q) out.push({...y, r: x.r, key: x.r.d + "|" + y.c.i}); }));
+  return out.filter(x => x.s.n || x.c.notices.length);
+}
+
+function render() {
+  const races = compute();
+  header(races);
+  feed(races);
+  const cols = state.v === "races" ? RACE_COLS : CAND_COLS();
+  if (!cols.some(c => c.k === state.sort)) state.sort = state.v === "races" ? "tot" : "tot";
+  const sortCol = cols.find(c => c.k === state.sort) || {v: x => x.tot ?? x.s.tot};
+  const list = rows(races).sort((a, b) => {
+    const va = sortCol.v(a), vb = sortCol.v(b);
+    return (typeof va === "string" ? va.localeCompare(vb) : va - vb) * state.dir || (a.key < b.key ? -1 : 1);
+  });
+  $("#tblTitle").textContent = state.v === "races" ? "Late money by race" : "Late money by candidate";
+  $("#tbl thead").innerHTML = "<tr>" + cols.map(c => `<th class="${c.l ? "l " : ""}${c.cls || ""}" data-k="${c.k}"${state.sort === c.k ? ` aria-sort="${state.dir < 0 ? "descending" : "ascending"}"` : ""} scope="col"><span>${esc(c.lab)}</span></th>`).join("") + "</tr>";
+  const body = [];
+  list.forEach((x, i) => {
+    const open = state.open.has(x.key);
+    body.push(`<tr class="race${i % 2 ? " alt" : ""}" data-key="${esc(x.key)}" tabindex="0" aria-expanded="${open}">` +
+      (state.v === "races" ? raceCells(x) : candCells(x)) + "</tr>");
+    if (open) body.push(`<tr class="detail"><td colspan="${cols.length}">${detail(x.r, state.v === "cands" ? x.c : null)}</td></tr>`);
+  });
+  $("#tbl tbody").innerHTML = body.join("") || `<tr><td class="empty" colspan="${cols.length}">${R.length ? "Nothing matches." : "No 48-hour notices yet."}</td></tr>`;
+  const tot = list.reduce((a, x) => a + (state.v === "races" ? x.tot : x.s.tot), 0);
+  $("#tbl tfoot").innerHTML = list.length ? `<tr><td class="l" colspan="2">${list.length} ${state.v === "races" ? "races" : "candidates"}</td><td colspan="${cols.length - 2}">${money(tot)} counted</td></tr>` : "";
+}
+
+// The IE tracker's nominee for a side with no 48-hour notices (yet).
+const nobody = name => name ? `<span class="na" title="No 48-hour notices in view">${esc(titleCase(name))}</span>` : '<span class="na">—</span>';
+
+function raceCells(x) {
+  const t = x.D + x.R, sp = x.r.same ? `<span class="tag">${x.r.same === "DEM" ? "D v D" : "R v R"}</span>` : "";
+  const z = v => v ? money(v) : '<span class="na">—</span>';
+  const others = x.cs.filter(y => y.c.side === "O" && y.s.n).length;
+  return `<td class="l dist">${dist(x.r.d)}${sp}</td>
+    <td class="l dc dem">${x.dem ? candName(x.dem) : nobody(x.r.dem)}</td><td class="dc">${z(x.D)}</td>
+    <td class="rc">${z(x.R)}</td><td class="l rc rep">${x.rep ? candName(x.rep) : nobody(x.r.rep)}${others ? `<span class="tag" title="Third-party or independent late money: ${money(x.O)}">+${others} other</span>` : ""}</td>
+    <td class="${x.edge > 0 ? "adv-d" : x.edge < 0 ? "adv-r" : ""}">${Math.round(x.edge) === 0 ? "EVEN" : (x.edge > 0 ? "D +" : "R +") + mil(Math.abs(x.edge))}</td>
+    <td><div class="split" aria-hidden="true"><i class="d" style="width:${t ? x.D / t * 100 : 0}%"></i><i class="r" style="width:${t ? x.R / t * 100 : 0}%"></i></div></td>
+    <td class="${x.rD + x.rR ? "new" : "na"}">${x.rD + x.rR ? mil(x.rD + x.rR) : "—"}</td>
+    <td>${x.n}</td><td>${x.notices}</td><td>${when(x.last) || "—"}</td>`;
+}
+
+function candCells(x) {
+  const c = x.c, s = x.s, z = v => v ? money(v) : '<span class="na">—</span>';
+  return `<td class="l dist">${dist(c.d)}</td>
+    <td class="l ${SIDECLS[c.side]}">${candName(c)} <span class="tag">${PLAB[c.p] || esc(c.p)}</span></td>
+    <td><b>${z(s.tot)}</b></td>${s.by.map(z).map(v => `<td>${v}</td>`).join("")}
+    <td>${z(s.big)}</td><td class="${s.recent ? "new" : "na"}">${s.recent ? mil(s.recent) : "—"}</td>
+    <td>${s.n}</td><td>${s.notices}</td><td>${when(s.last) || "—"}</td>`;
+}
+
+function hl(text, q) {
+  const t = esc(text);
+  if (!q) return t;
+  const i = String(text).toLowerCase().indexOf(q);
+  return i < 0 ? t : esc(text.slice(0, i)) + "<mark>" + esc(text.slice(i, i + q.length)) + "</mark>" + esc(text.slice(i + q.length));
+}
+
+function detail(r, only) {
+  const q = state.q.trim().toLowerCase();
+  const order = {D: 0, R: 1, O: 2};
+  const cs = (only ? [only] : r.C.slice().sort((a, b) => order[a.side] - order[b.side] || counted(b).tot - counted(a).tot))
+    .filter(c => c.notices.length);
+  const ie = r.ie_d || r.ie_r ? `<span>Outside spending in this race (IE tracker): <b class="dem">${money(r.ie_d)}</b> helping Democrats, <b class="rep">${money(r.ie_r)}</b> helping Republicans</span>` : "";
+  const ctx = `<div class="ctx">${ie}<a class="lnk" href="https://www.fec.gov/data/elections/house/${r.d.slice(0, 2)}/${r.d.slice(2)}/${DATA.election_date.slice(0, 4)}/" target="_blank" rel="noopener">FEC race page ↗</a></div>`;
+  return `<div class="detail-inner">${ctx}<div class="cards">${cs.map(c => card(c, q)).join("")}</div></div>`;
+}
+
+function card(c, q) {
+  const s = counted(c);
+  const party = c.p === "DEM" ? "Democrat" : c.p === "REP" ? "Republican" : (c.p === "OTH" ? "Other / unknown party" : c.p);
+  const mixT = s.tot || 1;
+  const mix = `<div class="mix" aria-hidden="true">${s.by.map((v, i) => v ? `<i class="t${i}" style="width:${v / mixT * 100}%"></i>` : "").join("")}</div>
+    <div class="mixkey">${DATA.types.map((t, i) => s.by[i] ? `<span><i class="t${i}"></i>${esc(t)} <b>${money(s.by[i])}</b></span>` : "").join("")}</div>`;
+  const links = `<div class="links">${c.id ? `<a href="https://www.fec.gov/data/candidate/${c.id}/" target="_blank" rel="noopener">Candidate page ↗</a>` : ""}
+    <a href="https://www.fec.gov/data/filings/?committee_id=${c.cmte}&form_type=F6&data_type=efiling" target="_blank" rel="noopener">All 48-hour notices at FEC ↗</a></div>`;
+  const key = c.i;
+  const notices = c.notices.filter(n => state.w !== "recent" || n.recent);
+  const showAll = state.all.has(key);
+  const limit = showAll ? Infinity : 6;
+  let shown = 0;
+  const rowsHtml = [];
+  for (const n of notices) {
+    const items = n.items.filter(it => state.type === "" || it.t === +state.type);
+    if (!items.length) continue;
+    if (shown++ >= limit) continue;
+    const amt = items.filter(it => !it.note && !n.sup).reduce((a, it) => a + it.amt, 0);
+    const tags = (n.amd ? " · amendment" : "") + (n.sup ? " · replaced by a later amendment, not counted" : "");
+    rowsHtml.push(`<tr class="nh${n.sup ? " sup" : ""}"><td>${n.recent ? '<span class="new">● </span>' : ""}Filed ${when(n.at)}<span class="m">#${n.fn}${tags}</span>
+      <span class="m"><a href="https://docquery.fec.gov/cgi-bin/forms/${n.cmte}/${n.fn}/" target="_blank" rel="noopener">View filing ↗</a></span></td><td></td><td class="a">${n.sup ? "" : money(amt)}</td></tr>`);
+    items.slice().sort((a, b) => b.amt - a.amt).forEach(it => {
+      const who = [it.occ, it.emp].filter(Boolean).map(titleCase).join(", ");
+      const where = [titleCase(it.city), it.st].filter(Boolean).join(", ");
+      const nc = it.note || n.sup;
+      const why = it.note && !n.sup ? `<small class="why">Not counted: ${esc(it.note)}</small>` : "";
+      rowsHtml.push(`<tr class="${nc ? "nc" : ""}"><td><span class="ty" style="background:${TYCOL[it.t]}" title="${esc(DATA.types[it.t])}">${TYSHORT[it.t]}</span>${hl(titleCase(it.name), q && match(it, q) ? q : "")}${who || where ? `<small>${hl(who, q)}${who && where ? " · " : ""}${esc(where)}</small>` : ""}${why}</td>
+        <td class="dt">${dShort(it.date) || "—"}</td><td class="a">${money(it.amt)}</td></tr>`);
+    });
+  }
+  const more = shown > 6 ? `<button type="button" class="showall" data-all="${key}">${showAll ? "Show fewer notices" : `Show all ${shown} notices`}</button>` : "";
+  return `<div class="card ${c.side}"><h3>${c.side === "D" ? "Democrat" : c.side === "R" ? "Republican" : "Other"}</h3>
+    <div class="nm">${candName(c)}<small>${esc(party)} · ${esc(titleCase(c.cmte_name) || c.cmte)}</small></div>
+    <div class="ctx"><span><b>${money(s.tot)}</b> in ${s.n} contribution${s.n === 1 ? "" : "s"} on ${s.notices} notice${s.notices === 1 ? "" : "s"}</span>${s.recent && state.w !== "recent" ? `<span class="new">${money(s.recent)} filed in the last 2 days</span>` : ""}${s.big ? `<span>Largest ${money(s.big)}</span>` : ""}</div>
+    ${s.tot ? mix : ""}${links}
+    <table class="items"><tbody>${rowsHtml.join("") || `<tr><td class="empty">No notices match the filters.</td></tr>`}</tbody></table>${more}</div>`;
+}
+
+// ---------------------------------------------------------------- notes + wiring
+function notes() {
+  const st = DATA.stats || {};
+  const ws = DATA.window_start, we = DATA.window_end, ed = DATA.election_date;
+  $("#kicker").textContent = `Form 6 · $1,000+ contributions received ${dShort(ws)}–${dShort(we)}, reported within 48 hours · Updated ${DATA.generated_label}`;
+  $("#notesBody").innerHTML = `
+  <p>Within 20 days of an election, a House campaign that receives a contribution of $1,000 or more must report it to the FEC within 48 hours on a <b>48-hour notice</b> (FEC Form 6). For the ${ed.slice(0, 4)} general election (${dShort(ed)}), that covers money received ${dShort(ws)} through ${dShort(we)}; later money shows up on the post-general report instead. (The 24-hour reports campaigns hear about are independent-expenditure notices from outside groups; those are on the <a href="./">outside spending tracker</a>.)</p>
+  <ul>
+    <li>Every hour this page lists new Form 6 filings from the FEC (the raw e-filing feed, so notices appear minutes after they're filed) and reads each notice straight from the filing. ${(DATA.listed || 0).toLocaleString()} Form 6 filings have been listed; ${(st.notices_read || 0).toLocaleString()} House notices read${DATA.pending ? `, ${DATA.pending.toLocaleString()} still to read (they're read newest first, a batch each hour)` : ""}.</li>
+    <li><b>Amendments:</b> an amended notice replaces the notice it amends (${(st.notices_amended_away || 0).toLocaleString()} so far; they're still listed, struck through). A contribution reported on more than one notice counts once (${(st.duplicate_lines || 0).toLocaleString()} repeats dropped).</li>
+    <li><b>Not counted:</b> lines dated before ${dShort(ws)} (they belong on the pre-general report) or after election day, and zero-dollar lines. ${(st.lines_not_counted || 0).toLocaleString()} lines are shown struck through for this reason.</li>
+    <li><b>Who gave</b> comes from each contribution's entity type: Individuals; PACs &amp; orgs (PACs, other candidates' committees and organizations); Party committees; and Self-funding (the candidate's own contributions and loans).</li>
+    <li><b>Party</b> follows the outside spending tracker: its party overrides (e.g. Kevin Kiley counts as a Republican), its same-party races, and its exclusions; otherwise the FEC candidate file. "Battlefield" is the tracker's party-race list.</li>
+    <li><b>Last 2 days</b> means notices filed in the 48 hours before this page was built. Times are Eastern.</li>
+    <li>Downloads: <a href="late_notices.csv">every notice</a> and <a href="late_contributions.csv">every contribution line</a>, with a counted / not-counted column.</li>
+  </ul>`;
+  const errs = DATA.errors || [];
+  if (errs.length) { $("#alert").hidden = false; $("#alert").textContent = "Data note: " + errs.join(" · "); }
+  $("#foot").textContent = `Updated ${DATA.generated_label}. ${N.length.toLocaleString()} notices from ${C.length.toLocaleString()} House candidates.`;
+}
+
+$("#type").innerHTML += DATA.types.map((t, i) => `<option value="${i}">${esc(t)}</option>`).join("");
+const seg = (id, key) => $(id).addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  state[key] = b.dataset[key]; $(id).querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  if (key === "v") { state.open.clear(); state.sort = "tot"; state.dir = -1; }
+  render();
+});
+seg("#raceSeg", "r"); seg("#viewSeg", "v"); seg("#whenSeg", "w");
+$("#raceSeg").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.r === state.r));
+$("#type").addEventListener("change", e => { state.type = e.target.value; render(); });
+let qt; $("#q").addEventListener("input", e => { clearTimeout(qt); qt = setTimeout(() => { state.q = e.target.value; render(); }, 150); });
+$("#tbl thead").addEventListener("click", e => {
+  const th = e.target.closest("th"); if (!th) return;
+  const k = th.dataset.k; state.dir = state.sort === k ? -state.dir : (["d", "dem", "rep", "name"].includes(k) ? 1 : -1); state.sort = k; render();
+});
+const toggle = tr => { const k = tr.dataset.key; state.open.has(k) ? state.open.delete(k) : state.open.add(k); render(); };
+$("#tbl tbody").addEventListener("click", e => {
+  const b = e.target.closest(".showall");
+  if (b) { const k = +b.dataset.all; state.all.has(k) ? state.all.delete(k) : state.all.add(k); render(); return; }
+  if (e.target.closest("a")) return;
+  const tr = e.target.closest("tr.race"); if (tr) toggle(tr);
+});
+$("#tbl tbody").addEventListener("keydown", e => { const tr = e.target.closest("tr.race"); if (tr && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); toggle(tr); } });
+$("#feed").addEventListener("click", e => {
+  const b = e.target.closest(".fi"); if (!b) return;
+  const c = C[+b.dataset.cand];
+  if (state.r === "bf" && !c.race.bf) { state.r = "all"; $("#raceSeg").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x.dataset.r === "all")); }
+  const key = state.v === "races" ? c.d : c.d + "|" + c.i;
+  state.open.add(key); render();
+  const tr = document.querySelector(`tr.race[data-key="${CSS.escape(key)}"]`);
+  if (tr) tr.scrollIntoView({behavior: "smooth", block: "start"});
+});
+$("#moreFeed").addEventListener("click", () => { state.feed += 24; render(); });
+$("#notesLink").addEventListener("click", () => { $("#notes").open = true; });
+notes();
+render();
+// Show when the page last checked the FEC, even if nothing new was filed since it was built.
+fetch("late_status.json", {cache: "no-store"}).then(r => r.ok ? r.json() : null).then(s => {
+  if (s && s.last_checked_label) $("#checked").textContent = `Last checked the FEC ${s.last_checked_label}${s.pending ? ` · ${s.pending.toLocaleString()} notices still to read` : ""}.`;
+}).catch(() => {});
+</script>
+</body>
+</html>

@@ -138,7 +138,7 @@ def build(xlsx, ie_path, tpl_path, out_path):
 
     tpl = Path(tpl_path).read_text()
     body = tpl.replace("/*__DATA__*/null", json.dumps(data, separators=(",", ":")))
-    body = body.replace("<!--NAV_EXTRA-->", '<a href="./">Outside spending</a>')
+    body = body.replace("<!--NAV_EXTRA-->", '<a href="./">Outside spending</a><a href="late.html">48-hour notices</a>')
     head_end = body.index("</style>") + len("</style>")
     html = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
