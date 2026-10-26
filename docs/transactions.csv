@@ -1,4 +1,6 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num,outside_group
+IE,MD01,ANDREW P HARRIS,REP,O,C00772525,Great Society PAC,2000.0,2026-10-25,2026-10-26,Texting,Texting campaign,VoteNexus Inc,2041942,SE.7074,,
+IE,MD01,ANDREW P HARRIS,REP,O,C00772525,Great Society PAC,3000.0,2026-10-25,2026-10-26,Production,Digital ad production,VoteNexus Inc,2041942,SE.7076,,
 IE,MT01,SAMUEL KELLEY FORSTAG,DEM,S,C00957340,MOVING MONTANA FORWARD,625.0,2026-11-01,2026-10-25,Canvassing/Lit,Canvassing - Estimate,Forward Montana,2041836,SE.4169,,
 IE,MT01,SAMUEL KELLEY FORSTAG,DEM,S,C00957340,MOVING MONTANA FORWARD,625.0,2026-10-31,2026-10-25,Canvassing/Lit,Canvassing - Estimate,Forward Montana,2041836,SE.4168,,
 IE,WI02,MARK POCAN,DEM,S,C00905752,Voces de la Frontera Political Fund,99.62,2026-10-26,2026-10-25,Other,Flyers - Pocan,Union Copy Centers,2041519,SE.4258,202610259945201868,
