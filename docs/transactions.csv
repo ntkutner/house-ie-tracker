@@ -1,4 +1,7 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num,outside_group
+IE,FL27,ELIOTT RODRIGUEZ,DEM,S,C90020041,EQUALITY FLORIDA ACTION INC.,2500.0,2026-10-26,2026-10-26,Production,Cost for video production of ad; Vote for Eliott Rodriguez for CD 27,MDW Communications,2041968,F57.000001,,
+IE,FL27,ELIOTT RODRIGUEZ,DEM,S,C90020041,EQUALITY FLORIDA ACTION INC.,7500.0,2026-10-26,2026-10-26,CTV/Streaming,Ad spend for CTV and META,"META, Inc.",2041968,F57.000002,,
+IE,MI07,WILLIAM LAWRENCE,DEM,S,C00738732,Clean Wave,600.0,2026-10-25,2026-10-26,Canvassing/Lit,Door-to-door voter contact and candidate advocacy,Clean Water Action,2041967,SE.5398,,
 IE,MD01,ANDREW P HARRIS,REP,O,C00772525,Great Society PAC,2000.0,2026-10-25,2026-10-26,Texting,Texting campaign,VoteNexus Inc,2041942,SE.7074,202610269945203167,
 IE,MD01,ANDREW P HARRIS,REP,O,C00772525,Great Society PAC,3000.0,2026-10-25,2026-10-26,Production,Digital ad production,VoteNexus Inc,2041942,SE.7076,202610269945203167,
 IE,MT01,SAMUEL KELLEY FORSTAG,DEM,S,C00957340,MOVING MONTANA FORWARD,625.0,2026-11-01,2026-10-25,Canvassing/Lit,Canvassing - Estimate,Forward Montana,2041836,SE.4169,202610259945202574,
