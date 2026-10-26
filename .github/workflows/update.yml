@@ -32,6 +32,12 @@ jobs:
         env:
           FEC_API_KEY: ${{ secrets.FEC_API_KEY }}
         run: python tracker.py ${{ inputs.force && '--force' || '' }}
+         - name: Build 48-hour contribution notices page
+        # Runs after the tracker so it can read docs/data.json. If it fails, the tracker still publishes.
+        continue-on-error: true
+        env:
+          FEC_API_KEY: ${{ secrets.FEC_API_KEY }}
+        run: python late.py ${{ inputs.force && '--force' || '' }}
       - name: Publish if anything changed
         run: |
           mkdir -p cache
