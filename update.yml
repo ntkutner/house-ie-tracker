@@ -1,0 +1,61 @@
+name: Update House IE tracker
+
+on:
+  schedule:
+    - cron: "23 * * * *"   # hourly; does nothing if the FEC file hasn't changed
+  workflow_dispatch:        # "Run workflow" button for manual refreshes
+    inputs:
+      force:
+        description: "Rebuild even if the FEC file hasn't changed"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ie-tracker
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the FEC filing parser
+        run: pip install fecfile
+      - name: Build
+        env:
+          FEC_API_KEY: ${{ secrets.FEC_API_KEY }}
+        run: python tracker.py ${{ inputs.force && '--force' || '' }}
+      - name: Build 48-hour contribution notices page
+        # Runs after the tracker so it can read docs/data.json. If it fails, the tracker still publishes.
+        continue-on-error: true
+        env:
+          FEC_API_KEY: ${{ secrets.FEC_API_KEY }}
+        run: python late.py ${{ inputs.force && '--force' || '' }}
+      - name: Publish if anything changed
+        run: |
+          mkdir -p cache
+          if [ -z "$(git status --porcelain docs cache)" ]; then
+            echo "No changes."
+            exit 0
+          fi
+          git config user.name  "ie-tracker-bot"
+          git config user.email "ie-tracker-bot@users.noreply.github.com"
+          git add docs cache
+          git commit -m "IE data update $(date -u +'%Y-%m-%d %H:%M UTC')"
+          # If you committed files while this run was working, fold your commit in
+          # first instead of failing the push.
+          for attempt in 1 2 3; do
+            if git pull --rebase -X theirs origin "${GITHUB_REF_NAME}" && git push; then
+              exit 0
+            fi
+            echo "Push attempt $attempt failed; retrying in 15 seconds."
+            sleep 15
+          done
+          exit 1
