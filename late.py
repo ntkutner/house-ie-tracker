@@ -387,15 +387,39 @@ def build(cfg: dict, s: dict, index: dict, cache_dir: Path, master: dict, ie_rac
 
     # 4) Candidates and races.
     cands: dict[str, dict] = {}
+    by_race = defaultdict(list)   # FEC candidate file entries by race, for name matching
+    for mid, mm in master.items():
+        if mm.get("office") == "H":
+            st = mm.get("state", "").upper()
+            by_race[st + T.norm_district(st, mm.get("district", ""))].append(mid)
+
+    def name_party(name: str, district: str) -> str:
+        """Party for a candidate whose ID didn't resolve: the IE tracker's nominee of that name in
+        the race, else a same-named candidate in the race in the FEC candidate file."""
+        ie = ie_races.get(district, {})
+        for side, party in (("rep", "REP"), ("dem", "DEM")):
+            if ie.get(side) and T.same_person(name, ie[side]):
+                return party
+        hits = {T.norm_party(master[mid].get("party")) for mid in by_race.get(district, [])
+                if T.same_person(name, master[mid].get("name", ""))} - {""}
+        return hits.pop() if len(hits) == 1 else ""
+
     for k, r in recs.items():
-        cid = r["cand_id"] or f"C:{r['committee_id']}"
+        state = (r.get("state") or "").upper()
         m = master.get(r["cand_id"], {})
-        state = (r.get("state") or m.get("state") or "").upper()
+        # Some campaigns put an old or wrong candidate ID on their notices; trust the committee.
+        if (not m or m.get("office") != "H" or (state and m.get("state", "").upper() != state)) \
+                and pcc_to_cand.get(r.get("committee_id", "")):
+            r["cand_id"] = pcc_to_cand[r["committee_id"]]
+            m = master[r["cand_id"]]
+        cid = r["cand_id"] or f"C:{r['committee_id']}"
+        state = state or m.get("state", "").upper()
         district = state + T.norm_district(state, r.get("district", ""), m.get("district", ""))
         if cid not in cands:
             name = T.display_name(m.get("name") or r.get("cand_name") or r.get("committee_name", ""))
             party = (T.find_override(overrides, r["cand_id"], district, [name, r.get("cand_name", "")])
-                     or same_party.get(district) or roles.get(r["cand_id"]) or T.norm_party(m.get("party")))
+                     or same_party.get(district) or roles.get(r["cand_id"]) or T.norm_party(m.get("party"))
+                     or name_party(name, district))
             cands[cid] = {"id": r["cand_id"], "name": name, "party": party, "district": district,
                           "inc": m.get("ici") == "I", "cmte": r["committee_id"],
                           "cmte_name": r.get("committee_name", ""), "files": [],

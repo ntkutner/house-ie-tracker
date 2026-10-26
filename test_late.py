@@ -23,8 +23,10 @@ class LateTest(unittest.TestCase):
         cls.races = {r["d"]: r for r in cls.data["races"]}
 
     def test_totals_by_candidate(self):
-        self.assertAlmostEqual(self.cands["DON DAVIS"]["tot"], 60300)
-        self.assertEqual(self.cands["DON DAVIS"]["by"], [5300, 5000, 0, 50000])  # indiv, PAC, party, self
+        # 1011 carries a stale Pennsylvania candidate ID; it's matched to Davis by his committee.
+        self.assertAlmostEqual(self.cands["DON DAVIS"]["tot"], 61300)
+        self.assertEqual(self.cands["DON DAVIS"]["by"], [6300, 5000, 0, 50000])  # indiv, PAC, party, self
+        self.assertNotIn("PAT OLDGUY", self.cands)
 
     def test_amendment_replaces_notice_and_repeats_count_once(self):
         # 1004 amends 1003 (B2 corrected to $3,000); 1005 re-reports B1 and adds $5,000 from the NRCC.
@@ -41,9 +43,9 @@ class LateTest(unittest.TestCase):
 
     def test_race_totals_and_recent(self):
         nc = self.races["NC01"]
-        self.assertAlmostEqual(nc["D"], 60300)
+        self.assertAlmostEqual(nc["D"], 61300)
         self.assertAlmostEqual(nc["R"], 11500)
-        self.assertAlmostEqual(nc["rD"], 52000)   # notice filed Oct 26 10:15 AM
+        self.assertAlmostEqual(nc["rD"], 53000)   # notices filed Oct 26
         self.assertAlmostEqual(nc["rR"], 8500)    # notice filed Oct 25
 
     def test_senate_and_excluded_candidates_left_out(self):
@@ -57,7 +59,7 @@ class LateTest(unittest.TestCase):
         replaced = [it for it in self.data["items"] if "amendment" in it[9]]
         self.assertEqual(len(replaced), 4)  # 1003's two lines and 1006's two, shown struck through
         self.assertEqual(notes[0][2], "Eve Early")
-        self.assertAlmostEqual(self.cands["DON DAVIS"]["tot"], 60300)
+        self.assertAlmostEqual(self.cands["DON DAVIS"]["tot"], 61300)
 
 
 class ListingTest(unittest.TestCase):

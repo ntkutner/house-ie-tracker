@@ -70,5 +70,12 @@
   "form_type": "F3",
   "committee_id": "C00800001",
   "receipt_date": "2026-10-25T11:30:00"
+ },
+ {
+  "file_number": 1011,
+  "form_type": "F6",
+  "committee_id": "C00800001",
+  "receipt_date": "2026-10-26T12:00:00",
+  "amendment_indicator": "N"
  }
 ]
