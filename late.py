@@ -638,7 +638,7 @@ def main() -> int:
     want = [k for k, m in index["filings"].items() if maybe_house(m)]
     read, read_errors = read_new_notices(index, cache_dir, want, s["max_new"], s["workers"], fixtures)
     pending = sum(1 for k in want if not (cache_dir / f"{k}.json").exists())
-    if read_errors:
+    if len(read_errors) > 5:   # a just-filed notice often isn't posted yet; that fixes itself next run
         errors.append(f"{len(read_errors)} notice(s) couldn't be read yet, will retry: " + "; ".join(read_errors[:3]))
     print(f"Notices read this run: {read:,}; still to read: {pending:,}")
     index_path.write_text(json.dumps(index, separators=(",", ":"), sort_keys=True))
