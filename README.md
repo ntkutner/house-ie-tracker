@@ -133,6 +133,13 @@ Tests: `python3 -m unittest test_late` (uses the sample filings in `late_fixture
   `docs/not_counted.csv`. It also flags any spender/candidate pair where the counted total exceeds the filer's
   own reported running aggregate by more than 5%.
 
+- **Third-party and independent candidates:** IEs for or against them are listed in the race's
+  detail (races marked 3P) and in `races.csv` (`third_party_for`, `third_party_against`), but
+  aren't added to either side's totals.
+- **When the FEC's API lags:** new filings are also read from the FEC's live e-filing RSS feed,
+  which kept working when OpenFEC's filing list stalled after the late-October 2026 outage. The
+  48-hour notices page uses the same feed.
+
 Known limits: the file only contains 24/48-hour notices, so IEs disclosed only on monthly or
 quarterly reports (generally small ones made more than 20 days out) won't appear. The FEC refreshes this
 file roughly daily, so "real time" here means within about a day of filing.
