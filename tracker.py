@@ -1620,6 +1620,22 @@ def main() -> int:
             source_coord["latest_transaction"] = max((r["date"] for r in coord_rows if r["date"]), default="")
 
     apply_district_fixes(rows, cfg, stats)
+    # Spending dated before the cycle began is previous-cycle spending filed late (e.g. 2024
+    # general-election ads reported in 2025); it doesn't count toward this cycle.
+    min_date = cfg.get("filters", {}).get("min_expenditure_date") or f"{cycle - 1}-01-01"
+    kept = []
+    for r in rows:
+        if r["date"] and r["date"] < min_date:
+            stats["dropped_previous_cycle"] += 1
+            stats["dropped_previous_cycle_amount"] = round(stats["dropped_previous_cycle_amount"] + r["amount"], 2)
+            if r.get("named"):
+                excluded.append({"column": r["named"], "reason": f"Dated before {min_date} (previous cycle)",
+                                 "spender": r["spe_nam"], "candidate": r["cand_name"], "race": r["district"],
+                                 "election_type": "G", "amount": r["amount"], "date": r["date"],
+                                 "file_num": r["file_num"], "tran_id": r["tran_id"]})
+            continue
+        kept.append(r)
+    rows = kept
     rows = apply_exclusions_and_aliases(rows, master, cfg, stats)
     merge_name_variants(rows, master, cfg, stats)
     cands, party_notes = resolve_candidates(rows, master, cfg)

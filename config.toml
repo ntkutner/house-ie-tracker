@@ -21,6 +21,9 @@ races = "party"
 # Coordinated "memo" entries are spending disseminated but not yet paid. They're counted (as the FEC
 # recommends) unless a regular entry for the same party, candidate and amount shows the payment.
 coordinated_include_memos = true
+# Spending dated before this is from the previous cycle (e.g. 2024 spending filed late in 2025)
+# and isn't counted. Default: January 1 of the cycle's first year.
+# min_expenditure_date = "2025-01-01"
 
 [display]
 title = "2026 House Battlefield Independent Expenditure Dashboard"
@@ -113,6 +116,7 @@ coordinated = true   # also count party coordinated expenditures (Schedule F) by
 # same race. Key = the candidate as Data notes lists it; value = the right last name.
 [candidate_aliases]
 "TX28:CUELLER" = "CUELLAR"   # Henry Cuellar (TX-28), misspelled by the filer
+"NJ07:BENNET" = "BENNETT"    # Rebecca Bennett (NJ-07), misspelled by the filer
 
 # Nominee names to show when no filing names them (or to override the name shown).
 # Keys: rep, dem. Add rep_incumbent = true / dem_incumbent = true for the (i) marker.
@@ -292,10 +296,13 @@ candidates = [
   "H4ME02093",      # John Baldacci, Maine ID filed against an Iowa race
   "CA47:BAUGH",     # Scott Baugh (CA-47)
   "RYAN ZINKE",     # MT-01 incumbent, retired; not on the November ballot
+  "H2SC01127",      # Annie Andrews: running for Senate; Care in Action filed her under her old SC-01 House ID
 ]
 # Single filings (FEC file number) or lines (FILE:TRANSACTION_ID) to leave out.
 transactions = [
   "1893746",   # Orange County PAC for Derek Tran (CA-45): 2024 phone banking, filed late in 2025
+  "2019555:F57.000002",   # Stand Up for Ohio, Carey Coleman (OH-13): same $34,924 canvass as the
+                          # filing's Emilia Sykes line, so it's counted once (as for Sykes)
 ]
 # Races to leave out entirely (spending there was for special elections).
 races = ["GA14", "CA01", "FL06", "TN07",
@@ -304,7 +311,6 @@ races = ["GA14", "CA01", "FL06", "TN07",
 # Filings that left support/oppose blank. Key = FEC file number (or FILE:TRANSACTION_ID);
 # value = "S" (support) or "O" (oppose).
 [support_oppose_fixes]
-"2019555:F57.000002" = "O"   # Stand Up for Ohio vs Carey Coleman (OH-13), "Deserves Better" canvass lit
 "2017728" = "S"   # Arizona Farm Bureau Federation for Juan Ciscomani (AZ-06), "Support Juan Ciscomani"
 
 # ---------------------------------------------------------------------------
