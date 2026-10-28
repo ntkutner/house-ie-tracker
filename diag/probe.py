@@ -1,33 +1,27 @@
-import re, urllib.request, json, os, collections
-UA = {"User-Agent": "house-ie-tracker-diag"}
-def get(u):
-    with urllib.request.urlopen(urllib.request.Request(u, headers=UA), timeout=90) as r:
-        return r.read().decode("utf-8", "replace")
-base = "https://efilingapps.fec.gov/rss/generate?preDefinedFilingType="
-for t in ["ALL", "F24", "F6", "F5", "F3X"]:
-    try:
-        txt = get(base + t)
-    except Exception as e:
-        print("==", t, "ERR", e); continue
-    items = re.findall(r"<item>(.*?)</item>", txt, re.S)
-    print(f"\n== {t}: {len(items)} items, {len(txt)} bytes")
-    if t == "ALL":
-        print(txt[:600]); print("---- first items raw:")
-        for it in items[:3]: print(it[:1200]); print("----")
-    dates = [re.search(r"<pubDate>(.*?)</pubDate>", it).group(1) for it in items if "<pubDate>" in it]
-    if dates: print("newest", dates[0], "| oldest", dates[-1])
-    fns = [int(x) for it in items for x in re.findall(r"/(\d{7})/", it)[:1]]
-    if fns: print("file numbers", min(fns), "-", max(fns))
-    forms = collections.Counter(re.findall(r"(F\d+[A-Z]?[NAT]?)\b", " ".join(re.findall(r"<description>(.*?)</description>", txt, re.S))))
-    print("forms in descriptions:", forms.most_common(12))
-# docquery for a few RSS file numbers
-txt = get(base + "ALL")
-fns = sorted({int(x) for x in re.findall(r"/(\d{7})/", txt)}, reverse=True)[:5]
-for fn in fns:
-    for kind in ("dcdev/posted", "cgi-bin/forms"):
-        try:
-            with urllib.request.urlopen(urllib.request.Request(f"https://docquery.fec.gov/{kind}/{fn}.fec" if kind.startswith("dcdev") else f"https://docquery.fec.gov/cgi-bin/forms/x/{fn}/", headers=UA), timeout=60) as r:
-                b = r.read(300).decode("latin-1", "replace").replace("\x1c", "|")
-                print(fn, kind, r.status, b.splitlines()[1][:80] if kind.startswith("dcdev") and len(b.splitlines()) > 1 else "")
-        except Exception as e:
-            print(fn, kind, "ERR", str(e)[:80])
+import sys, json
+from collections import Counter, defaultdict
+sys.path.insert(0, ".")
+import tracker as T
+orig = T.build
+def wrapped(cfg, rows, cands, pres, excluded):
+    same_party = {d.strip().upper(): T.norm_party(v.get("party", "")) for d, v in cfg.get("same_party_races", {}).items()}
+    bad = defaultdict(lambda: {"amt": 0.0, "n": 0, "names": Counter(), "party_raw": Counter(), "party_text": Counter(), "so": Counter(), "spe": Counter(), "ids": Counter(), "kind": Counter()})
+    for r in rows:
+        c = cands[r["cand_key"]]
+        sp = same_party.get(c["district"])
+        side = (("D" if sp == "DEM" else "R") if sp and r["so"] in ("S", "O") else T.side_of(c["party"], r["so"]))
+        if side is None:
+            b = bad[(r["cand_key"], c["party"], c["district"])]
+            b["amt"] += r["amount"]; b["n"] += 1
+            b["names"][r["cand_name"]] += 1; b["party_raw"][r.get("party_raw")] += 1; b["party_text"][r.get("party_text")] += 1
+            b["so"][r["so"]] += 1; b["spe"][r["spe_nam"]] += r["amount"]; b["kind"][r["kind"]] += 1
+    for k, b in sorted(bad.items(), key=lambda kv: -kv[1]["amt"]):
+        print(k, round(b["amt"]), b["n"], dict(b["names"].most_common(3)), dict(b["party_raw"]), dict(b["party_text"]), dict(b["so"]), dict(b["kind"]), [s for s, _ in b["spe"].most_common(3)])
+    # what candidates exist in those races
+    print("\n-- other candidate keys in those races")
+    for (k, p, d) in list(bad)[:40]:
+        print(d, k, "->", [(ck, c["name"], c["party"]) for ck, c in cands.items() if c["district"] == d and ck != k][:6])
+    return orig(cfg, rows, cands, pres, excluded)
+T.build = wrapped
+sys.argv = ["tracker.py", "--force", "--out", "/tmp/out"]
+T.main()
