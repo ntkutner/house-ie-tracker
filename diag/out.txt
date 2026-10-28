@@ -1,49 +1,61 @@
+Checking https://www.fec.gov/files/bulk-downloads/2026/independent_expenditure_2026.csv ...
+New 24/48-hour filings read directly: 2 (3 lines)
+Downloading https://www.fec.gov/files/bulk-downloads/2026/pas226.zip ...
+('CA48:WILPERT', '', 'CA48') 799749 21 {'Wilpert, Marni Von': 12, 'WILPERT, MARNI VON': 8, 'Wilpert, Marni von': 1} {'': 21} {'': 21} {'S': 21} {'IE': 21} ['Planned Parenthood Affiliates of California VOTES PAC', 'Planned Parenthood Action Fund of the Pacific Southwest', 'EQUALITY CALIFORNIA VOTES']
+('H4MA01091', '', 'MA01') 644650 10 {'MILLERON, NADIA D': 9, 'Milleron, Nadia D': 1} {'': 10} {'NO PARTY AFFILIATION': 10} {'O': 10} {'IE': 10} ['ONE PAC', 'FORWARD UNITED', 'Forward United']
+('PA07:MACKENZIE', '', 'PA07') 380177 46 {'MACKENZIE, RYAN': 36, 'Mackenzie, Ryan': 10} {'': 46} {'': 46} {'O': 10, 'S': 36} {'IE': 46} ['Planned Parenthood Votes', 'Early Vote Action PAC', 'Popular Democracy PAC']
+('KY06:BOWMAN', '', 'KY06') 94602 6 {'BOWMAN, JAY': 6} {'': 6} {'': 6} {'S': 6} {'IE': 6} ['OUR HERITAGE MATTERS']
+('IA02:STEWART', '', 'IA02') 73616 6 {'Stewart, Rick': 6} {'': 6} {'': 6} {'S': 6} {'IE': 6} ['OUR HERITAGE MATTERS']
+('H6MI04220', '', 'MI04') 65475 4 {'BARNETT, SHAFINA': 4} {'': 4} {'GREEN PARTY': 4} {'S': 4} {'IE': 4} ['PROGRESSIVE CHAMPIONS PAC']
+('H6VA02263', '', 'VA02') 57867 4 {'BAKER, MATTHEW': 4} {'': 4} {'INDEPENDENT': 4} {'S': 4} {'IE': 4} ['PROGRESSIVE CHAMPIONS PAC']
+('H6OH10113', '', 'OH10') 56760 5 {'MCMASTERS, THOMAS': 5} {'': 5} {'LIBERTARIAN PARTY': 5} {'S': 5} {'IE': 5} ['OUR HERITAGE MATTERS']
+('MT00:SHEEDY', '', 'MT00') 54563 7 {'Sheedy, Nick': 5, 'SHEEDY, NICK': 2} {'': 7} {'': 7} {'S': 5, 'O': 2} {'IE': 7} ['OUR HERITAGE MATTERS', 'NO GOING BACK PAC INC.']
+('H0TX34059', '', 'TX34') 54218 5 {'ROYAL, CHRIS B.': 5} {'': 5} {'LIBERTARIAN PARTY': 5} {'S': 5} {'IE': 5} ['OUR HERITAGE MATTERS']
+('H6KY06242', '', 'KY06') 51544 2 {'LYNCH, PETER SHAW KELLER DR': 2} {'': 2} {'OTHER': 2} {'O': 2} {'IE': 2} ['NO GOING BACK PAC INC.']
+('H6KY06234', '', 'KY06') 51544 2 {'JAY, BOWMAN J': 2} {'': 2} {'NONE': 2} {'O': 2} {'IE': 2} ['NO GOING BACK PAC INC.']
+('H6SC01342', '', 'SC01') 40108 2 {'REESIDE, WILLIAM OLIVER JR.': 2} {'': 2} {'LIBERTARIAN PARTY': 2} {'S': 2} {'IE': 2} ['OUR HERITAGE MATTERS']
+('H6OH13307', 'REP', 'OH13') 34924 1 {'Coleman, Carey': 1} {'': 1} {'': 1} {'': 1} {'IE': 1} ['STAND UP FOR OHIO (OHIO ORGANIZING CAMPAIGN)']
+('CO08:WOOD', '', 'CO08') 31324 6 {'Wood, Dave': 6} {'': 6} {'': 6} {'S': 6} {'IE': 6} ['OUR HERITAGE MATTERS']
+('H2SC01127', '', 'SC01') 28425 7 {'ANDREWS, ANNIE': 7} {'': 7} {'': 7} {'S': 7} {'IE': 7} ['Care in Action PAC']
+('H2AZ02360', 'REP', 'AZ06') 20000 1 {'Juan, Ciscomani': 1} {'': 1} {'': 1} {'': 1} {'IE': 1} ['Arizona Farm Bureau Federation']
+('NJ07:JR.', '', 'NJ07') 12940 2 {'Jr., Thomas Kean': 1, 'JR., THOMAS KEAN': 1} {'': 2} {'': 2} {'O': 2} {'IE': 2} ['KITCHEN TABLE VALUES PAC', 'Popular Democracy PAC']
+('H2NY18103', '', 'NY18') 7425 2 {'Ryan, Patrick': 2} {'': 2} {'': 2} {'S': 2} {'IE': 2} ['American Democracy Project']
+('H4NV02219', '', 'NV02') 6000 1 {'CHAPMAN, LYNN': 1} {'': 1} {'INDEPENDENT AMERICAN PARTY': 1} {'S': 1} {'IE': 1} ['NEVADANS FOR SENSIBLE GOVERNMENT']
+('H4CA45170', 'DEM', 'CA45') 5642 1 {'TRAN, DEREK': 1} {'DEM': 1} {'DEMOCRATIC PARTY': 1} {'': 1} {'IE': 1} ['Orange County PAC']
+("NJ07:O'TOOLE", '', 'NJ07') 4721 3 {"O'Toole, Seamus": 3} {'': 3} {'': 3} {'S': 3} {'IE': 3} ['Peace NJ']
+('TX15:CRUZ', '', 'TX15') 2940 1 {'Cruz, Monica De La': 1} {'': 1} {'': 1} {'O': 1} {'IE': 1} ['Popular Democracy PAC']
+('FL13:LUNA', '', 'FL13') 2940 1 {'Luna, Anna Paulina': 1} {'': 1} {'': 1} {'O': 1} {'IE': 1} ['Popular Democracy PAC']
+('H2CT05172', '', 'CT05') 2058 1 {'DONOVAN, CHRISTOPHER G': 1} {'': 1} {'': 1} {'S': 1} {'IE': 1} ['United We Can']
+('NY01:LALOTA', '', 'NY01') 118 3 {'LaLota, Nick': 3} {'': 3} {'': 3} {'S': 3} {'IE': 3} ["D.R.I.V.E. - Dem, Rep, Ind Voter Ed (The PAC of the Int'l Brhd of Teamsters)"]
+('NJ07:BENNET', '', 'NJ07') 100 1 {'Bennet, Rebecca': 1} {'': 1} {'': 1} {'S': 1} {'IE': 1} ['Growing Economic Opportunities']
 
-== ALL: 8693 items, 5853902 bytes
-<?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
-  <channel>
-    <title>FEC Electronic Filing RSS Feed - ALL</title>
-    <link>http://docquery.fec.gov//rss</link>
-    <description>New filings within the last 7 days</description>
-    <item>
-      <title>New filing by CHRISTINA BOHANNAN FOR CONGRESS</title>
-      <link>http://docquery.fec.gov/dcdev/posted/2042590.fec</link>
-      <description>&lt;p&gt;The CHRISTINA BOHANNAN FOR CONGRESS successfully filed  their F6N  with a confirmation ID of FEC-2042590&lt;/p&gt;*********CommitteeId
----- first items raw:
-
-      <title>New filing by CHRISTINA BOHANNAN FOR CONGRESS</title>
-      <link>http://docquery.fec.gov/dcdev/posted/2042590.fec</link>
-      <description>&lt;p&gt;The CHRISTINA BOHANNAN FOR CONGRESS successfully filed  their F6N  with a confirmation ID of FEC-2042590&lt;/p&gt;*********CommitteeId: C00787820 | FilingId: 2042590 | FormType: F6N | CoverageFrom:  | CoverageThrough:  | ReportType: *********</description>
-      <pubDate>Wed, 28 Oct 2026 22:58:58 GMT</pubDate>
-      <guid>http://docquery.fec.gov/dcdev/posted/2042590.fec</guid>
-      <dc:date>2026-10-28T22:58:58Z</dc:date>
-    
-----
-
-      <title>New filing by PINE TREE RESULTS PAC</title>
-      <link>http://docquery.fec.gov/dcdev/posted/2042591.fec</link>
-      <description>&lt;p&gt;The PINE TREE RESULTS PAC successfully filed  their F24N  with a confirmation ID of FEC-2042591&lt;/p&gt;*********CommitteeId: C00894709 | FilingId: 2042591 | FormType: F24N | CoverageFrom:  | CoverageThrough:  | ReportType: *********</description>
-      <pubDate>Wed, 28 Oct 2026 22:59:22 GMT</pubDate>
-      <guid>http://docquery.fec.gov/dcdev/posted/2042591.fec</guid>
-      <dc:date>2026-10-28T22:59:22Z</dc:date>
-    
-----
-
-      <title>New filing by DEREK MERRIN FOR CONGRESS</title>
-      <link>http://docquery.fec.gov/dcdev/posted/2042592.fec</link>
-      <description>&lt;p&gt;The DEREK MERRIN FOR CONGRESS successfully filed  their F6N  with a confirmation ID of FEC-2042592&lt;/p&gt;*********CommitteeId: C00909630 | FilingId: 2042592 | FormType: F6N | CoverageFrom:  | CoverageThrough:  | ReportType: *********</description>
-      <pubDate>Wed, 28 Oct 2026 22:59:33 GMT</pubDate>
-      <guid>http://docquery.fec.gov/dcdev/posted/2042592.fec</guid>
-      <dc:date>2026-10-28T22:59:33Z</dc:date>
-    
-----
-newest Wed, 28 Oct 2026 22:58:58 GMT | oldest Wed, 21 Oct 2026 04:00:27 GMT
-forms in descriptions: [('F3XN', 7606), ('F6N', 4182), ('F3N', 2180), ('F24N', 1800), ('F3XA', 374), ('F3A', 210), ('F99', 190), ('F5N', 156), ('F1A', 132), ('F2N', 110), ('F24A', 90), ('F6A', 88)]
-== F24 ERR HTTP Error 500: 
-== F6 ERR HTTP Error 500: 
-== F5 ERR HTTP Error 500: 
-
-== F3X: 4010 items, 2896831 bytes
-newest Wed, 28 Oct 2026 22:53:47 GMT | oldest Wed, 21 Oct 2026 04:04:53 GMT
-forms in descriptions: [('F3XN', 7606), ('F3XA', 374), ('F3XT', 40)]
+-- other candidate keys in those races
+VA02 H6VA02263 -> [('H2VA02064', 'JENNIFER KIGGANS', 'REP'), ('H6VA02198', 'ELAINE LURIA', 'DEM'), ('VA02:LURIA', 'ELAINE LURIA', 'DEM'), ('H8VA02111', 'ELAINE LURIA', 'DEM'), ('H4VA02060', 'MISSY COTTER SMASAL', 'DEM')]
+MI04 H6MI04220 -> [('H0MI02094', 'WILLIAM P HUIZENGA', 'REP'), ('H6MI04204', 'SEAN MCCANN', 'DEM')]
+CA48 CA48:WILPERT -> [('H6CA49128', 'JIM DESMOND', 'REP'), ('H6CA48310', 'MARNI VON WILPERT', 'DEM')]
+KY06 KY06:BOWMAN -> [('H6KY06184', 'ZACH DEMBO', 'DEM'), ('H6KY06192', 'RALPH A ALVARADO', 'REP'), ('H6KY06234', 'BOWMAN J JAY', ''), ('H6KY06242', 'PETER SHAW KELLER LYNCH', '')]
+OH10 H6OH10113 -> [('H2OH03067', 'MICHAEL R REP. TURNER', 'REP'), ('H6OH10121', 'KRISTINA KNICKERBOCKER', 'DEM')]
+TX34 H0TX34059 -> [('H6TX34080', 'ERIC FLORES', 'REP'), ('H6TX15162', 'VICENTE GONZALEZ', 'DEM')]
+MT00 MT00:SHEEDY -> []
+IA02 IA02:STEWART -> [('H6IA02211', 'LINDSAY JAMES', 'DEM'), ('H6IA02237', 'JOE MITCHELL', 'REP'), ('H0IA01174', 'ASHLEY HINSON ARENHOLZ', 'REP')]
+CO08 CO08:WOOD -> [('H6CO08013', 'MANNY RUTINEL', 'DEM'), ('H4CO08034', 'TIMOTHY GABRIEL JOSEPH EVANS', 'REP'), ('H2CO08020', 'YADIRA CARAVEO', 'DEM')]
+SC01 H6SC01342 -> [('H6SC01334', 'JENNY COSTA HONEYCUTT', 'REP'), ('H6SC01359', 'NANCY LACORE', 'DEM'), ('H2SC01127', 'ANNIE ANDREWS', '')]
+NJ07 NJ07:O'TOOLE -> [('H6NJ07201', 'REBECCA BENNETT', 'DEM'), ('H0NJ07261', 'THOMAS H. JR. KEAN', 'REP'), ('NJ07:JR.', 'THOMAS KEAN JR.', ''), ('H0NJ07089', 'THOMAS KEAN', 'REP'), ('NJ07:BENNET', 'REBECCA BENNET', '')]
+NY01 NY01:LALOTA -> [('H6NY01159', 'CHRISTOPHER GALLANT', 'DEM'), ('H2NY01190', 'LALOTA NICK', 'REP')]
+SC01 H2SC01127 -> [('H6SC01334', 'JENNY COSTA HONEYCUTT', 'REP'), ('H6SC01359', 'NANCY LACORE', 'DEM'), ('H6SC01342', 'WILLIAM OLIVER JR. REESIDE', '')]
+KY06 H6KY06234 -> [('H6KY06184', 'ZACH DEMBO', 'DEM'), ('H6KY06192', 'RALPH A ALVARADO', 'REP'), ('KY06:BOWMAN', 'JAY BOWMAN', ''), ('H6KY06242', 'PETER SHAW KELLER LYNCH', '')]
+KY06 H6KY06242 -> [('H6KY06184', 'ZACH DEMBO', 'DEM'), ('H6KY06192', 'RALPH A ALVARADO', 'REP'), ('KY06:BOWMAN', 'JAY BOWMAN', ''), ('H6KY06234', 'BOWMAN J JAY', '')]
+TX15 TX15:CRUZ -> [('H0TX15124', 'MONICA DE LA CRUZ', 'REP'), ('H6TX15246', 'BOBBY PULIDO', 'DEM')]
+NJ07 NJ07:JR. -> [('H6NJ07201', 'REBECCA BENNETT', 'DEM'), ("NJ07:O'TOOLE", "SEAMUS O'TOOLE", ''), ('H0NJ07261', 'THOMAS H. JR. KEAN', 'REP'), ('H0NJ07089', 'THOMAS KEAN', 'REP'), ('NJ07:BENNET', 'REBECCA BENNET', '')]
+FL13 FL13:LUNA -> [('H0FL13158', 'ANNA PAULINA LUNA', 'REP'), ('H6FL13312', 'LEELA J GRAY', 'DEM')]
+PA07 PA07:MACKENZIE -> [('H8PA15195', 'RYAN EDWARD MACKENZIE', 'REP'), ('H6PA07188', 'BOB BROOKS', 'DEM'), ('H4PA07118', 'RYAN MACKENZIE', 'REP'), ('H8PA15229', 'SUSAN WILD', 'DEM')]
+MA01 H4MA01091 -> [('H8MA02041', 'RICHARD E NEAL', 'DEM')]
+CT05 H2CT05172 -> [('H6CT05231', 'CHRIS SHEA', 'REP'), ('H8CT05245', 'JAHANA HAYES', 'DEM')]
+NV02 H4NV02219 -> [('H4NV04108', 'DAVID FLIPPO', 'REP'), ('H6NV02362', 'TERESA BENITEZ-THOMPSON', 'DEM')]
+NY18 H2NY18103 -> []
+OH13 H6OH13307 -> [('H2OH13264', 'EMILIA SYKES', 'DEM'), ('OH13:SKYES', 'EMILIA SKYES', 'DEM')]
+NJ07 NJ07:BENNET -> [('H6NJ07201', 'REBECCA BENNETT', 'DEM'), ("NJ07:O'TOOLE", "SEAMUS O'TOOLE", ''), ('H0NJ07261', 'THOMAS H. JR. KEAN', 'REP'), ('NJ07:JR.', 'THOMAS KEAN JR.', ''), ('H0NJ07089', 'THOMAS KEAN', 'REP')]
+AZ06 H2AZ02360 -> [('H6AZ06099', 'JOANNA MENDOZA', 'DEM'), ('H2AZ02311', 'KIRSTEN ENGEL', 'DEM')]
+CA45 H4CA45170 -> [('H0CA48198', 'MICHELLE STEEL', 'REP')]
+Rows in file: 40,949 | House general: 18,259 | counted: 16,907 (dropped 1,311 amended, 41 duplicate) | coordinated rows: 963
+Races: 80 with party spending, 258 total. Data filed through 2026-10-26. Wrote /tmp/out/index.html
