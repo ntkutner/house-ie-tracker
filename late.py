@@ -609,16 +609,22 @@ def main() -> int:
     elif now.date() >= s["window_start"]:
         since = max(s["window_start"], dt.date.fromisoformat(index.get("listed_through", s["window_start"].isoformat()))
                     - dt.timedelta(days=2)).isoformat()
-        try:
-            new_listed += update_index(index, list_processed(api_key, since))
-        except Exception as e:
-            errors.append(f"couldn't list Form 6 filings ({e})")
-        try:
-            # Both lists, in case one lags or leaves something out; filings are matched by number.
-            new_listed += update_index(index, list_efiled(api_key, since))
-        except Exception as e:
-            errors.append(f"couldn't list new e-filings ({e})")
-        if sum(e.startswith("couldn't list") for e in errors) < 2:   # at least one list came back
+        # Three lists, in case one lags or leaves something out (OpenFEC's stalled for two days
+        # after the FEC's late-October outage); filings are matched by number.
+        sources = [("FEC filings list", lambda: list_processed(api_key, since)),
+                   ("FEC e-filing list", lambda: list_efiled(api_key, since)),
+                   ("FEC filing feed", lambda: [m for m in (filing_meta(f, "rss") for f in T.list_rss_filings())
+                                                if m and m["receipt"][:10] >= since])]
+        worked = 0
+        for label, fn in sources:
+            try:
+                new_listed += update_index(index, fn())
+                worked += 1
+            except Exception as e:
+                print(f"Warning: couldn't read the {label} ({e})", file=sys.stderr)
+        if not worked:
+            errors.append("couldn't reach the FEC to list new notices; will retry next hour")
+        else:
             index["listed_through"] = now.date().isoformat()
     print(f"Form 6 filings listed: {len(index['filings']):,} ({new_listed:,} new)")
 

@@ -16,6 +16,7 @@ import argparse
 import csv
 import datetime as dt
 import hashlib
+import html
 import io
 import os
 import json
@@ -423,13 +424,39 @@ def load_coordinated_raw(cfg: dict, cols: list[dict], cache_dir: Path, stats: Co
 
 
 _IE_LIST_CACHE: dict[str, list[dict]] = {}
+RSS_URL = "https://efilingapps.fec.gov/rss/generate?preDefinedFilingType=ALL"
+_RSS_CACHE: list[dict] | None = None
 
 
-def list_recent_ie_filings(api_key: str, since: str, max_pages: int = 40) -> list[dict]:
-    """24/48-hour IE notices (Form 24) and Form 5 reports e-filed on or after `since`, newest
-    first, from OpenFEC's raw e-filing list."""
-    if since in _IE_LIST_CACHE:
-        return _IE_LIST_CACHE[since]
+def list_rss_filings() -> list[dict]:
+    """Every filing in the FEC's live e-filing RSS feed (the last 7 days), newest first. This
+    keeps working when OpenFEC's filing list stalls, as it did for two days after the FEC's
+    late-October 2026 outage. Receipt times are converted to Eastern."""
+    global _RSS_CACHE
+    if _RSS_CACHE is not None:
+        return _RSS_CACHE
+    with urllib.request.urlopen(urllib.request.Request(RSS_URL, headers={"User-Agent": UA}), timeout=180) as r:
+        txt = r.read().decode("utf-8", "replace")
+    out = []
+    for item in re.findall(r"<item>(.*?)</item>", txt, re.S):
+        m = re.search(r"CommitteeId:\s*(C\w+)\s*\|\s*FilingId:\s*(\d+)\s*\|\s*FormType:\s*([A-Z0-9]+)", item)
+        if not m:
+            continue
+        when = re.search(r"<dc:date>\s*(.*?)\s*</dc:date>", item)
+        title = re.search(r"<title>\s*New filing by (.*?)\s*</title>", item, re.S)
+        try:
+            at = (dt.datetime.fromisoformat(when[1].replace("Z", "+00:00")).astimezone(ET)
+                  .replace(tzinfo=None).isoformat(timespec="seconds")) if when else ""
+        except ValueError:
+            at = ""
+        out.append({"file_number": int(m[2]), "form_type": m[3].upper(), "committee_id": m[1].upper(),
+                    "committee_name": html.unescape(title[1]) if title else "", "receipt_date": at})
+    out.sort(key=lambda f: f["file_number"], reverse=True)
+    _RSS_CACHE = out
+    return out
+
+
+def _list_api_ie_filings(api_key: str, since: str, max_pages: int) -> tuple[list[dict], set]:
     out, seen = [], set()
     for page in range(1, max_pages + 1):
         base = f"{FEC_API}/efile/filings/?sort=-receipt_date&per_page=100&page={page}&api_key={api_key}"
@@ -450,6 +477,7 @@ def list_recent_ie_filings(api_key: str, since: str, max_pages: int = 40) -> lis
             oldest = min(oldest, rd or oldest)
             form = str(f.get("form_type") or "").upper()
             fn = f.get("file_number") or f.get("fec_file_id")
+            fn = int(fn) if str(fn or "").isdigit() else fn
             if not fn or rd < since or fn in seen or not (form.startswith("F24") or form.startswith("F5")):
                 continue
             seen.add(fn)
@@ -461,6 +489,37 @@ def list_recent_ie_filings(api_key: str, since: str, max_pages: int = 40) -> lis
                         "amends": str(amends) if amends else ""})
         if oldest < since:
             break
+    return out, seen
+
+
+def list_recent_ie_filings(api_key: str, since: str, max_pages: int = 40) -> list[dict]:
+    """24/48-hour IE notices (Form 24) and Form 5 reports e-filed on or after `since`, from
+    OpenFEC's raw e-filing list plus the FEC's live filing feed."""
+    if since in _IE_LIST_CACHE:
+        return _IE_LIST_CACHE[since]
+    out, seen = [], set()
+    api_error = None
+    try:
+        out, seen = _list_api_ie_filings(api_key, since, max_pages)
+    except Exception as e:  # the API can be down while the FEC's filing feed still works
+        api_error = e
+        print(f"Warning: OpenFEC filing list unavailable ({e})", file=sys.stderr)
+    rss_ok = False
+    # Anything the API's list hasn't caught up with yet, from the FEC's live filing feed.
+    try:
+        for f in list_rss_filings():
+            fn, form = f["file_number"], f["form_type"]
+            if fn in seen or f["receipt_date"][:10] < since or not (form.startswith("F24") or form.startswith("F5")):
+                continue
+            seen.add(fn)
+            out.append({"file_number": fn, "form_type": form, "receipt_date": f["receipt_date"][:10],
+                        "committee_id": f["committee_id"], "committee_name": f["committee_name"],
+                        "amendment": form.endswith("A"), "amends": "", "source": "rss"})
+        rss_ok = True
+    except Exception as e:
+        print(f"Warning: couldn't read the FEC filing feed ({e})", file=sys.stderr)
+    if api_error is not None and not rss_ok:
+        raise api_error
     _IE_LIST_CACHE[since] = out
     return out
 
@@ -894,6 +953,94 @@ def apply_exclusions_and_aliases(rows: list[dict], master: dict, cfg: dict, stat
     return kept
 
 
+def token_set(n: str) -> set:
+    return {t for t in name_tokens(n)[0] if len(t) > 1}
+
+
+def same_tokens(a: str, b: str) -> bool:
+    """Same person written in a different order or with a middle name: 'Wilpert, Marni Von' and
+    'MARNI VON WILPERT', 'Jr., Thomas Kean' and 'THOMAS H. JR. KEAN', 'LALOTA NICK' and 'LaLota, Nick'."""
+    x, y = token_set(a), token_set(b)
+    return len(x) >= 2 and len(y) >= 2 and (x <= y or y <= x)
+
+
+def merge_name_variants(rows: list[dict], master: dict, cfg: dict, stats: Counter) -> None:
+    """A second, looser pass after apply_exclusions_and_aliases: a candidate with no party (usually
+    a filing that named the candidate in an unusual order) is folded into the candidate in the
+    same race whose name has the same words. If nobody in the filings matches, a name-only key is
+    matched to the FEC candidate file, so third-party candidates get their ID and party."""
+    overrides = {k.upper(): norm_party(v) for k, v in cfg.get("party_overrides", {}).items()}
+    info = defaultdict(lambda: {"names": Counter(), "districts": Counter(), "parties": Counter(), "money": 0.0})
+    for r in rows:
+        i = info[r["cand_key"]]
+        i["names"][r["cand_name"]] += 1
+        i["districts"][r["district"]] += 1
+        i["parties"][r["party_raw"]] += 1
+        i["money"] += abs(r["amount"])
+
+    def major(k):
+        i = info[k]
+        names = list(i["names"]) + [master.get(k, {}).get("name", "")]
+        return (find_override(overrides, k, best_district(i["districts"]), names)
+                or next((p for p, _ in i["parties"].most_common() if p), "") or norm_party(master.get(k, {}).get("party")))
+
+    by_race = defaultdict(list)
+    for mid, m in master.items():
+        if m.get("office") == "H":
+            by_race[m.get("state", "") + norm_district(m.get("state", ""), m.get("district", ""))].append(mid)
+    names_of = lambda k: [n for n in list(info[k]["names"]) + [master.get(k, {}).get("name", "")] if n]
+    remap = {}
+    for k, i in info.items():
+        if major(k):
+            continue
+        d, mine = best_district(i["districts"]), names_of(k)
+        same = [ok for ok, o in info.items() if ok != k and best_district(o["districts"]) == d
+                and any(same_tokens(a, b) for a in mine for b in names_of(ok))]
+        with_party = [ok for ok in same if major(ok)]
+        if with_party:
+            if len({major(ok) for ok in with_party}) == 1:
+                remap[k] = max(with_party, key=lambda ok: info[ok]["money"])
+            continue
+        if ":" not in k:
+            continue
+        ids = [ok for ok in same if ":" not in ok]
+        if len(ids) == 1:
+            remap[k] = ids[0]
+            continue
+        hits = [mid for mid in by_race.get(d, []) if any(same_tokens(a, master[mid]["name"]) for a in mine)]
+        if len(hits) == 1:
+            remap[k] = hits[0]
+    for r in rows:
+        k = r["cand_key"]
+        seen = set()
+        while k in remap and k not in seen:
+            seen.add(k)
+            k = remap[k]
+        if k != r["cand_key"]:
+            r["cand_key"] = k
+            stats["merged_name_variants"] += 1
+
+
+# Third-party and independent candidates: a label from what filers or the FEC candidate file say.
+PARTY_LABELS = [("INDEPENDENT AMERICAN", "Independent American"), ("IAP", "Independent American"),
+                ("LIB", "Libertarian"), ("GRE", "Green"), ("GRN", "Green"), ("CON", "Constitution"),
+                ("WORKING", "Working Families"), ("WFP", "Working Families"), ("FORWARD", "Forward"),
+                ("FWD", "Forward"), ("ALLIANCE", "Alliance"), ("REF", "Reform"), ("SOC", "Socialist"),
+                ("IND", "Independent"), ("NPA", "Independent"), ("NNE", "Independent"), ("NONE", "Independent"),
+                ("NON", "Independent"), ("NO PARTY", "Independent"), ("UNAFFIL", "Independent"),
+                ("UN", "Independent"), ("OTH", "Independent / other"), ("W", "Write-in")]
+
+
+def party_label(text: str) -> str:
+    t = (text or "").strip().upper()
+    if not t or t.startswith(("REP", "DEM", "DFL")):
+        return ""
+    for prefix, label in PARTY_LABELS:
+        if t.startswith(prefix):
+            return label
+    return t.title()
+
+
 def best_district(districts: Counter) -> str:
     """Most-used district for a candidate, ignoring 00 (a filing error outside at-large states)."""
     real = [(n, d) for d, n in districts.items() if d[2:] != "00" or d[:2] in AT_LARGE_STATES]
@@ -930,10 +1077,12 @@ def resolve_candidates(rows: list[dict], master: dict, cfg: dict) -> tuple[dict,
                           "district": best_district(a["districts"]),
                           "filers_say": a["texts"].most_common(1)[0][0] or "blank",
                           "fec_master_says": m.get("party", "") or "n/a", "counted_as": party or "unassigned"})
+        label = "" if party in ("REP", "DEM") else (
+            party_label(next((t for t, _ in a["texts"].most_common() if t), "")) or party_label(m.get("party", "")))
         cands[key] = {
             "key": key,
             "name": display_name(m.get("name") or a["names"].most_common(1)[0][0]),
-            "party": party,
+            "party": party, "label": label,
             "district": best_district(a["districts"]),
             "incumbent": m.get("ici") == "I",
         }
@@ -1019,12 +1168,27 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
 
     races: dict[str, dict] = {}
     unassigned: dict[str, dict] = {}
+    new_race = lambda: {"cols": defaultdict(float), "cand_money": defaultdict(float), "spenders": {},
+                        "new7": defaultdict(float), "last_filed": "", "coord": defaultdict(float), "third": {}}
     pair_check = defaultdict(lambda: {"sum": 0.0, "agg": 0.0, "label": ("", "", "")})
 
     for r in rows:
         c = cands[r["cand_key"]]
         sp_party = same_party.get(c["district"])
         side = ("D" if sp_party == "DEM" else "R") if sp_party and r["so"] in ("S", "O") else side_of(c["party"], r["so"])
+        if side is None and c.get("label") and r["so"] in ("S", "O") and r["kind"] == "IE":
+            race = races.setdefault(c["district"], new_race())
+            t = race["third"].setdefault(c["key"], {"name": c["name"], "party": c["label"], "for": 0.0,
+                                                     "against": 0.0, "spenders": {}, "last": ""})
+            t["for" if r["so"] == "S" else "against"] += r["amount"]
+            t["last"] = max(t["last"], r["filed"])
+            sp = t["spenders"].setdefault(r["spe_id"] or r["spe_nam"], {"id": r["spe_id"], "name": r["spe_nam"],
+                                                                          "for": 0.0, "against": 0.0, "n": 0, "last": ""})
+            sp["for" if r["so"] == "S" else "against"] += r["amount"]
+            sp["n"] += 1
+            sp["last"] = max(sp["last"], r["date"] or r["filed"])
+            race["last_filed"] = max(race["last_filed"], r["filed"])
+            continue
         if side is None:
             u = unassigned.setdefault(c["key"], {"name": c["name"], "district": c["district"], "amount": 0.0})
             u["amount"] += r["amount"]
@@ -1037,9 +1201,7 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
             continue
         col = classify(r["spe_id"], r["spe_nam"], side, cols)
         d = c["district"]
-        race = races.setdefault(d, {"cols": defaultdict(float), "cand_money": defaultdict(float),
-                                    "spenders": {}, "new7": defaultdict(float), "last_filed": "",
-                                    "coord": defaultdict(float)})
+        race = races.setdefault(d, new_race())
         race["cols"][col] += r["amount"]
         race["cand_money"][c["key"]] += abs(r["amount"])
         if r["filed"] >= week_ago:
@@ -1113,6 +1275,14 @@ def build(cfg: dict, rows: list[dict], cands: dict, pres: dict, excluded: list[d
             "new7_r": round(race["new7"]["R"], 2), "new7_d": round(race["new7"]["D"], 2),
             "party_race": any(abs(cvals.get(k, 0)) > 0 for k in named),
             "last_filed": race["last_filed"], "spenders": spenders,
+            # Independent expenditures for/against third-party and independent candidates. Not in
+            # the D/R totals: helping a third-party candidate doesn't clearly help either side.
+            "third": sorted(({"name": t["name"], "party": t["party"], "for": round(t["for"], 2),
+                              "against": round(t["against"], 2), "last": t["last"],
+                              "spenders": sorted(({**sp, "for": round(sp["for"], 2), "against": round(sp["against"], 2)}
+                                                  for sp in t["spenders"].values()),
+                                                 key=lambda x: -(x["for"] + x["against"]))}
+                             for t in race["third"].values()), key=lambda t: -(t["for"] + t["against"])),
             "fec_url": f"https://www.fec.gov/data/elections/house/{st}/{dn}/{cfg.get('cycle', 2026)}/",
         })
     # Races to leave out (e.g. special elections), and nominees no filing names yet.
@@ -1235,12 +1405,15 @@ def write_outputs(result: dict, rows: list[dict], cands: dict, out: Path, cfg: d
         w = csv.writer(fh)
         w.writerow(["district", "pres_2024_margin_r", "rep", "dem"]
                    + [c["label"] for c in result["columns"]]
-                   + ["r_total", "d_total", "advantage_d_minus_r", "filed_last_7_days", "total"])
+                   + ["r_total", "d_total", "advantage_d_minus_r", "filed_last_7_days", "total",
+                      "third_party_for", "third_party_against"])
         for r in result["races"]:
             w.writerow([r["district"], r["pres"] if r["pres"] is not None else "",
                         (r["rep"] or {}).get("name", ""), (r["dem"] or {}).get("name", "")]
                        + [r["cols"].get(k, 0) for k in keys]
-                       + [r["r_total"], r["d_total"], r["adv"], r["new7"], r["total"]])
+                       + [r["r_total"], r["d_total"], r["adv"], r["new7"], r["total"],
+                          round(sum(t["for"] for t in r.get("third", [])), 2),
+                          round(sum(t["against"] for t in r.get("third", [])), 2)])
 
     with open(out / "transactions.csv", "w", newline="") as fh:
         w = csv.writer(fh)
@@ -1392,6 +1565,7 @@ def main() -> int:
             source_coord["latest_transaction"] = max((r["date"] for r in coord_rows if r["date"]), default="")
 
     rows = apply_exclusions_and_aliases(rows, master, cfg, stats)
+    merge_name_variants(rows, master, cfg, stats)
     cands, party_notes = resolve_candidates(rows, master, cfg)
     result = build(cfg, rows, cands, load_pres_margins(pres_path), excluded)
 
