@@ -293,9 +293,19 @@ candidates = [
   "CA47:BAUGH",     # Scott Baugh (CA-47)
   "RYAN ZINKE",     # MT-01 incumbent, retired; not on the November ballot
 ]
+# Single filings (FEC file number) or lines (FILE:TRANSACTION_ID) to leave out.
+transactions = [
+  "1893746",   # Orange County PAC for Derek Tran (CA-45): 2024 phone banking, filed late in 2025
+]
 # Races to leave out entirely (spending there was for special elections).
 races = ["GA14", "CA01", "FL06", "TN07",
          "KS00", "SC00"]   # KS00/SC00: Senate spending (Marshall, Andrews) mis-filed as House
+
+# Filings that left support/oppose blank. Key = FEC file number (or FILE:TRANSACTION_ID);
+# value = "S" (support) or "O" (oppose).
+[support_oppose_fixes]
+"2019555:F57.000002" = "O"   # Stand Up for Ohio vs Carey Coleman (OH-13), "Deserves Better" canvass lit
+"2017728" = "S"   # Arizona Farm Bureau Federation for Juan Ciscomani (AZ-06), "Support Juan Ciscomani"
 
 # ---------------------------------------------------------------------------
 # Spending categories for the per-group breakdown (independent expenditures only;

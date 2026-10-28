@@ -897,6 +897,22 @@ def apply_exclusions_and_aliases(rows: list[dict], master: dict, cfg: dict, stat
     """1) Drop rows for candidates listed under [exclusions] (by name or key).
     2) A candidate key with no usable party (an unrecognized or old FEC ID, or a name-only
     filing) is folded into the candidate with the same name in the same race who has one."""
+    # Single filings or lines to leave out, and fixes for filings that left support/oppose blank.
+    # Keys are an FEC file number (every line in it) or FILE:TRANSACTION_ID.
+    ex_tx = {str(e).strip().upper() for e in cfg.get("exclusions", {}).get("transactions", [])}
+    so_fix = {str(k).strip().upper(): str(v).strip().upper()[:1] for k, v in cfg.get("support_oppose_fixes", {}).items()}
+    fixed = []
+    for r in rows:
+        keys = (r["file_num"], f"{r['file_num']}:{r['tran_id']}".upper())
+        if any(k in ex_tx for k in keys):
+            stats["excluded_transactions"] += 1
+            continue
+        fix = next((so_fix[k] for k in keys if k in so_fix), "")
+        if fix in ("S", "O") and r["so"] not in ("S", "O"):
+            r["so"] = fix
+            stats["support_oppose_fixed"] += 1
+        fixed.append(r)
+    rows = fixed
     ex_entries = [e.strip().upper() for e in cfg.get("exclusions", {}).get("candidates", [])]
     ex_keys = {e for e in ex_entries if ":" in e or re.fullmatch(r"[HSP][0-9A-Z]{8}", e)}
     ex_names = [set(name_tokens(e)[0]) for e in ex_entries if e not in ex_keys]
