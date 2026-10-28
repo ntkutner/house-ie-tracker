@@ -131,7 +131,7 @@ tr.detail td{padding:0 0 14px;background:var(--paper);text-align:left}
 .sp .meta{grid-column:1/-1;color:var(--muted);font-weight:400;white-space:normal}
 .sp .am{font-variant-numeric:tabular-nums;font-weight:700}
 .detail .links{grid-column:1/-1;font:500 13px var(--cond)}
-.detail .third{grid-column:1/-1} .detail .third h3{color:var(--o,#6b6f78)}
+.detail .third h3{color:var(--o,#6b6f78)}
 .detail .third .sp .nm small{font-weight:500;color:var(--muted);margin-left:6px}
 .tp{font-size:9px;font-weight:700;color:var(--muted);margin-left:3px;vertical-align:super;letter-spacing:.02em}
 .empty{padding:28px;text-align:center;color:var(--muted)}
@@ -227,6 +227,7 @@ details.notes summary{font:700 15px var(--sans);cursor:pointer}
     <div class="seg" role="group" aria-label="Which races">
       <button type="button" data-view="party" aria-pressed="true">Party races</button>
       <button type="button" data-view="all" aria-pressed="false">All races</button>
+      <button type="button" data-view="third" aria-pressed="false" title="Races with IEs for or against third-party or independent candidates">Third party</button>
     </div>
     <details class="catpick" id="catpick">
       <summary>Spending type: <b id="catsum">All</b></summary>
@@ -314,7 +315,8 @@ function view(r) {
 
 function visible() {
   const q = state.q.trim().toLowerCase();
-  let rows = DATA.races.map(view).filter(r => (state.view === "all" || r.party_race) && (!filtering() || Math.round(r.total) !== 0));
+  let rows = DATA.races.map(view).filter(r => (state.view === "all" || (state.view === "third" ? rawThird(r) > 0 : r.party_race))
+                                              && (!filtering() || Math.round(r.total) !== 0));
   if (q) rows = rows.filter(r => [r.district, r.rep?.name, r.dem?.name, ...r.spenders.map(s => s.name),
                                    ...(r.third || []).flatMap(t => [t.name, ...t.spenders.map(s => s.name)])]
                                   .some(v => (v || "").toLowerCase().includes(q)));
@@ -337,7 +339,7 @@ function cell(f, r) {
   const sp = r.same_party;
   if (f.key === "district") {
     const tag = sp ? `<span class="rtag">${sp.party === "DEM" ? "D v D" : "R v R"}</span>` : (r.note ? `<span class="rtag">${esc(r.note)}</span>` : "");
-    const tp = thirdTotal(r) ? `<span class="tp" title="${esc(money(thirdTotal(r)))} in IEs for or against third-party candidates (click the race; not in the D/R totals)">3P</span>` : "";
+    const tp = thirdTotal(r) ? `<span class="tp" title="${esc(money(thirdTotal(r)))} in IEs for or against third-party candidates (open the race; not in the D/R totals)">3P</span>` : "";
     return `<td class="${f.cls}">${esc(v)}${tp}${tag}</td>`;
   }
   if (f.key === "pres") return `<td>${presCell(r.pres)}</td>`;
@@ -389,12 +391,13 @@ function spPanel(r, s) {
 }
 
 // Independent expenditures for/against third-party and independent candidates (kept out of the D/R totals).
-const thirdTotal = r => filtering() ? 0 : (r.third || []).reduce((a, t) => a + t.for + t.against, 0);
+const rawThird = r => (r.third || []).reduce((a, t) => a + t.for + t.against, 0);
+const thirdTotal = r => filtering() ? 0 : rawThird(r);
 function thirdBlock(r) {
   const tot = thirdTotal(r);
   if (!tot) return "";
   const side = sp => [sp.for ? `${money(sp.for)} for` : "", sp.against ? `${money(sp.against)} against` : ""].filter(Boolean).join(", ");
-  return `<div class="third"><h3>Third-party &amp; independent candidates ${money(tot)} <span style="font-weight:500">(not in the totals above)</span></h3>` +
+  return `<div class="third"><h3>Third-party &amp; independent ${money(tot)} <span style="font-weight:500">(not in D/R totals)</span></h3>` +
     r.third.map(t => `<div class="sp"><span class="nm">${esc(t.name)}<small>${esc(t.party)}</small></span><span class="am">${esc(side(t))}</span>
       <span class="meta">${t.spenders.map(sp => `${sp.id ? `<a href="https://www.fec.gov/data/committee/${esc(sp.id)}/" target="_blank" rel="noopener">${esc(sp.name)}</a>` : esc(sp.name)} ${esc(side(sp))}`).join("; ")}. Latest filing ${esc(fmtDate(t.last))}.</span></div>`).join("") + `</div>`;
 }
@@ -499,7 +502,7 @@ function renderNotes() {
     ${["R","D"].map(sd => tbl([sd === "R" ? "Helping Republicans" : "Helping Democrats", "Races", "Amount"],
       (g.top_other?.[sd] || []).map(o => `<tr><td>${esc(o.name)} <span style="opacity:.6">${esc(o.id)}</span></td><td class="n">${o.races}</td><td class="n">${money(o.amount)}</td></tr>`))).join("")}
     <h4>Third-party and independent candidates</h4>
-    <p>Independent expenditures for or against third-party and independent candidates are listed in each race's detail (races marked <span class="tp">3P</span>) but aren't added to either side's totals. The party label comes from the filers or the FEC candidate file. Total: ${money(DATA.races.reduce((a, r) => a + (r.third || []).reduce((b, t) => b + t.for + t.against, 0), 0))}.</p>
+    <p>Independent expenditures for or against third-party and independent candidates are listed in each race's detail, to the right of the Democratic side (races marked <span class="tp">3P</span>; the Third party button shows only those races), but aren't added to either side's totals. The party label comes from the filers or the FEC candidate file. Total: ${money(DATA.races.reduce((a, r) => a + (r.third || []).reduce((b, t) => b + t.for + t.against, 0), 0))}.</p>
     <h4>Candidates with no usable party (not counted)</h4>
     ${tbl(["Candidate", "District", "Amount"], (g.unassigned || []).map(u => `<tr><td>${esc(u.name)} <span style="opacity:.6">${esc(u.key)}</span></td><td>${esc(u.district)}</td><td class="n">${money(u.amount)}</td></tr>`))}
     <p>Fix these with a party override in config.toml.</p>

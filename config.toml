@@ -111,6 +111,7 @@ coordinated = true   # also count party coordinated expenditures (Schedule F) by
 "CO08:WOOD" = "Libertarian"      # Dave Wood (CO-08)
 "MT00:SHEEDY" = { party = "Libertarian", district = "MT01" }   # Nick Sheedy (MT-01); some filings say MT-00
 "MT01:SHEEDY" = "Libertarian"
+"NJ07:O'TOOLE" = "Stop Israel's Genocide"   # Seamus O'Toole (NJ-07)
 
 # Filings that name a candidate wrongly, to be counted toward the right candidate in the
 # same race. Key = the candidate as Data notes lists it; value = the right last name.
@@ -297,6 +298,7 @@ candidates = [
   "CA47:BAUGH",     # Scott Baugh (CA-47)
   "RYAN ZINKE",     # MT-01 incumbent, retired; not on the November ballot
   "H2SC01127",      # Annie Andrews: running for Senate; Care in Action filed her under her old SC-01 House ID
+  "H2CT05172",      # Christopher Donovan (CT-05): not a 2026 nominee
 ]
 # Single filings (FEC file number) or lines (FILE:TRANSACTION_ID) to leave out.
 transactions = [
