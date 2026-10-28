@@ -964,6 +964,36 @@ def same_tokens(a: str, b: str) -> bool:
     return len(x) >= 2 and len(y) >= 2 and (x <= y or y <= x)
 
 
+def third_party_config(cfg: dict) -> tuple[dict, dict]:
+    """[third_party] in config.toml: "RACE:LASTNAME" (or FEC ID) = "Libertarian", or
+    = { party = "Libertarian", district = "MT01" } to also move filings that named the wrong district."""
+    labels, moves = {}, {}
+    for k, v in cfg.get("third_party", {}).items():
+        k = k.strip().upper()
+        if isinstance(v, dict):
+            if v.get("district"):
+                moves[k] = v["district"].strip().upper()
+            v = v.get("party", "")
+        if v:
+            labels[k] = str(v).strip()
+            if k in moves and ":" in k:   # the label follows the candidate to the right district
+                labels[f"{moves[k]}:{k.split(':', 1)[1]}"] = str(v).strip()
+    return labels, moves
+
+
+def apply_district_fixes(rows: list[dict], cfg: dict, stats: Counter) -> None:
+    _, moves = third_party_config(cfg)
+    by_race = {tuple(k.split(":", 1)): d for k, d in moves.items() if ":" in k}
+    for r in rows:
+        key = r["cand_key"]   # an FEC ID, or RACE:LASTNAME for filings with no ID
+        hit = moves.get(key) or by_race.get((r["district"], last_name(r["cand_name"])))
+        if hit and hit != r["district"]:
+            r["district"] = hit
+            if ":" in key:
+                r["cand_key"] = f"{hit}:{key.split(':', 1)[1]}"
+            stats["district_fixed"] += 1
+
+
 def merge_name_variants(rows: list[dict], master: dict, cfg: dict, stats: Counter) -> None:
     """A second, looser pass after apply_exclusions_and_aliases: a candidate with no party (usually
     a filing that named the candidate in an unusual order) is folded into the candidate in the
@@ -1056,6 +1086,7 @@ def best_district(districts: Counter) -> str:
 
 def resolve_candidates(rows: list[dict], master: dict, cfg: dict) -> tuple[dict, list[dict]]:
     overrides = {k.upper(): norm_party(v) for k, v in cfg.get("party_overrides", {}).items()}
+    tp_labels, _ = third_party_config(cfg)
     agg = defaultdict(lambda: {"districts": Counter(), "parties": Counter(),
                                "names": Counter(), "texts": Counter()})
     for r in rows:
@@ -1085,7 +1116,8 @@ def resolve_candidates(rows: list[dict], master: dict, cfg: dict) -> tuple[dict,
                           "filers_say": a["texts"].most_common(1)[0][0] or "blank",
                           "fec_master_says": m.get("party", "") or "n/a", "counted_as": party or "unassigned"})
         label = "" if party in ("REP", "DEM") else (
-            party_label(next((t for t, _ in a["texts"].most_common() if t), "")) or party_label(m.get("party", "")))
+            find_override(tp_labels, key, best_district(a["districts"]), list(a["names"]) + [m.get("name", "")])
+            or party_label(next((t for t, _ in a["texts"].most_common() if t), "")) or party_label(m.get("party", "")))
         cands[key] = {
             "key": key,
             "name": display_name(m.get("name") or a["names"].most_common(1)[0][0]),
@@ -1571,6 +1603,7 @@ def main() -> int:
             rows += coord_rows
             source_coord["latest_transaction"] = max((r["date"] for r in coord_rows if r["date"]), default="")
 
+    apply_district_fixes(rows, cfg, stats)
     rows = apply_exclusions_and_aliases(rows, master, cfg, stats)
     merge_name_variants(rows, master, cfg, stats)
     cands, party_notes = resolve_candidates(rows, master, cfg)

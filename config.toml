@@ -100,6 +100,15 @@ coordinated = true   # also count party coordinated expenditures (Schedule F) by
 "H4CA45170" = "DEM"    # Derek Tran (CA-45)
 "OH13:SKYES" = "DEM"   # Emilia Sykes (OH-13), misspelled by the filer
 
+# Third-party and independent candidates whose party no filing or FEC record gives. Their IEs show
+# in the race's detail (not in the D/R totals). Key = FEC ID or RACE:LASTNAME; value = the party,
+# or { party = "...", district = "XX01" } to also move filings that named the wrong district.
+[third_party]
+"IA02:STEWART" = "Libertarian"   # Rick Stewart (IA-02)
+"CO08:WOOD" = "Libertarian"      # Dave Wood (CO-08)
+"MT00:SHEEDY" = { party = "Libertarian", district = "MT01" }   # Nick Sheedy (MT-01); some filings say MT-00
+"MT01:SHEEDY" = "Libertarian"
+
 # Filings that name a candidate wrongly, to be counted toward the right candidate in the
 # same race. Key = the candidate as Data notes lists it; value = the right last name.
 [candidate_aliases]
