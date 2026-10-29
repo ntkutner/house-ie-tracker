@@ -1,10 +1,13 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num,outside_group
 IE,FL25,JARED MOSKOWITZ,DEM,S,C00684969,JDCA PAC,71811.85,2026-10-28,2026-10-29,Digital (general),Digital Advertising - Estimate,Rising Tide Interactive,2042969,500135589,,
 IE,FL25,JARED MOSKOWITZ,DEM,S,C00684969,JDCA PAC,10000.0,2026-10-28,2026-10-29,Digital (general),Digital Advertising Production,Rising Tide Interactive,2042969,500135590,,
+IE,AL02,RHETT MARQUES,REP,S,C00782656,ALABAMA CHRISTIAN CONSERVATIVES (ACC),50034.9,2026-10-27,2026-10-29,Direct Mail,Postage and Shipping for Mailers,KAP Print LLC,2042975,SE.4785,,
+IE,AL02,RHETT MARQUES,REP,S,C00782656,ALABAMA CHRISTIAN CONSERVATIVES (ACC),55000.0,2026-10-27,2026-10-29,Digital (general),Online Advertising,Prevail Strategies,2042975,SE.4787,,
 IE,FL22,PIA DANDIYA,DEM,S,C00684969,JDCA PAC,69599.19,2026-10-27,2026-10-29,Digital (general),Digital Advertising - Estimate,Rising Tide Interactive,2042969,500135583,,
 IE,FL22,PIA DANDIYA,DEM,S,C00684969,JDCA PAC,10000.0,2026-10-27,2026-10-29,Digital (general),Digital Advertising Production,Rising Tide Interactive,2042969,500135584,,
 IE,MI10,CHRISTINA HINES,DEM,S,C00684969,JDCA PAC,38785.45,2026-10-27,2026-10-29,Digital (general),Digital Advertising - Estimate,Rising Tide Interactive,2042969,500135585,,
 IE,MI10,CHRISTINA HINES,DEM,S,C00684969,JDCA PAC,10000.0,2026-10-27,2026-10-29,Digital (general),Digital Advertising Production,Rising Tide Interactive,2042969,500135586,,
+IE,AL02,RHETT MARQUES,REP,S,C00782656,ALABAMA CHRISTIAN CONSERVATIVES (ACC),95596.2,2026-10-26,2026-10-29,Direct Mail,Postage and Shipping for Mailers,KAP Print LLC,2042975,SE.4786,,
 IE,CA07,DORIS MATSUI,DEM,S,C00956250,Freedom Horizon PAC,3241.5,2026-10-26,2026-10-29,Texting,Estimated Cost of Text Messages,In Field Pro,2042968,EDT.E.2,,
 IE,CA07,MAI VANG,DEM,O,C00956250,Freedom Horizon PAC,7563.5,2026-10-26,2026-10-29,Texting,Estimated Cost of Text Messages,In Field Pro,2042968,EDT.E.1,,
 IE,FL25,JARED MOSKOWITZ,DEM,S,C00684969,JDCA PAC,195.75,2026-10-25,2026-10-29,Texting,Text Banking - Estimate,Scale To Win,2042969,500135588,,
