@@ -186,6 +186,7 @@ coordinated = true   # also count party coordinated expenditures (Schedule F) by
 "IL17" = { rep = "Dillan Vancil", dem = "Eric Sorensen" }
 "IN02" = { rep = "Rudy Yakym", dem = "Jamee Decio" }
 "IN09" = { rep = "Erin Houchin", dem = "Brad Meyer" }
+"KS02" = { dem = "Don Coover" }
 "KS03" = { rep = "Eric Jenkins", dem = "Sharice Davids" }
 "KY04" = { rep = "Ed Gallrein", dem = "Melissa Strange" }
 "MA01" = { dem = "Richard Neal", note = "No Republican" }
