@@ -1,4 +1,7 @@
 file_number,filed,district,candidate,party,committee_id,amendment,replaced_by_amendment,contributions_counted,amount_counted,fec_link
+2044800,2026-10-31T07:07:35,CO05,JEFF CRANK,REP,C00865592,,,3,7000.0,https://docquery.fec.gov/cgi-bin/forms/C00865592/2044800/
+2044799,2026-10-31T07:05:20,IA03,ZACH NUNN,REP,C00784389,,,8,25000.0,https://docquery.fec.gov/cgi-bin/forms/C00784389/2044799/
+2044798,2026-10-31T07:02:22,NH01,ANTHONY DILORENZO,REP,C00923367,,,3,5541.02,https://docquery.fec.gov/cgi-bin/forms/C00923367/2044798/
 2044796,2026-10-31T05:53:05,MI05,CHRISTIAN A VUKASOVICH,DEM,C00922534,,,1,5000.0,https://docquery.fec.gov/cgi-bin/forms/C00922534/2044796/
 2044792,2026-10-31T00:35:31,CA26,JACQUI V IRWIN,DEM,C00933630,yes,,10,26160.0,https://docquery.fec.gov/cgi-bin/forms/C00933630/2044792/
 2044785,2026-10-30T23:38:44,CA05,THOMAS MCCLINTOCK,REP,C00446815,,,1,2150.0,https://docquery.fec.gov/cgi-bin/forms/C00446815/2044785/
