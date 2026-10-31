@@ -1,4 +1,6 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num,outside_group
+IE,GA01,AMANDA HOLLOWELL,DEM,S,C00753277,BLACK VOTERS MATTER ACTION PAC,25000.0,2026-10-31,2026-10-31,Phones,Phone Banking,Onyx Communications,2045167,SE.4695,,
+IE,GA01,AMANDA HOLLOWELL,DEM,S,C00753277,BLACK VOTERS MATTER ACTION PAC,11000.0,2026-10-31,2026-10-31,Digital (general),Payment for LED Ad displaying Truck,Singleton Consulting,2045167,SE.4693,,
 IE,VA02,ELAINE LURIA,DEM,S,C00685693,CASA in Action PAC,3460.0,2026-10-31,2026-10-31,Canvassing/Lit,Staff Time - Canvassing Management - GOTV - Estimate,CASA in Action,2045100,500014316,,
 IE,PA10,JANELLE STELSON,DEM,S,C00685693,CASA in Action PAC,19658.47,2026-10-31,2026-10-31,Canvassing/Lit,Staff Time - Canvassing Management - GOTV - Estimate,CASA in Action,2045100,500014328,,
 IE,VA02,ELAINE LURIA,DEM,S,C00685693,CASA in Action PAC,6025.74,2026-10-31,2026-10-31,Canvassing/Lit,Door Literature - GOTV - Estimate,Pendulum Creative Group LLC,2045100,500014319,,
@@ -13,6 +15,7 @@ IE,TN09,JUSTIN J. PEARSON,DEM,S,C00606962,Working Families Party PAC,40000.0,202
 IE,NJ02,JEFF VAN DREW,REP,O,C00606962,Working Families Party PAC,20000.0,2026-10-31,2026-10-31,Radio,Radio ads,Red Horse Strategies,2044884,500005182,,
 IE,CA11,CONNIE CHAN,DEM,O,C00922229,Abundant Future,110250.0,2026-10-31,2026-10-31,CTV/Streaming,CTV/OTT Ad Program 10/31 - 11/03/2026 (Estimate),Grassroots Media,2044860,EDT.E.27,,
 IE,CA11,SCOTT WIENER,DEM,S,C00922229,Abundant Future,15750.0,2026-10-31,2026-10-31,CTV/Streaming,CTV/OTT Ad Program 10/31 - 11/03/2026 (Estimate),Grassroots Media,2044860,EDT.E.28,,
+IE,CA22,RANDY VILLEGAS,DEM,S,C00890723,Lucete Leadership Fund,1100.0,2026-10-30,2026-10-31,Phones,Phone Banking 10/30/26,RCBS Payroll,2045170,EDT.E.303,,
 IE,FL22,PIA DANDIYA,DEM,S,C00962688,Floridians for Affordability,14388.7,2026-10-30,2026-10-31,Texting,text messages,"Potomac Campaigns Group, LLC",2045160,E-11,,
 IE,CO04,LAUREN BOEBERT,REP,O,C00936997,Invest in Tomorrow Coalition PAC,11495.42,2026-10-30,2026-10-31,Texting,Texting Program (Estimate),Tusk Strategies,2045128,SE.4265,,Energy
 IE,IN05,VICTORIA SPARTZ,REP,O,C00936997,Invest in Tomorrow Coalition PAC,8025.26,2026-10-30,2026-10-31,Texting,Texting Program (Estimate),Tusk Strategies,2045128,SE.4269,,Energy
