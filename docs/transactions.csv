@@ -1,4 +1,11 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num,outside_group
+IE,VA05,JOHN J. MR. III MCGUIRE,REP,S,C00960658,Virginians for Conservative Leadership PAC,113000.0,2026-11-01,2026-11-01,Texting,Texting,JLK Political Strategies,2045471,SE.4175,,
+IE,OH15,DON RALPH LEONARD,DEM,S,C00959502,Science Victory Fund,607.14,2026-10-31,2026-11-01,Phones,In-Kind: Phone Bank Organizer (Estimate),Stand Up for Science,2045467,500042270,,
+IE,OH15,DON RALPH LEONARD,DEM,S,C00959502,Science Victory Fund,60.96,2026-10-31,2026-11-01,Phones,In-Kind: Phone Bank Software (Estimate),Stand Up for Science,2045467,500042271,,
+IE,OH15,DON RALPH LEONARD,DEM,S,C00959502,Science Victory Fund,571.01,2026-10-31,2026-11-01,Digital (general),In-Kind: Digital Ad Buy (Estimate),Stand Up for Science,2045467,500042266,,
+IE,KY06,ZACH DEMBO,DEM,S,C00959502,Science Victory Fund,571.01,2026-10-31,2026-11-01,Digital (general),In-Kind: Digital Ad Buy (Estimate),Stand Up for Science,2045467,500042267,,
+IE,OH15,MIKE CAREY,REP,O,C00959502,Science Victory Fund,571.01,2026-10-31,2026-11-01,Digital (general),In-Kind: Digital Ad Buy (Estimate),Stand Up for Science,2045467,500042268,,
+IE,KY06,RALPH A ALVARADO,REP,O,C00959502,Science Victory Fund,571.01,2026-10-31,2026-11-01,Digital (general),In-Kind: Digital Ad Buy (Estimate),Stand Up for Science,2045467,500042269,,
 IE,NE01,CHRISTOPHER BACKEMEYER,DEM,O,C00808121,BIG RED LEADERSHIP PAC,14222.18,2026-10-31,2026-11-01,Texting,Text Messaging (Estimate),Remington Research Group,2045442,SE.4337,,
 IE,IA02,JOE MITCHELL,REP,S,C00821439,MAHA PAC,5835.08,2026-10-31,2026-11-01,Texting,Noncontribution account - Text Campaign,"JLK Strategies, LLC",2045427,E198DBC99EA514F31B22,,
 IE,FL13,ANNA PAULINA LUNA,REP,S,C00821439,MAHA PAC,4642.92,2026-10-31,2026-11-01,Texting,Noncontribution account - Text Campaign,"JLK Strategies, LLC",2045427,E3AF09098F93A4B7B859,,
