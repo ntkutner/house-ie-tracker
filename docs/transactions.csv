@@ -1,4 +1,5 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num,outside_group
+IE,IA03,ZACH NUNN,REP,S,C90023839,The Family Leader,19605.07,2026-10-31,2026-11-01,Phones,Phone banking,Campaign HQ,2045265,F57.4122,,
 IE,PA07,BOB BROOKS,DEM,S,C00684258,UnidosUS Action PAC,7500.0,2026-11-03,2026-10-31,Canvassing/Lit,GOTV Canvass and Poll Monitoring - Estimate,AION Group,2045255,500101733,,
 IE,PA08,PAIGE COGNETTI,DEM,S,C00684258,UnidosUS Action PAC,3000.0,2026-11-03,2026-10-31,Canvassing/Lit,GOTV Canvass and Poll Monitoring - Estimate,AION Group,2045255,500101734,,
 IE,PA10,JANELLE STELSON,DEM,S,C00684258,UnidosUS Action PAC,4500.0,2026-11-03,2026-10-31,Canvassing/Lit,GOTV Canvass and Poll Monitoring - Estimate,AION Group,2045255,500101735,,
