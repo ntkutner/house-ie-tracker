@@ -1,4 +1,5 @@
 type,district,candidate,candidate_party,support_oppose,spender_id,spender,amount,date,filed,category,purpose,payee,file_num,tran_id,image_num,outside_group
+IE,AR02,CHRIS JONES,DEM,S,C00678839,Indivisible Action,529.03,2026-10-31,2026-11-01,Phones,Telephone calls (estimate,Scale To Win,2045326,500280623,,
 IE,TN09,JUSTIN J. PEARSON,DEM,S,C00606962,Working Families Party PAC,40000.0,2026-10-31,2026-11-01,Digital (general),Digital ads,Canal Partners Media,2045308,500005183,,
 IE,CA22,RANDY VILLEGAS,DEM,S,C00606962,Working Families Party PAC,2500.0,2026-10-31,2026-11-01,Texting,Texting (estimate),Community Labor Administrative Services,2045308,500005186,,
 IE,NJ02,JEFF VAN DREW,REP,O,C00606962,Working Families Party PAC,20000.0,2026-10-31,2026-11-01,Radio,Radio ads,Red Horse Strategies,2045308,500005182,,
@@ -13,6 +14,7 @@ IE,OH13,EMILIA SYKES,DEM,S,C90021726,OHIO CITIZEN ACTION,2875.0,2026-10-31,2026-
 IE,OH15,DON RALPH LEONARD,DEM,S,C90021726,OHIO CITIZEN ACTION,2875.0,2026-10-31,2026-11-01,Canvassing/Lit,Design and Printing IE Campaign Literature,Peerless Printing,2045273,F57.4365,,
 IE,IA03,ZACH NUNN,REP,S,C90023839,The Family Leader,19605.07,2026-10-31,2026-11-01,Phones,Phone banking,Campaign HQ,2045265,F57.4122,202611019945306973,
 IE,CA07,MAI VANG,DEM,S,C00606962,Working Families Party PAC,2200.0,2026-10-30,2026-11-01,Texting,Texting (estimate),Community Labor Administrative Services,2045308,500005184,,
+IE,AR02,CHRIS JONES,DEM,S,C00678839,Indivisible Action,587.0,2026-10-22,2026-11-01,Texting,Text Messages (estimate),Civitech,2045326,500280622,,
 IE,PA02,BRENDAN F BOYLE,DEM,S,C00684258,UnidosUS Action PAC,1250.0,2026-11-03,2026-10-31,Canvassing/Lit,GOTV Canvass and Poll Monitoring - Estimate,Artist Proof Collective,2045255,500101736,202610319945306938,
 IE,PA07,BOB BROOKS,DEM,S,C00684258,UnidosUS Action PAC,3000.0,2026-11-03,2026-10-31,Canvassing/Lit,GOTV Canvass and Poll Monitoring - Estimate,Madison Hamilton Holdings Co.,2045255,500101732,202610319945306940,
 IE,PA07,BOB BROOKS,DEM,S,C00684258,UnidosUS Action PAC,7500.0,2026-11-03,2026-10-31,Canvassing/Lit,GOTV Canvass and Poll Monitoring - Estimate,AION Group,2045255,500101733,202610319945306936,
