@@ -1,4 +1,10 @@
 file_number,filed,district,candidate,party,committee_id,amendment,replaced_by_amendment,contributions_counted,amount_counted,fec_link
+2046623,2026-11-06T15:29:30,CA43,MAXINE WATERS,DEM,C00167585,,,1,3500.0,https://docquery.fec.gov/cgi-bin/forms/C00167585/2046623/
+2046622,2026-11-06T15:27:43,CA43,MAXINE WATERS,DEM,C00167585,,,1,2500.0,https://docquery.fec.gov/cgi-bin/forms/C00167585/2046622/
+2046621,2026-11-06T15:24:05,CA43,MAXINE WATERS,DEM,C00167585,,,3,5800.0,https://docquery.fec.gov/cgi-bin/forms/C00167585/2046621/
+2046618,2026-11-06T15:18:43,CA43,MAXINE WATERS,DEM,C00167585,,,6,23500.0,https://docquery.fec.gov/cgi-bin/forms/C00167585/2046618/
+2046595,2026-11-06T13:21:51,MD03,SARAH KELLY ELFRETH,DEM,C00855353,yes,,3,8500.0,https://docquery.fec.gov/cgi-bin/forms/C00855353/2046595/
+2046584,2026-11-06T12:24:43,AZ09,PAUL GOSAR,REP,C00461806,,,2,2000.0,https://docquery.fec.gov/cgi-bin/forms/C00461806/2046584/
 2046543,2026-11-06T10:50:18,MA01,NADIA D MILLERON,OTH,C00868927,,,1,2500.0,https://docquery.fec.gov/cgi-bin/forms/C00868927/2046543/
 2046523,2026-11-06T08:22:01,WI03,DERRICK F. VAN ORDEN,REP,C00742007,yes,,5,11500.0,https://docquery.fec.gov/cgi-bin/forms/C00742007/2046523/
 2046441,2026-11-05T14:55:48,FL08,MIKE HARIDOPOLOS,REP,C00877324,,,1,5000.0,https://docquery.fec.gov/cgi-bin/forms/C00877324/2046441/
@@ -225,7 +231,7 @@ file_number,filed,district,candidate,party,committee_id,amendment,replaced_by_am
 2045570,2026-11-01T18:32:16,NY18,PATRICK RYAN,DEM,C00815290,,,2,4500.0,https://docquery.fec.gov/cgi-bin/forms/C00815290/2045570/
 2045569,2026-11-01T18:25:24,WI01,MITCHELL BERMAN,DEM,C00915637,,,15,36500.0,https://docquery.fec.gov/cgi-bin/forms/C00915637/2045569/
 2045567,2026-11-01T18:18:03,CA07,MAI VANG,DEM,C00918037,,,3,8000.0,https://docquery.fec.gov/cgi-bin/forms/C00918037/2045567/
-2045566,2026-11-01T18:16:28,MD03,SARAH KELLY ELFRETH,DEM,C00855353,,,2,7500.0,https://docquery.fec.gov/cgi-bin/forms/C00855353/2045566/
+2045566,2026-11-01T18:16:28,MD03,SARAH KELLY ELFRETH,DEM,C00855353,,yes,0,0.0,https://docquery.fec.gov/cgi-bin/forms/C00855353/2045566/
 2045564,2026-11-01T18:08:44,TX33,COLIN ALLRED,DEM,C00929844,,yes,0,0.0,https://docquery.fec.gov/cgi-bin/forms/C00929844/2045564/
 2045562,2026-11-01T18:05:18,NY03,THOMAS SUOZZI,DEM,C00607200,,,14,33500.0,https://docquery.fec.gov/cgi-bin/forms/C00607200/2045562/
 2045561,2026-11-01T18:04:17,CA03,AMERISH BERA,DEM,C00461061,,,3,8500.0,https://docquery.fec.gov/cgi-bin/forms/C00461061/2045561/
